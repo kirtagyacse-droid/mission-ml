@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# credentials
+credentials.txt
+
+# local sqlite database
+*.db
+*.db-journal
+

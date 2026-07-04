@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id       String     @id @default(cuid())
+  email    String     @unique
+  name     String?
+  image    String?
+  progress Progress[]
+}
+
+model Topic {
+  id    String    @id @default(cuid())
+  title String
+  order Int
+  kind  String    // COURSE_MANUAL | SINGLE_VIDEO | PLAYLIST
+  items Item[]
+}
+
+model Item {
+  id             String     @id @default(cuid())
+  topicId        String
+  topic          Topic      @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title          String
+  order          Int
+  type           String     // MANUAL_MILESTONE | YOUTUBE_VIDEO
+  youtubeVideoId String?
+  playlistId     String?
+  progress       Progress[]
+}
+
+model Progress {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId         String
+  item           Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  completed      Boolean   @default(false)
+  manuallyMarked Boolean   @default(false)
+  watchedSeconds Float?    @default(0)
+  duration       Float?
+  percent        Float?    @default(0)
+  lastPosition   Float?    @default(0)
+  completedAt    DateTime?
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([userId, itemId])
+}
