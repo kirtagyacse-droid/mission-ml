@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 
 function createPrismaClient() {
-  const url = process.env.DATABASE_URL;
-  const isPostgres = url && (url.startsWith("postgres://") || url.startsWith("postgresql://"));
+  const url = process.env.MISSION_ML_PRISMA_DATABASE_URL ?? process.env.DATABASE_URL;
+  const isPostgres = (url && (url.startsWith("postgres://") || url.startsWith("postgresql://"))) || process.env.VERCEL;
 
   if (isPostgres) {
     const { PrismaPg } = require("@prisma/adapter-pg");
     const { Pool } = require("pg");
-    const pool = new Pool({ connectionString: url });
+    const pool = new Pool({ connectionString: url ?? "postgres://localhost/dummy" });
     const adapter = new PrismaPg(pool);
     return new PrismaClient({ adapter });
   } else {
