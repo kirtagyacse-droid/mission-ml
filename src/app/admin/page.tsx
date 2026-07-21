@@ -2,8 +2,8 @@
 
 // Mock useSession to bypass Google Sign-in and automatically load the admin panel
 const useSession = () => ({
-  data: { user: { email: "kirtagyacse2@gmail.com", name: "Kirtagya" } },
-  status: "authenticated" as const,
+  data: { user: { email: "kirtagyacse2@gmail.com", name: "Kirtagya", image: null as string | null } },
+  status: "authenticated" as "authenticated" | "loading" | "unauthenticated",
 });
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";

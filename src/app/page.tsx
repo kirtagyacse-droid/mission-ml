@@ -2,10 +2,10 @@
 
 // Mock useSession to bypass Google Sign-in and automatically load the dashboard
 const useSession = () => ({
-  data: { user: { email: "kirtagyacse2@gmail.com", name: "Kirtagya" } },
-  status: "authenticated" as const,
+  data: { user: { email: "kirtagyacse2@gmail.com", name: "Kirtagya", image: null as string | null } },
+  status: "authenticated" as "authenticated" | "loading" | "unauthenticated",
 });
-const signIn = () => {};
+const signIn = (provider?: string) => {};
 const signOut = () => {};
 import { useEffect, useState, useCallback } from "react";
 import TopicCard from "@/components/TopicCard";
