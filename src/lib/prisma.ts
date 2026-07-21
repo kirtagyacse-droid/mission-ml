@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 function createPrismaClient() {
-  const url = process.env.MISSION_ML_PRISMA_DATABASE_URL ?? process.env.DATABASE_URL;
+  const url = process.env.missionml_PRISMA_DATABASE_URL ?? process.env.MISSION_ML_PRISMA_DATABASE_URL ?? process.env.DATABASE_URL;
   const isPostgres = (url && (url.startsWith("postgres://") || url.startsWith("postgresql://"))) || process.env.VERCEL;
 
   if (isPostgres) {
