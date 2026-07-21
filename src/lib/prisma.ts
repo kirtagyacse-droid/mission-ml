@@ -5,7 +5,11 @@ function createPrismaClient() {
   const isPostgres = url && (url.startsWith("postgres://") || url.startsWith("postgresql://"));
 
   if (isPostgres) {
-    return new PrismaClient();
+    const { PrismaPg } = require("@prisma/adapter-pg");
+    const { Pool } = require("pg");
+    const pool = new Pool({ connectionString: url });
+    const adapter = new PrismaPg(pool);
+    return new PrismaClient({ adapter });
   } else {
     // Dynamically load SQLite dependencies only when needed to prevent build failures on Vercel
     const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
