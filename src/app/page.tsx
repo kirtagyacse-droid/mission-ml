@@ -1,6 +1,12 @@
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+// Mock useSession to bypass Google Sign-in and automatically load the dashboard
+const useSession = () => ({
+  data: { user: { email: "kirtagyacse2@gmail.com", name: "Kirtagya" } },
+  status: "authenticated" as const,
+});
+const signIn = () => {};
+const signOut = () => {};
 import { useEffect, useState, useCallback } from "react";
 import TopicCard from "@/components/TopicCard";
 

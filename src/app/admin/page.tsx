@@ -1,6 +1,10 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+// Mock useSession to bypass Google Sign-in and automatically load the admin panel
+const useSession = () => ({
+  data: { user: { email: "kirtagyacse2@gmail.com", name: "Kirtagya" } },
+  status: "authenticated" as const,
+});
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 

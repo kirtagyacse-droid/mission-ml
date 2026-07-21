@@ -36,15 +36,13 @@ async function main() {
   - ${items.length} Items
   - ${progresses.length} Progress records`);
 
-  // Connect to target PostgreSQL database
+  // Connect to target PostgreSQL database using the driver adapter (required in Prisma 7)
   console.log("Connecting to target PostgreSQL database...");
-  const pgPrisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: pgUrl,
-      },
-    },
-  });
+  const { PrismaPg } = require("@prisma/adapter-pg");
+  const { Pool } = require("pg");
+  const pool = new Pool({ connectionString: pgUrl });
+  const adapter = new PrismaPg(pool);
+  const pgPrisma = new PrismaClient({ adapter });
 
   // Migrate Users
   console.log("Migrating Users...");
