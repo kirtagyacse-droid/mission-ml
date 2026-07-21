@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Session 42 — Non-Gaussian Probability Distributions & Data Transformations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#7c3aed;--primary-dark:#5b21b6;--primary-light:#f5f3ff;--secondary:#2563eb;--secondary-light:#eff6ff;--accent:#059669;--accent-light:#ecfdf5;--warning:#d97706;--warning-light:#fffbeb;--dark:#0f172a;--dark-card:#1e293b;--light:#f8fafc;--border:#e2e8f0;--text-main:#334155;--text-light:#64748b; }
+        @page { size:A4; margin:18mm 15mm 20mm 15mm; }
+        @page cover-page { size:A4; margin:0; }
+        * { box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:var(--text-main); background:white; margin:0; padding:0; line-height:1.7; font-size:10pt; }
+        .cover-page { page-break-after:always; page:cover-page; height:297mm; background:linear-gradient(135deg,#0f172a 0%,#2e1065 45%,#4c1d95 100%); color:white; padding:50mm 30mm 40mm 30mm; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; }
+        .cover-page::before { content:""; position:absolute; top:-20%; right:-15%; width:80%; height:80%; background:radial-gradient(circle,rgba(139,92,246,0.15) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-page::after { content:""; position:absolute; bottom:-10%; left:-8%; width:45%; height:45%; background:radial-gradient(circle,rgba(37,99,235,0.08) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-header { z-index:2; }
+        .cover-badge { display:inline-block; background:linear-gradient(90deg,#8b5cf6,#3b82f6); color:white; font-family:'Outfit',sans-serif; font-size:9pt; font-weight:700; padding:6px 16px; border-radius:9999px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:15px; }
+        .cover-series { font-family:'Outfit',sans-serif; font-size:11pt; color:#94a3b8; font-weight:400; letter-spacing:0.5px; margin-bottom:10px; }
+        .cover-title h1 { font-family:'Outfit',sans-serif; font-size:34pt; line-height:1.15; font-weight:800; border:none; margin:0 0 20px 0; padding:0; background:linear-gradient(to right,#ffffff,#ddd6fe); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .cover-subtitle { font-size:14pt; color:#94a3b8; font-weight:400; margin-bottom:25px; font-family:'Outfit',sans-serif; line-height:1.5; }
+        .cover-topics { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; z-index:2; }
+        .cover-topic-tag { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; font-size:8pt; padding:4px 12px; border-radius:20px; font-family:'Outfit',sans-serif; }
+        .cover-footer { border-top:1px solid rgba(255,255,255,0.1); padding-top:25px; z-index:2; }
+        .cover-author { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:600; color:white; margin-bottom:5px; }
+        .cover-meta { font-size:9pt; color:#64748b; }
+        .toc-page { page-break-after:always; padding-top:10px; }
+        .toc-title { font-family:'Outfit',sans-serif; font-size:20pt; font-weight:800; color:var(--dark); margin-bottom:25px; border-bottom:3px solid var(--primary); padding-bottom:10px; }
+        .toc-section { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; border-bottom:1px dotted #cbd5e1; font-size:10.5pt; }
+        .toc-section-num { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary); min-width:30px; }
+        .toc-section-title { flex:1; font-weight:500; color:var(--dark); }
+        .section-wrapper { page-break-before:always; padding-top:5px; }
+        h1 { font-family:'Outfit',sans-serif; font-size:18pt; font-weight:800; color:var(--dark); margin-top:30px; margin-bottom:12px; border-bottom:2px solid var(--primary); padding-bottom:8px; page-break-after:avoid; }
+        h2 { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:700; color:var(--primary); margin-top:22px; margin-bottom:8px; page-break-after:avoid; }
+        h3 { font-family:'Outfit',sans-serif; font-size:11pt; font-weight:600; color:var(--secondary); margin-top:16px; margin-bottom:6px; page-break-after:avoid; }
+        h4 { font-family:'Outfit',sans-serif; font-size:10pt; font-weight:600; color:#475569; margin-top:12px; margin-bottom:5px; }
+        p { margin-top:0; margin-bottom:10px; text-align:justify; }
+        li { margin-bottom:5px; }
+        ul,ol { margin-top:4px; margin-bottom:12px; padding-left:22px; }
+        strong { color:#1e293b; }
+        .formula-box { background:linear-gradient(135deg,#f5f3ff 0%,#eff6ff 100%); border:1px solid #c7d2fe; border-left:4px solid var(--primary); border-radius:0 8px 8px 0; padding:14px 18px; margin:14px 0; page-break-inside:avoid; }
+        .formula-box .formula-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary-dark); font-size:9pt; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+        .formula-box .formula-content { font-family:'Fira Code',monospace; font-size:10pt; color:#1e293b; line-height:1.8; }
+        .callout { border-radius:0 8px 8px 0; padding:14px 16px; margin:14px 0; page-break-inside:avoid; }
+        .callout-title { font-family:'Outfit',sans-serif; font-weight:700; font-size:9.5pt; margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+        .callout-note { background-color:var(--primary-light); border-left:4px solid var(--primary); }
+        .callout-note .callout-title { color:var(--primary-dark); }
+        .callout-tip { background-color:var(--accent-light); border-left:4px solid var(--accent); }
+        .callout-tip .callout-title { color:#065f46; }
+        .callout-warning { background-color:var(--warning-light); border-left:4px solid var(--warning); }
+        .callout-warning .callout-title { color:#92400e; }
+        .callout-example { background-color:#fdf4ff; border-left:4px solid #a855f7; }
+        .callout-example .callout-title { color:#7e22ce; }
+        .table-wrapper { margin:14px 0; border:1px solid var(--border); border-radius:8px; overflow:hidden; page-break-inside:avoid; }
+        table { width:100%; border-collapse:collapse; font-size:8.5pt; }
+        th { background-color:var(--dark); color:white; font-family:'Outfit',sans-serif; font-weight:600; text-transform:uppercase; font-size:7.5pt; letter-spacing:0.5px; padding:10px 12px; border:none; }
+        td { padding:8px 12px; border:none; border-bottom:1px solid var(--border); vertical-align:top; }
+        tr:last-child td { border-bottom:none; }
+        tr:nth-child(even) { background-color:var(--light); }
+        .comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0; page-break-inside:avoid; }
+        .comparison-card { border:1px solid var(--border); border-radius:8px; padding:14px; background-color:var(--light); }
+        .comparison-card h4 { margin-top:0; color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:5px; }
+        .diagram-box { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:16px; margin:14px 0; text-align:center; font-family:'Fira Code',monospace; font-size:9pt; line-height:1.8; page-break-inside:avoid; }
+        .diagram-box .diagram-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--dark); font-size:10pt; margin-bottom:10px; text-align:left; }
+        pre { background-color:var(--dark-card); color:#f8fafc; padding:14px 16px; border-radius:8px; border:1px solid #334155; font-family:'Fira Code',monospace; font-size:8pt; line-height:1.5; margin:12px 0; overflow:hidden; white-space:pre-wrap; word-break:break-all; page-break-inside:avoid; }
+        code { font-family:'Fira Code',monospace; font-size:8.5pt; background-color:#f1f5f9; color:#0f172a; padding:2px 5px; border-radius:4px; }
+        pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:8pt; }
+        .code-comment { color:#6b7280; } .code-keyword { color:#c084fc; } .code-string { color:#34d399; } .code-function { color:#60a5fa; }
+        .quick-ref { background:linear-gradient(135deg,#0f172a 0%,#2e1065 100%); color:white; border-radius:10px; padding:20px; margin:16px 0; page-break-inside:avoid; }
+        .quick-ref h3 { color:#c084fc; margin-top:0; font-size:12pt; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; }
+        .quick-ref p,.quick-ref li { color:#e2e8f0; }
+        .quick-ref code { background:rgba(255,255,255,0.1); color:#a5b4fc; }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════ COVER ════════════════════ -->
+<div class="cover-page">
+    <div class="cover-header">
+        <div class="cover-badge">📐 Mathematics for Machine Learning</div>
+        <div class="cover-series">CampusX · Data Science Mentorship Program 2023 · Video 6 of 23</div>
+    </div>
+    <div class="cover-title">
+        <h1>NON-GAUSSIAN<br>PROBABILITY<br>DISTRIBUTIONS</h1>
+        <div class="cover-subtitle">Session 42 — Uniform, Log-Normal, and Pareto Distributions · Kurtosis · Data Transformations</div>
+        <div class="cover-topics">
+            <span class="cover-topic-tag">Kurtosis Deep Dive</span>
+            <span class="cover-topic-tag">Uniform Distribution</span>
+            <span class="cover-topic-tag">Log-Normal Distribution</span>
+            <span class="cover-topic-tag">Pareto Distribution</span>
+            <span class="cover-topic-tag">QQ Plots Analysis</span>
+            <span class="cover-topic-tag">Mathematical Transforms</span>
+            <span class="cover-topic-tag">Box-Cox & Yeo-Johnson</span>
+        </div>
+    </div>
+    <div class="cover-footer">
+        <div class="cover-author">Session Notes — Complete Reference</div>
+        <div class="cover-meta">Playlist: Maths for Machine Learning · Instructor: Nitish Singh (CampusX)</div>
+    </div>
+</div>
+
+<!-- ════════════════════ TOC ════════════════════ -->
+<div class="toc-page">
+    <div class="toc-title">📑 Table of Contents</div>
+    <div class="toc-section"><span class="toc-section-num">01</span><span class="toc-section-title">Introduction to Non-Gaussian Distributions</span></div>
+    <div class="toc-section"><span class="toc-section-num">02</span><span class="toc-section-title">Kurtosis & Excess Kurtosis</span></div>
+    <div class="toc-section"><span class="toc-section-num">03</span><span class="toc-section-title">Continuous Uniform Distribution</span></div>
+    <div class="toc-section"><span class="toc-section-num">04</span><span class="toc-section-title">Log-Normal Distribution</span></div>
+    <div class="toc-section"><span class="toc-section-num">05</span><span class="toc-section-title">Pareto Distribution (Power Law)</span></div>
+    <div class="toc-section"><span class="toc-section-num">06</span><span class="toc-section-title">Evaluating Distributions with QQ Plots</span></div>
+    <div class="toc-section"><span class="toc-section-num">07</span><span class="toc-section-title">Why Do We Transform Data?</span></div>
+    <div class="toc-section"><span class="toc-section-num">08</span><span class="toc-section-title">Mathematical Data Transformations</span></div>
+    <div class="toc-section"><span class="toc-section-num">09</span><span class="toc-section-title">Power Transformers — Box-Cox & Yeo-Johnson</span></div>
+    <div class="toc-section"><span class="toc-section-num">10</span><span class="toc-section-title">Sklearn API Integration</span></div>
+    <div class="toc-section"><span class="toc-section-num">11</span><span class="toc-section-title">Python Implementation — Code Examples</span></div>
+    <div class="toc-section"><span class="toc-section-num">12</span><span class="toc-section-title">Quick Reference Card</span></div>
+</div>
+
+<!-- ═══════ SECTION 1 ═══════ -->
+<div class="section-wrapper">
+<h1>1 · Introduction to Non-Gaussian Distributions</h1>
+<p>While the Normal distribution is very common, real-world datasets often do not follow a Gaussian curve. Many domains exhibit patterns that are bounded, highly skewed, or fat-tailed. Modeling these correctly is essential for building accurate statistical models and machine learning pipelines.</p>
+
+<h2>1.1 What are Non-Gaussian Distributions?</h2>
+<p>A non-Gaussian distribution is any probability distribution that does not follow the standard bell-shaped symmetric Gaussian curve. Common characteristics include:</p>
+<ul>
+    <li><strong>Asymmetric shape:</strong> Skewed to the left or right</li>
+    <li><strong>Bounded domains:</strong> Variables that cannot be negative or must fall in a fixed range</li>
+    <li><strong>Heavy tails:</strong> Outliers occur far more frequently than predicted by a normal curve</li>
+    <li><strong>Flat structures:</strong> Outcomes having equal probabilities over an interval</li>
+</ul>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 Why Do We Study Them?</div>
+    <p>Using algorithms that assume Gaussian data (like Linear Regression or Logistic Regression) on highly non-Gaussian features can lead to biased parameters, poor predictions, and incorrect hypothesis test conclusions. Recognizing the type of distribution allows us to choose either non-parametric methods, algorithms that handle arbitrary distributions (like tree-based models), or apply data transformations to make the distribution Gaussian-like.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 2 ═══════ -->
+<div class="section-wrapper">
+<h1>2 · Kurtosis & Excess Kurtosis</h1>
+<p><strong>Kurtosis</strong> is a statistical measure that defines how heavily the tails of a distribution differ from the tails of a normal distribution. It describes the extreme values (outliers) present in the data.</p>
+
+<h2>2.1 The Mathematical Formula</h2>
+<div class="formula-box">
+    <div class="formula-title">Kurtosis Formula (Fourth Standardized Moment)</div>
+    <div class="formula-content">
+        Kurtosis (β₂) = E[(X − μ)⁴] / σ⁴
+
+        Excess Kurtosis = Kurtosis − 3
+    </div>
+</div>
+
+<h2>2.2 Three Types of Kurtosis</h2>
+<div class="comparison-grid">
+    <div class="comparison-card">
+        <h4>📊 Mesokurtic (Kurtosis = 3)</h4>
+        <p>This is the baseline behavior of the <strong>Normal Distribution</strong>. Its excess kurtosis is exactly <strong>0</strong>.</p>
+        <p>Outliers occur at standard expected rates.</p>
+    </div>
+    <div class="comparison-card">
+        <h4>📊 Leptokurtic (Kurtosis > 3)</h4>
+        <p>Excess kurtosis is positive (<strong>> 0</strong>). The distribution has <strong>heavy tails</strong> and a sharp, tall peak.</p>
+        <p><strong>Think:</strong> High risk of extreme outliers. Examples: Laplace and Student's t-distributions.</p>
+    </div>
+</div>
+
+<div class="comparison-grid" style="grid-template-columns: 1fr; width: 50%;">
+    <div class="comparison-card">
+        <h4>📊 Platykurtic (Kurtosis &lt; 3)</h4>
+        <p>Excess kurtosis is negative (<strong>&lt; 0</strong>). The distribution has <strong>thin tails</strong> and a flatter, shorter peak.</p>
+        <p><strong>Think:</strong> Low risk of outliers. Example: Uniform distribution.</p>
+    </div>
+</div>
+
+<div class="diagram-box">
+    <div class="diagram-title">📊 Visualizing Kurtosis Types</div>
+    <pre style="background:transparent;color:#334155;border:none;text-align:left;padding:0;font-size:9.5pt;">
+                ▲
+                │         ▲  Leptokurtic (positive excess, sharp peak, fat tails)
+                │        ╱ ╲
+                │       ╱│  ╲
+                │      │ │   │  Mesokurtic (Normal, excess = 0)
+                │     ╱  │    ╲
+                │    ╱   │     ╲ 
+                │  _╱____│_____╲_  Platykurtic (negative excess, flat peak, thin tails)
+                └──────────────────────► x
+    </pre>
+</div>
+</div>
+
+<!-- ═══════ SECTION 3 ═══════ -->
+<div class="section-wrapper">
+<h1>3 · Continuous Uniform Distribution</h1>
+<p>The <strong>Continuous Uniform Distribution</strong> describes an experiment where every outcome within a bounded interval $[a, b]$ is equally likely to occur.</p>
+
+<h2>3.1 PDF and CDF Formulas</h2>
+<div class="formula-box">
+    <div class="formula-title">Uniform Distribution Formulas</div>
+    <div class="formula-content">
+        PDF:  f(x) = 1 / (b − a)      for a ≤ x ≤ b, and 0 elsewhere
+
+        CDF:  F(x) = (x − a) / (b − a)  for a ≤ x ≤ b
+    </div>
+</div>
+
+<h2>3.2 Properties</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Property</th><th>Formula / Value</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Notation</strong></td><td>X ~ U(a, b)</td></tr>
+        <tr><td><strong>Mean (Expected Value)</strong></td><td>E[X] = (a + b) / 2</td></tr>
+        <tr><td><strong>Variance</strong></td><td>Var(X) = (b − a)² / 12</td></tr>
+        <tr><td><strong>Standard Deviation</strong></td><td>σ = (b − a) / √12</td></tr>
+        <tr><td><strong>Skewness</strong></td><td>0 (perfectly symmetric)</td></tr>
+        <tr><td><strong>Kurtosis</strong></td><td>1.8 (excess kurtosis = −1.2 → platykurtic)</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Real-World Use Case</div>
+    <p>• <strong>Random number generation:</strong> Generating a random floating-point number between 0 and 1 (np.random.rand()).<br>
+    • <strong>Uniform priors:</strong> Used in Bayesian statistics when we want to express complete uncertainty about a parameter's range.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 4 ═══════ -->
+<div class="section-wrapper">
+<h1>4 · Log-Normal Distribution</h1>
+<p>A continuous random variable X is <strong>log-normally distributed</strong> if its natural logarithm $Y = \ln(X)$ follows a Normal distribution.</p>
+
+<h2>4.1 PDF and CDF</h2>
+<div class="formula-box">
+    <div class="formula-title">Log-Normal PDF</div>
+    <div class="formula-content">
+        f(x) = (1 / (x·σ·√(2π))) · e^[−(ln(x) − μ)² / (2σ²)]      for x > 0
+
+        where:
+        μ and σ are the mean and standard deviation of the variable's ln(X)
+        (NOT the mean and standard deviation of X itself).
+    </div>
+</div>
+
+<h2>4.2 Properties</h2>
+<ul>
+    <li><strong>Domain:</strong> $(0, +\infty)$. A log-normal variable can never take negative values or zero.</li>
+    <li><strong>Shape:</strong> Right-skewed (positively skewed) distribution.</li>
+    <li><strong>Mean of X:</strong> $e^{\mu + \sigma^2/2}$</li>
+    <li><strong>Median of X:</strong> $e^{\mu}$</li>
+    <li><strong>Mode of X:</strong> $e^{\mu - \sigma^2}$</li>
+    <li><strong>Relationship:</strong> As $\sigma \to 0$, the log-normal distribution approaches a normal shape.</li>
+</ul>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Real-World Examples</div>
+    <p>• <strong>Income and wealth distribution:</strong> Most people earn near the median, but a small fraction earns exponentially more.<br>
+    • <strong>Biometric properties:</strong> Rainfall amounts, incubation periods of diseases, sizes of living organisms.<br>
+    • <strong>Finance:</strong> Stock prices are often modeled as log-normal because prices cannot drop below zero.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 5 ═══════ -->
+<div class="section-wrapper">
+<h1>5 · Pareto Distribution (Power Law)</h1>
+<p>The <strong>Pareto Distribution</strong> is a power-law probability distribution that is widely used to describe social, scientific, and geophysical phenomena. It is highly skewed and features an extremely heavy tail, embodying the famous "80/20 rule".</p>
+
+<h2>5.1 Formulas</h2>
+<div class="formula-box">
+    <div class="formula-title">Pareto Distribution Formulas</div>
+    <div class="formula-content">
+        PDF:  f(x) = (α · x_m^α) / x^(α + 1)      for x ≥ x_m
+
+        CDF:  F(x) = 1 − (x_m / x)^α             for x ≥ x_m
+
+        where:
+        x_m = scale parameter (minimum possible value of X, must be > 0)
+        α   = shape parameter (tail index, determines thickness of tail)
+    </div>
+</div>
+
+<h2>5.2 Properties</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Property</th><th>Condition / Value</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Mean</strong></td><td>E[X] = (α · x_m) / (α − 1) &nbsp; (only defined if α > 1)</td></tr>
+        <tr><td><strong>Variance</strong></td><td>Var(X) = (α · x_m²) / ((α − 1)²(α − 2)) &nbsp; (only defined if α > 2)</td></tr>
+        <tr><td><strong>80/20 Rule</strong></td><td>Approximately 80% of effects come from 20% of causes (occurs when α ≈ 1.16)</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Real-World Examples</div>
+    <p>• <strong>Wealth distribution:</strong> 80% of the world's wealth is owned by 20% of the population.<br>
+    • <strong>City sizes:</strong> A few cities have massive populations, while most have very small populations.<br>
+    • <strong>Software engineering:</strong> 80% of execution time is spent running 20% of the code.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 6 ═══════ -->
+<div class="section-wrapper">
+<h1>6 · Evaluating Distributions with QQ Plots</h1>
+<p>The <strong>Quantile-Quantile (Q-Q) Plot</strong> is an essential visual diagnostic tool to check if empirical data matches a theoretical distribution (usually Normal, but can be set to any distribution).</p>
+
+<div class="diagram-box">
+    <div class="diagram-title">📊 Q-Q Plot Deviation Signatures (compared to Normal)</div>
+    <pre style="background:transparent;color:#334155;border:none;text-align:left;padding:0;font-size:9.5pt;">
+   1. Uniform (Thin Tails)            2. Log-Normal (Skewed)           3. Pareto (Very Heavy Tail)
+       
+       y (Data)                           y (Data)                         y (Data)
+         ▲                                  ▲                                ▲
+         │       /───                       │       /                        │       /
+         │      ╱                           │     _╱                         │     _╱
+         │     ╱                            │   _╱                           │    ╱  
+         │   _╱                             │  ╱                             │   │   
+         │───/                              │_╱                              │__╱    
+         └─────────────► x (Theoretical)    └─────────────► x (Theoretical)  └─────────────► x
+         Ends flatten out.                  Curves upwards on right side.    Severe upward spike
+                                                                             on the right tail.
+    </pre>
+</div>
+</div>
+
+<!-- ═══════ SECTION 7 ═══════ -->
+<div class="section-wrapper">
+<h1>7 · Why Do We Transform Data?</h1>
+<p>Many classic machine learning models assume that numerical features follow a Normal (Gaussian) distribution. Transforming data is the process of modifying the scale of our features to satisfy this assumption.</p>
+
+<h2>7.1 Model Assumptions</h2>
+<ul>
+    <li><strong>Linear Models:</strong> Linear and Logistic Regression assume that the residuals (errors) are normally distributed.</li>
+    <li><strong>Parametric Models:</strong> Linear Discriminant Analysis (LDA) and Gaussian Naive Bayes assume normal distributions of the features.</li>
+    <li><strong>Distance-based models:</strong> Highly skewed features can distort distance metrics (e.g., KNN, K-Means).</li>
+</ul>
+
+<h2>7.2 Benefits of Normality Transformations</h2>
+<ol>
+    <li><strong>Stabilizes variance:</strong> Makes variance homoscedastic (constant across the range of predictions)</li>
+    <li><strong>Reduces the influence of outliers:</strong> Expands dense regions and compresses sparse, long-tailed regions</li>
+    <li><strong>Linearizes relationships:</strong> Makes non-linear relationships more linear</li>
+    <li><strong>Improves model convergence:</strong> Gradient descent algorithms converge much faster on normally scaled features</li>
+</ol>
+</div>
+
+<!-- ═══════ SECTION 8 ═══════ -->
+<div class="section-wrapper">
+<h1>8 · Mathematical Data Transformations</h1>
+
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Transformation</th><th>Formula</th><th>Use Case</th><th>Limitations</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Log Transform</strong></td><td>X' = ln(X) &nbsp; or &nbsp; ln(X + 1)</td><td>Highly right-skewed data, log-normal data</td><td>Cannot handle zero or negative values (use ln(X+1) for zero)</td></tr>
+        <tr><td><strong>Reciprocal Transform</strong></td><td>X' = 1 / X</td><td>Inverts large and small values (e.g., speed to travel time)</td><td>Cannot handle zero values</td></tr>
+        <tr><td><strong>Square Root</strong></td><td>X' = √X</td><td>Moderate right-skewed data, count data (Poisson)</td><td>Cannot handle negative values</td></tr>
+        <tr><td><strong>Square Transform</strong></td><td>X' = X²</td><td>Left-skewed data (left tail compression)</td><td>Usually applied to negative/bounded ranges</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-warning">
+    <div class="callout-title">⚠️ Transform Target vs Features</div>
+    <p>In regression, we often transform the <strong>target variable (y)</strong> to stabilize residual variance. If you transform the target, remember to apply the <strong>inverse transform</strong> (e.g., $e^{y'}$ for log transform) to your predictions to return them to the original scale.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 9 ═══════ -->
+<div class="section-wrapper">
+<h1>9 · Power Transformers — Box-Cox & Yeo-Johnson</h1>
+<p>Rather than manually guessing which mathematical function to apply, we can use **Power Transformers** which automatically find the optimal mathematical parameter ($\lambda$) to make the data as Gaussian-like as possible.</p>
+
+<h2>9.1 Box-Cox Transformation</h2>
+<div class="formula-box">
+    <div class="formula-title">Box-Cox Transformation Formula</div>
+    <div class="formula-content">
+        y_i^(λ) = (x_i^λ − 1) / λ      if λ ≠ 0
+
+        y_i^(λ) = ln(x_i)              if λ = 0
+
+        Constraint: x_i must be strictly greater than 0 (x_i > 0).
+    </div>
+</div>
+
+<h2>9.2 Yeo-Johnson Transformation</h2>
+<p>The Yeo-Johnson transformation is an extension of the Box-Cox transformation that allows for <strong>zero and negative values</strong>.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Yeo-Johnson Transformation Formula</div>
+    <div class="formula-content">
+        y_i^(λ) = ((x_i + 1)^λ − 1) / λ       if λ ≠ 0, x_i ≥ 0
+        y_i^(λ) = ln(x_i + 1)                 if λ = 0, x_i ≥ 0
+        y_i^(λ) = −((−x_i + 1)^(2−λ) − 1)/(2−λ) if λ ≠ 2, x_i < 0
+        y_i^(λ) = −ln(−x_i + 1)               if λ = 2, x_i < 0
+    </div>
+</div>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 Finding the Optimal Lambda</div>
+    <p>Algorithms like Maximum Likelihood Estimation (MLE) or Pearson correlation optimization are used in background libraries to scan potential $\lambda$ values and pick the one that maximizes the normality of the output.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 10 ═══════ -->
+<div class="section-wrapper">
+<h1>10 · Sklearn API Integration</h1>
+<p>Scikit-Learn provides dedicated classes to apply these transformations in machine learning pipelines.</p>
+
+<h3>1. FunctionTransformer</h3>
+<p>Used to apply custom mathematical functions (like log, sqrt, reciprocal) within pipelines.</p>
+
+<h3>2. PowerTransformer</h3>
+<p>Used to automatically apply Box-Cox or Yeo-Johnson transformations to features.</p>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 Pipeline Safety</div>
+    <p>Using <code>PowerTransformer</code> from Scikit-Learn is essential because it learns the optimal parameters ($\lambda$, mean, scale) on the **training set** and applies those same parameters to the **test set**, preventing data leakage.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 11 ═══════ -->
+<div class="section-wrapper">
+<h1>11 · Python Implementation — Code Examples</h1>
+
+<h2>11.1 Plotting Non-Gaussian Distributions</h2>
+<pre><code><span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np
+<span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt
+<span class="code-keyword">from</span> scipy <span class="code-keyword">import</span> stats
+<span class="code-keyword">import</span> seaborn <span class="code-keyword">as</span> sns
+
+<span class="code-comment"># Generate Uniform, Log-Normal, and Pareto distributions</span>
+np.random.seed(42)
+uniform_data = np.random.uniform(low=0, high=10, size=1000)
+lognormal_data = np.random.lognormal(mean=1, sigma=0.6, size=1000)
+pareto_data = (np.random.pareto(a=2, size=1000) + 1) * 2  <span class="code-comment"># scale=2, alpha=2</span>
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+sns.histplot(uniform_data, kde=<span class="code-keyword">True</span>, ax=axes[0], color=<span class="code-string">'#3b82f6'</span>)
+axes[0].set_title(<span class="code-string">'Uniform Distribution'</span>)
+
+sns.histplot(lognormal_data, kde=<span class="code-keyword">True</span>, ax=axes[1], color=<span class="code-string">'#7c3aed'</span>)
+axes[1].set_title(<span class="code-string">'Log-Normal Distribution'</span>)
+
+sns.histplot(pareto_data, kde=<span class="code-keyword">True</span>, ax=axes[2], color=<span class="code-string">'#059669'</span>)
+axes[2].set_xlim(0, 20)
+axes[2].set_title(<span class="code-string">'Pareto Distribution (Power Law)'</span>)
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h2>11.2 Calculating Kurtosis</h2>
+<pre><code><span class="code-comment"># Calculate excess kurtosis (Fisher's definition, where Normal = 0)</span>
+k_uni = stats.kurtosis(uniform_data, fisher=<span class="code-keyword">True</span>)
+k_log = stats.kurtosis(lognormal_data, fisher=<span class="code-keyword">True</span>)
+k_par = stats.kurtosis(pareto_data, fisher=<span class="code-keyword">True</span>)
+
+<span class="code-function">print</span>(f<span class="code-string">"Uniform excess kurtosis: {k_uni:.4f} (Platykurtic)"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"Log-Normal excess kurtosis: {k_log:.4f} (Leptokurtic)"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"Pareto excess kurtosis: {k_par:.4f} (Highly Leptokurtic)"</span>)
+</code></pre>
+
+<h2>11.3 FunctionTransformer in Pipelines</h2>
+<pre><code><span class="code-keyword">from</span> sklearn.preprocessing <span class="code-keyword">import</span> FunctionTransformer
+<span class="code-keyword">from</span> sklearn.pipeline <span class="code-keyword">import</span> Pipeline
+<span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd
+
+df = pd.DataFrame({<span class="code-string">'salary'</span>: [50000, 80000, 120000, 300000, 1000000]})
+
+<span class="code-comment"># Apply Log Transform using Sklearn FunctionTransformer</span>
+log_transformer = FunctionTransformer(np.log1p)  <span class="code-comment"># log(x + 1)</span>
+df_transformed = log_transformer.transform(df)
+<span class="code-function">print</span>(df_transformed)
+</code></pre>
+
+<h2>11.4 PowerTransformer (Box-Cox & Yeo-Johnson)</h2>
+<pre><code><span class="code-keyword">from</span> sklearn.preprocessing <span class="code-keyword">import</span> PowerTransformer
+
+<span class="code-comment"># Box-Cox requires values > 0</span>
+pt_box = PowerTransformer(method=<span class="code-string">'box-cox'</span>)
+boxcox_salary = pt_box.fit_transform(df[[<span class="code-string">'salary'</span>]])
+<span class="code-function">print</span>(f<span class="code-string">"Box-Cox Lambda: {pt_box.lambdas_[0]:.4f}"</span>)
+
+<span class="code-comment"># Yeo-Johnson can handle negative/zero values</span>
+pt_yeo = PowerTransformer(method=<span class="code-string">'yeo-johnson'</span>)
+yeo_salary = pt_yeo.fit_transform(df[[<span class="code-string">'salary'</span>]])
+<span class="code-function">print</span>(f<span class="code-string">"Yeo-Johnson Lambda: {pt_yeo.lambdas_[0]:.4f}"</span>)
+</code></pre>
+</div>
+
+<!-- ═══════ SECTION 12 ═══════ -->
+<div class="section-wrapper">
+<h1>12 · Quick Reference Card</h1>
+
+<div class="quick-ref">
+    <h3>🚀 Session 42 — Non-Gaussian Distributions Cheat Sheet</h3>
+
+    <h4 style="color:#a5b4fc; margin-top:14px;">Kurtosis Summary</h4>
+    <ul>
+        <li><strong>Mesokurtic:</strong> Kurtosis = 3 (Excess = 0) → Normal behavior</li>
+        <li><strong>Leptokurtic:</strong> Kurtosis > 3 (Excess > 0) → Heavy tails, high outlier risk</li>
+        <li><strong>Platykurtic:</strong> Kurtosis < 3 (Excess < 0) → Flat shape, thin tails</li>
+    </ul>
+
+    <h4 style="*color:#a5b4fc; margin-top:14px;">Key Distributions</h4>
+    <ul>
+        <li><strong>Uniform:</strong> PDF = 1/(b−a), Flat probability density</li>
+        <li><strong>Log-Normal:</strong> Bounded [0, ∞), Right-skewed. ln(X) follows Normal</li>
+        <li><strong>Pareto:</strong> Heavy-tailed power law. 80/20 rule</li>
+    </ul>
+
+    <h4 style="color:#a5b4fc; margin-top:14px;">Data Transformations</h4>
+    <ul>
+        <li><strong>Log:</strong> Compresses right-skewed data. Handles exponential relationships</li>
+        <li><strong>Square Root:</strong> Good for moderately right-skewed and count data</li>
+        <li><strong>Reciprocal:</strong> 1/x transform, flips scales</li>
+        <li><strong>Box-Cox:</strong> Power transform. Automatically finds best λ. Requires data > 0</li>
+        <li><strong>Yeo-Johnson:</strong> Power transform. Works on positive, zero, and negative data</li>
+    </ul>
+
+    <h4 style="color:#a5b4fc; margin-top:14px;">Python Sklearn API</h4>
+    <ul>
+        <li><code>FunctionTransformer(np.log1p)</code> — Custom custom transformations</li>
+        <li><code>PowerTransformer(method='box-cox')</code> — Automatic power transformation</li>
+        <li><code>PowerTransformer(method='yeo-johnson')</code> — Zero/negative value friendly</li>
+    </ul>
+</div>
+
+<div class="callout callout-note" style="margin-top:20px;">
+    <div class="callout-title">📚 What's Next? → Central Limit Theorem (Session 43)</div>
+    <p>The next session covers the **Central Limit Theorem (CLT)**, explaining how sample means converge to a normal distribution regardless of the underlying population distribution, forming the core of inferential statistics.</p>
+</div>
+</div>
+
+</body>
+</html>

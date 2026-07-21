@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Session 12 — Analysis of Variance (ANOVA)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;--secondary:#7c3aed;--secondary-light:#f5f3ff;--accent:#059669;--accent-light:#ecfdf5;--warning:#d97706;--warning-light:#fffbeb;--dark:#0f172a;--dark-card:#1e293b;--light:#f8fafc;--border:#e2e8f0;--text-main:#334155;--text-light:#64748b; }
+        @page { size:A4; margin:18mm 15mm 20mm 15mm; }
+        @page cover-page { size:A4; margin:0; }
+        * { box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:var(--text-main); background:white; margin:0; padding:0; line-height:1.7; font-size:10pt; }
+        .cover-page { page-break-after:always; page:cover-page; height:297mm; background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 45%,#312e81 100%); color:white; padding:50mm 30mm 40mm 30mm; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; }
+        .cover-page::before { content:""; position:absolute; top:-20%; right:-15%; width:80%; height:80%; background:radial-gradient(circle,rgba(59,130,246,0.15) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-page::after { content:""; position:absolute; bottom:-10%; left:-8%; width:45%; height:45%; background:radial-gradient(circle,rgba(139,92,246,0.08) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-header { z-index:2; }
+        .cover-badge { display:inline-block; background:linear-gradient(90deg,#3b82f6,#8b5cf6); color:white; font-family:'Outfit',sans-serif; font-size:9pt; font-weight:700; padding:6px 16px; border-radius:9999px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:15px; }
+        .cover-series { font-family:'Outfit',sans-serif; font-size:11pt; color:#94a3b8; font-weight:400; letter-spacing:0.5px; margin-bottom:10px; }
+        .cover-title h1 { font-family:'Outfit',sans-serif; font-size:32pt; line-height:1.15; font-weight:800; border:none; margin:0 0 20px 0; padding:0; background:linear-gradient(to right,#ffffff,#c7d2fe); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .cover-subtitle { font-size:14pt; color:#94a3b8; font-weight:400; margin-bottom:25px; font-family:'Outfit',sans-serif; line-height:1.5; }
+        .cover-topics { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; z-index:2; }
+        .cover-topic-tag { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; font-size:8pt; padding:4px 12px; border-radius:20px; font-family:'Outfit',sans-serif; }
+        .cover-footer { border-top:1px solid rgba(255,255,255,0.1); padding-top:25px; z-index:2; }
+        .cover-author { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:600; color:white; margin-bottom:5px; }
+        .cover-meta { font-size:9pt; color:#64748b; }
+        .toc-page { page-break-after:always; padding-top:10px; }
+        .toc-title { font-family:'Outfit',sans-serif; font-size:20pt; font-weight:800; color:var(--dark); margin-bottom:25px; border-bottom:3px solid var(--primary); padding-bottom:10px; }
+        .toc-section { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; border-bottom:1px dotted #cbd5e1; font-size:10.5pt; }
+        .toc-section-num { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary); min-width:30px; }
+        .toc-section-title { flex:1; font-weight:500; color:var(--dark); }
+        .section-wrapper { page-break-before:always; padding-top:5px; }
+        h1 { font-family:'Outfit',sans-serif; font-size:18pt; font-weight:800; color:var(--dark); margin-top:30px; margin-bottom:12px; border-bottom:2px solid var(--primary); padding-bottom:8px; page-break-after:avoid; }
+        h2 { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:700; color:var(--primary); margin-top:22px; margin-bottom:8px; page-break-after:avoid; }
+        h3 { font-family:'Outfit',sans-serif; font-size:11pt; font-weight:600; color:var(--secondary); margin-top:16px; margin-bottom:6px; page-break-after:avoid; }
+        h4 { font-family:'Outfit',sans-serif; font-size:10pt; font-weight:600; color:#475569; margin-top:12px; margin-bottom:5px; }
+        p { margin-top:0; margin-bottom:10px; text-align:justify; }
+        li { margin-bottom:5px; }
+        ul,ol { margin-top:4px; margin-bottom:12px; padding-left:22px; }
+        strong { color:#1e293b; }
+        .formula-box { background:linear-gradient(135deg,#eff6ff 0%,#f5f3ff 100%); border:1px solid #c7d2fe; border-left:4px solid var(--primary); border-radius:0 8px 8px 0; padding:14px 18px; margin:14px 0; page-break-inside:avoid; }
+        .formula-box .formula-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary-dark); font-size:9pt; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+        .formula-box .formula-content { font-family:'Fira Code',monospace; font-size:10pt; color:#1e293b; line-height:1.8; }
+        .callout { border-radius:0 8px 8px 0; padding:14px 16px; margin:14px 0; page-break-inside:avoid; }
+        .callout-title { font-family:'Outfit',sans-serif; font-weight:700; font-size:9.5pt; margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+        .callout-note { background-color:var(--primary-light); border-left:4px solid var(--primary); }
+        .callout-note .callout-title { color:var(--primary-dark); }
+        .callout-tip { background-color:var(--accent-light); border-left:4px solid var(--accent); }
+        .callout-tip .callout-title { color:#065f46; }
+        .callout-warning { background-color:var(--warning-light); border-left:4px solid var(--warning); }
+        .callout-warning .callout-title { color:#92400e; }
+        .callout-example { background-color:#fdf4ff; border-left:4px solid #a855f7; }
+        .callout-example .callout-title { color:#7e22ce; }
+        .table-wrapper { margin:14px 0; border:1px solid var(--border); border-radius:8px; overflow:hidden; page-break-inside:avoid; }
+        table { width:100%; border-collapse:collapse; font-size:8.5pt; }
+        th { background-color:var(--dark); color:white; font-family:'Outfit',sans-serif; font-weight:600; text-transform:uppercase; font-size:7.5pt; letter-spacing:0.5px; padding:10px 12px; border:none; }
+        td { padding:8px 12px; border:none; border-bottom:1px solid var(--border); vertical-align:top; }
+        tr:last-child td { border-bottom:none; }
+        tr:nth-child(even) { background-color:var(--light); }
+        .comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0; page-break-inside:avoid; }
+        .comparison-card { border:1px solid var(--border); border-radius:8px; padding:14px; background-color:var(--light); }
+        .comparison-card h4 { margin-top:0; color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:5px; }
+        .diagram-box { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:16px; margin:14px 0; text-align:center; font-family:'Fira Code',monospace; font-size:9pt; line-height:1.8; page-break-inside:avoid; }
+        .diagram-box .diagram-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--dark); font-size:10pt; margin-bottom:10px; text-align:left; }
+        pre { background-color:var(--dark-card); color:#f8fafc; padding:14px 16px; border-radius:8px; border:1px solid #334155; font-family:'Fira Code',monospace; font-size:8pt; line-height:1.5; margin:12px 0; overflow:hidden; white-space:pre-wrap; word-break:break-all; page-break-inside:avoid; }
+        code { font-family:'Fira Code',monospace; font-size:8.5pt; background-color:#f1f5f9; color:#0f172a; padding:2px 5px; border-radius:4px; }
+        pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:8pt; }
+        .code-comment { color:#6b7280; } .code-keyword { color:#c084fc; } .code-string { color:#34d399; } .code-function { color:#60a5fa; }
+        .quick-ref { background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); color:white; border-radius:10px; padding:20px; margin:16px 0; page-break-inside:avoid; }
+        .quick-ref h3 { color:#c7d2fe; margin-top:0; font-size:12pt; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; }
+        .quick-ref p,.quick-ref li { color:#e2e8f0; }
+        .quick-ref code { background:rgba(255,255,255,0.1); color:#a5b4fc; }
+    </style>
+</head>
+<body>
+
+<div class="cover-page">
+    <div class="cover-header">
+        <div class="cover-badge">📐 Mathematics for Machine Learning</div>
+        <div class="cover-series">CampusX · Data Science Mentorship Program 2023 · Video 12 of 23</div>
+    </div>
+    <div class="cover-title">
+        <h1>SESSION 12<br>Analysis of Variance (ANOVA)</h1>
+        <div class="cover-subtitle">One-Way ANOVA · F-Distribution · Sum of Squares Partitioning · Post-Hoc Analysis</div>
+        <div class="cover-topics">
+            <span class="cover-topic-tag">What is ANOVA?</span>
+<span class="cover-topic-tag">The F-Distribution & F-Statistic</span>
+<span class="cover-topic-tag">Sum of Squares Decomposition</span>
+<span class="cover-topic-tag">One-Way ANOVA Formulation</span>
+<span class="cover-topic-tag">Degrees of Freedom in ANOVA</span>
+<span class="cover-topic-tag">ANOVA Assumptions</span>
+<span class="cover-topic-tag">Post-Hoc Analysis (Tukey's HSD)</span>
+<span class="cover-topic-tag">Python Code Implementation</span>
+
+        </div>
+    </div>
+    <div class="cover-footer">
+        <div class="cover-author">Session Notes — Complete Reference</div>
+        <div class="cover-meta">Playlist: Maths for Machine Learning · Instructor: Nitish Singh (CampusX)</div>
+    </div>
+</div>
+
+<div class="toc-page">
+    <div class="toc-title">📑 Table of Contents</div>
+    
+        <div class="toc-section">
+            <span class="toc-section-num">01</span>
+            <span class="toc-section-title">What is ANOVA?</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">02</span>
+            <span class="toc-section-title">The F-Distribution & F-Statistic</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">03</span>
+            <span class="toc-section-title">Sum of Squares Decomposition</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">04</span>
+            <span class="toc-section-title">One-Way ANOVA Formulation</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">05</span>
+            <span class="toc-section-title">Degrees of Freedom in ANOVA</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">06</span>
+            <span class="toc-section-title">ANOVA Assumptions</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">07</span>
+            <span class="toc-section-title">Post-Hoc Analysis (Tukey's HSD)</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">08</span>
+            <span class="toc-section-title">Python Code Implementation</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">09</span>
+            <span class="toc-section-title">Quick Reference Card</span>
+        </div>
+        
+</div>
+
+
+        <div class="section-wrapper">
+            <h1>01 · What is ANOVA?</h1>
+            <p><strong>Analysis of Variance (ANOVA)</strong> is a statistical test used to compare the means of <strong>three or more independent groups</strong> simultaneously. It avoids the increased Type I error rate that occurs if we perform multiple pairwise t-tests.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>02 · The F-Distribution & F-Statistic</h1>
+            <p>ANOVA uses the **F-statistic**, which is the ratio of variability between groups to variability within groups:</p>
+                <div class="formula-box">
+                    <div class="formula-title">F-Statistic Formula</div>
+                    <div class="formula-content">
+                        F = Mean Square Between (MSB) / Mean Square Within (MSW)
+                    </div>
+                </div>
+                <p>If $F > 1$ and the p-value $\le lpha$, we reject the null hypothesis that all group means are equal.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>03 · Sum of Squares Decomposition</h1>
+            <p>ANOVA divides the total variance in the data into distinct components:</p>
+                <div class="formula-box">
+                    <div class="formula-title">Partition of Sum of Squares</div>
+                    <div class="formula-content">
+                        SST = SSB + SSW
+
+                        SST = Total Sum of Squares (overall variance)
+                        SSB = Sum of Squares Between groups (treatment effect)
+                        SSW = Sum of Squares Within groups (error/residual variance)
+                    </div>
+                </div>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>04 · One-Way ANOVA Formulation</h1>
+            <p><strong>Null Hypothesis ($H_0$):</strong> $\mu_1 = \mu_2 = ... = \mu_k$ &nbsp; (all group means are equal)<br>
+                <strong>Alternative Hypothesis ($H_a$):</strong> At least one group mean is different from the others.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>05 · Degrees of Freedom in ANOVA</h1>
+            <ul>
+                    <li><strong>Between Groups ($df_{between}$):</strong> $k - 1$ &nbsp; (where $k$ is the number of groups).</li>
+                    <li><strong>Within Groups ($df_{within}$):</strong> $N - k$ &nbsp; (where $N$ is the total sample size across all groups).</li>
+                </ul>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>06 · ANOVA Assumptions</h1>
+            <p>ANOVA assumes:</p>
+                <ol>
+                    <li><strong>Normality:</strong> The residuals (errors) within each group must be normally distributed.</li>
+                    <li><strong>Homogeneity of Variance:</strong> All groups must have approximately equal variances (homoscedasticity).</li>
+                    <li><strong>Independence:</strong> Observations are independent.</li>
+                </ol>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>07 · Post-Hoc Analysis (Tukey's HSD)</h1>
+            <p>ANOVA is an **omnibus test** — it only tells you if *at least one* group is different, but not *which* ones. If ANOVA is significant, we perform **Tukey's Honestly Significant Difference (HSD)** test to check all pairwise comparisons.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>08 · Python Code Implementation</h1>
+            <pre><code>from scipy import stats
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
+# Group data
+g1 = [10, 12, 15, 11, 13]
+g2 = [18, 20, 22, 19, 21]
+g3 = [14, 15, 17, 16, 15]
+
+# Perform One-way ANOVA
+f_stat, p_val = stats.f_oneway(g1, g2, g3)
+print(f"F-statistic: {f_stat:.4f}, p-value: {p_val:.4f}")</code></pre>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>09 · Quick Reference Card</h1>
+            <div class="quick-ref">
+                    <h3>🚀 ANOVA Quick Reference</h3>
+                    <ul>
+                        <li><strong>Use Case:</strong> Comparing means of 3 or more groups.</li>
+                        <li><strong>F-Ratio:</strong> Variance between groups / Variance within groups.</li>
+                        <li><strong>Post-Hoc:</strong> Use Tukey's HSD only if the overall ANOVA is significant.</li>
+                    </ul>
+                </div>
+        </div>
+        
+
+</body>
+</html>

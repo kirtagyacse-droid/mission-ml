@@ -117,9 +117,113 @@ async function main() {
     });
   }
 
+  // ─── Topic 3.5: Mathematics for Machine Learning (Book) ───
+  const topicBook = await prisma.topic.create({
+    data: {
+      title: "Mathematics for Machine Learning (Book)",
+      order: 3,
+      kind: "BOOK",
+    },
+  });
+  const mmlChapters = [
+    "Part I: Chapter 1 — Introduction and Motivation",
+    "Part I: Chapter 2 — Linear Algebra",
+    "Part I: Chapter 3 — Analytic Geometry",
+    "Part I: Chapter 4 — Matrix Decompositions",
+    "Part I: Chapter 5 — Vector Calculus",
+    "Part I: Chapter 6 — Probability and Distributions",
+    "Part I: Chapter 7 — Continuous Optimization",
+    "Part II: Chapter 8 — When Models Meet Data",
+    "Part II: Chapter 9 — Linear Regression",
+    "Part II: Chapter 10 — Dimensionality Reduction with Principal Component Analysis",
+    "Part II: Chapter 11 — Density Estimation with Gaussian Mixture Models",
+    "Part II: Chapter 12 — Classification with Support Vector Machines",
+  ];
+  for (let i = 0; i < mmlChapters.length; i++) {
+    await prisma.item.create({
+      data: {
+        topicId: topicBook.id,
+        title: mmlChapters[i],
+        order: i,
+        type: "MANUAL_MILESTONE",
+      },
+    });
+  }
+  console.log(`✅ Topic: "${topicBook.title}" — added ${mmlChapters.length} book chapters`);
+
+  // ─── Topic 3.6: Hands-on Large Language Models (Book) ──────
+  const topicLlmBook = await prisma.topic.create({
+    data: {
+      title: "Hands-on Large Language Models (Book)",
+      order: 4,
+      kind: "BOOK",
+    },
+  });
+  const llmChapters = [
+    "Part I: Chapter 1 — An Introduction to Large Language Models",
+    "Part I: Chapter 2 — Tokens and Embeddings",
+    "Part I: Chapter 3 — Looking Inside Large Language Models",
+    "Part II: Chapter 4 — Text Classification",
+    "Part II: Chapter 5 — Text Clustering and Topic Modeling",
+    "Part II: Chapter 6 — Prompt Engineering",
+    "Part II: Chapter 7 — Advanced Text Generation Techniques and Tools",
+    "Part II: Chapter 8 — Semantic Search and Retrieval-Augmented Generation",
+    "Part II: Chapter 9 — Multimodal Large Language Models",
+    "Part III: Chapter 10 — Creating Text Embedding Models",
+    "Part III: Chapter 11 — Fine-Tuning Representation Models for Classification",
+    "Part III: Chapter 12 — Fine-Tuning Generation Models",
+  ];
+  for (let i = 0; i < llmChapters.length; i++) {
+    await prisma.item.create({
+      data: {
+        topicId: topicLlmBook.id,
+        title: llmChapters[i],
+        order: i,
+        type: "MANUAL_MILESTONE",
+      },
+    });
+  }
+  console.log(`✅ Topic: "${topicLlmBook.title}" — added ${llmChapters.length} book chapters`);
+
+  // ─── Topic 3.7: Hands-on Machine Learning (Book) ──────────
+  const topicHomlBook = await prisma.topic.create({
+    data: {
+      title: "Hands-on Machine Learning (Book)",
+      order: 5,
+      kind: "BOOK",
+    },
+  });
+  const homlChapters = [
+    "Part I: Chapter 1 — The Machine Learning Landscape",
+    "Part I: Chapter 2 — End-to-End Machine Learning Project",
+    "Part I: Chapter 3 — Classification",
+    "Part I: Chapter 4 — Training Models",
+    "Part I: Chapter 5 — Support Vector Machines",
+    "Part I: Chapter 6 — Decision Trees",
+    "Part I: Chapter 7 — Ensemble Learning and Random Forests",
+    "Part I: Chapter 8 — Dimensionality Reduction",
+    "Part I: Chapter 9 — Unsupervised Learning Techniques",
+    "Part II: Chapter 10 — Introduction to Artificial Neural Networks with Keras",
+    "Part II: Chapter 11 — Training Deep Neural Networks",
+    "Part II: Chapter 12 — Custom Models and Training with TensorFlow",
+    "Part II: Chapter 13 — Loading and Preprocessing Data with TensorFlow",
+    "Part II: Chapter 14 — Deep Computer Vision Using Convolutional Neural Networks",
+  ];
+  for (let i = 0; i < homlChapters.length; i++) {
+    await prisma.item.create({
+      data: {
+        topicId: topicHomlBook.id,
+        title: homlChapters[i],
+        order: i,
+        type: "MANUAL_MILESTONE",
+      },
+    });
+  }
+  console.log(`✅ Topic: "${topicHomlBook.title}" — added ${homlChapters.length} book chapters`);
+
   // ─── Topic 4: Machine Learning (Mixed) ─────────────────────
   const topic4 = await prisma.topic.create({
-    data: { title: "Machine Learning", order: 3, kind: "PLAYLIST" },
+    data: { title: "Machine Learning", order: 6, kind: "PLAYLIST" },
   });
 
   // Standalone items first
@@ -159,51 +263,7 @@ async function main() {
     });
   }
 
-  // Krish Naik ML Playlist
-  const krishPlaylistId = "PLTDARY42LDV7WGmlzZtY-w9pemyPrKNUZ";
-  try {
-    console.log(`  📡 Fetching Krish Naik ML playlist...`);
-    const krishVideos = await fetchPlaylistItems(krishPlaylistId);
-    for (let i = 0; i < krishVideos.length; i++) {
-      const item = await prisma.item.create({
-        data: {
-          topicId: topic4.id,
-          title: krishVideos[i].title,
-          order: mlOrder++,
-          type: "YOUTUBE_VIDEO",
-          youtubeVideoId: krishVideos[i].videoId,
-          playlistId: krishPlaylistId,
-        },
-      });
-      // Mark first 17 as completed
-      if (i < 17) {
-        await prisma.progress.create({
-          data: {
-            userId: user.id,
-            itemId: item.id,
-            completed: true,
-            completedAt: new Date(),
-          },
-        });
-      }
-    }
-    console.log(
-      `✅ Topic: "${topic4.title}" — ${mlStandalone.length} standalone + ${krishVideos.length} Krish Naik videos (17 completed)`
-    );
-  } catch (err: any) {
-    console.warn(
-      `⚠️  Failed to fetch Krish Naik playlist: ${err.message}. Creating placeholder.`
-    );
-    await prisma.item.create({
-      data: {
-        topicId: topic4.id,
-        title: "Krish Naik ML Playlist (import failed — use admin to re-import)",
-        order: mlOrder++,
-        type: "MANUAL_MILESTONE",
-        playlistId: krishPlaylistId,
-      },
-    });
-  }
+  // Moved book chapters to separate Hands-on Machine Learning (Book) topic
 
   // Placeholder items at the end
   const placeholders = ["MLOps", "FastAPI", "MLflow", "Docker"];
@@ -221,7 +281,7 @@ async function main() {
 
   // ─── Topic 5: Deep Learning ────────────────────────────────
   const topic5 = await prisma.topic.create({
-    data: { title: "Deep Learning", order: 4, kind: "COURSE_MANUAL" },
+    data: { title: "Deep Learning", order: 7, kind: "COURSE_MANUAL" },
   });
   await prisma.item.create({
     data: {

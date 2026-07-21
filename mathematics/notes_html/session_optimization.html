@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Session 22 — Mathematical Optimization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;--secondary:#7c3aed;--secondary-light:#f5f3ff;--accent:#059669;--accent-light:#ecfdf5;--warning:#d97706;--warning-light:#fffbeb;--dark:#0f172a;--dark-card:#1e293b;--light:#f8fafc;--border:#e2e8f0;--text-main:#334155;--text-light:#64748b; }
+        @page { size:A4; margin:18mm 15mm 20mm 15mm; }
+        @page cover-page { size:A4; margin:0; }
+        * { box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:var(--text-main); background:white; margin:0; padding:0; line-height:1.7; font-size:10pt; }
+        .cover-page { page-break-after:always; page:cover-page; height:297mm; background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 45%,#312e81 100%); color:white; padding:50mm 30mm 40mm 30mm; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; }
+        .cover-page::before { content:""; position:absolute; top:-20%; right:-15%; width:80%; height:80%; background:radial-gradient(circle,rgba(59,130,246,0.15) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-page::after { content:""; position:absolute; bottom:-10%; left:-8%; width:45%; height:45%; background:radial-gradient(circle,rgba(139,92,246,0.08) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-header { z-index:2; }
+        .cover-badge { display:inline-block; background:linear-gradient(90deg,#3b82f6,#8b5cf6); color:white; font-family:'Outfit',sans-serif; font-size:9pt; font-weight:700; padding:6px 16px; border-radius:9999px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:15px; }
+        .cover-series { font-family:'Outfit',sans-serif; font-size:11pt; color:#94a3b8; font-weight:400; letter-spacing:0.5px; margin-bottom:10px; }
+        .cover-title h1 { font-family:'Outfit',sans-serif; font-size:32pt; line-height:1.15; font-weight:800; border:none; margin:0 0 20px 0; padding:0; background:linear-gradient(to right,#ffffff,#c7d2fe); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .cover-subtitle { font-size:14pt; color:#94a3b8; font-weight:400; margin-bottom:25px; font-family:'Outfit',sans-serif; line-height:1.5; }
+        .cover-topics { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; z-index:2; }
+        .cover-topic-tag { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; font-size:8pt; padding:4px 12px; border-radius:20px; font-family:'Outfit',sans-serif; }
+        .cover-footer { border-top:1px solid rgba(255,255,255,0.1); padding-top:25px; z-index:2; }
+        .cover-author { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:600; color:white; margin-bottom:5px; }
+        .cover-meta { font-size:9pt; color:#64748b; }
+        .toc-page { page-break-after:always; padding-top:10px; }
+        .toc-title { font-family:'Outfit',sans-serif; font-size:20pt; font-weight:800; color:var(--dark); margin-bottom:25px; border-bottom:3px solid var(--primary); padding-bottom:10px; }
+        .toc-section { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; border-bottom:1px dotted #cbd5e1; font-size:10.5pt; }
+        .toc-section-num { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary); min-width:30px; }
+        .toc-section-title { flex:1; font-weight:500; color:var(--dark); }
+        .section-wrapper { page-break-before:always; padding-top:5px; }
+        h1 { font-family:'Outfit',sans-serif; font-size:18pt; font-weight:800; color:var(--dark); margin-top:30px; margin-bottom:12px; border-bottom:2px solid var(--primary); padding-bottom:8px; page-break-after:avoid; }
+        h2 { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:700; color:var(--primary); margin-top:22px; margin-bottom:8px; page-break-after:avoid; }
+        h3 { font-family:'Outfit',sans-serif; font-size:11pt; font-weight:600; color:var(--secondary); margin-top:16px; margin-bottom:6px; page-break-after:avoid; }
+        h4 { font-family:'Outfit',sans-serif; font-size:10pt; font-weight:600; color:#475569; margin-top:12px; margin-bottom:5px; }
+        p { margin-top:0; margin-bottom:10px; text-align:justify; }
+        li { margin-bottom:5px; }
+        ul,ol { margin-top:4px; margin-bottom:12px; padding-left:22px; }
+        strong { color:#1e293b; }
+        .formula-box { background:linear-gradient(135deg,#eff6ff 0%,#f5f3ff 100%); border:1px solid #c7d2fe; border-left:4px solid var(--primary); border-radius:0 8px 8px 0; padding:14px 18px; margin:14px 0; page-break-inside:avoid; }
+        .formula-box .formula-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary-dark); font-size:9pt; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+        .formula-box .formula-content { font-family:'Fira Code',monospace; font-size:10pt; color:#1e293b; line-height:1.8; }
+        .callout { border-radius:0 8px 8px 0; padding:14px 16px; margin:14px 0; page-break-inside:avoid; }
+        .callout-title { font-family:'Outfit',sans-serif; font-weight:700; font-size:9.5pt; margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+        .callout-note { background-color:var(--primary-light); border-left:4px solid var(--primary); }
+        .callout-note .callout-title { color:var(--primary-dark); }
+        .callout-tip { background-color:var(--accent-light); border-left:4px solid var(--accent); }
+        .callout-tip .callout-title { color:#065f46; }
+        .callout-warning { background-color:var(--warning-light); border-left:4px solid var(--warning); }
+        .callout-warning .callout-title { color:#92400e; }
+        .callout-example { background-color:#fdf4ff; border-left:4px solid #a855f7; }
+        .callout-example .callout-title { color:#7e22ce; }
+        .table-wrapper { margin:14px 0; border:1px solid var(--border); border-radius:8px; overflow:hidden; page-break-inside:avoid; }
+        table { width:100%; border-collapse:collapse; font-size:8.5pt; }
+        th { background-color:var(--dark); color:white; font-family:'Outfit',sans-serif; font-weight:600; text-transform:uppercase; font-size:7.5pt; letter-spacing:0.5px; padding:10px 12px; border:none; }
+        td { padding:8px 12px; border:none; border-bottom:1px solid var(--border); vertical-align:top; }
+        tr:last-child td { border-bottom:none; }
+        tr:nth-child(even) { background-color:var(--light); }
+        .comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0; page-break-inside:avoid; }
+        .comparison-card { border:1px solid var(--border); border-radius:8px; padding:14px; background-color:var(--light); }
+        .comparison-card h4 { margin-top:0; color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:5px; }
+        .diagram-box { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:16px; margin:14px 0; text-align:center; font-family:'Fira Code',monospace; font-size:9pt; line-height:1.8; page-break-inside:avoid; }
+        .diagram-box .diagram-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--dark); font-size:10pt; margin-bottom:10px; text-align:left; }
+        pre { background-color:var(--dark-card); color:#f8fafc; padding:14px 16px; border-radius:8px; border:1px solid #334155; font-family:'Fira Code',monospace; font-size:8pt; line-height:1.5; margin:12px 0; overflow:hidden; white-space:pre-wrap; word-break:break-all; page-break-inside:avoid; }
+        code { font-family:'Fira Code',monospace; font-size:8.5pt; background-color:#f1f5f9; color:#0f172a; padding:2px 5px; border-radius:4px; }
+        pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:8pt; }
+        .code-comment { color:#6b7280; } .code-keyword { color:#c084fc; } .code-string { color:#34d399; } .code-function { color:#60a5fa; }
+        .quick-ref { background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); color:white; border-radius:10px; padding:20px; margin:16px 0; page-break-inside:avoid; }
+        .quick-ref h3 { color:#c7d2fe; margin-top:0; font-size:12pt; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; }
+        .quick-ref p,.quick-ref li { color:#e2e8f0; }
+        .quick-ref code { background:rgba(255,255,255,0.1); color:#a5b4fc; }
+    </style>
+</head>
+<body>
+
+<div class="cover-page">
+    <div class="cover-header">
+        <div class="cover-badge">📐 Mathematics for Machine Learning</div>
+        <div class="cover-series">CampusX · Data Science Mentorship Program 2023 · Video 22 of 23</div>
+    </div>
+    <div class="cover-title">
+        <h1>SESSION 22<br>Mathematical Optimization</h1>
+        <div class="cover-subtitle">Convex vs Non-Convex Functions · Global & Local Extrema · Gradient Descent Algorithms</div>
+        <div class="cover-topics">
+            <span class="cover-topic-tag">Introduction to Mathematical Optimization</span>
+<span class="cover-topic-tag">Convexity & Convex Optimization</span>
+<span class="cover-topic-tag">Global vs Local Extrema</span>
+<span class="cover-topic-tag">Saddle Points & Plateau Regions</span>
+<span class="cover-topic-tag">Gradient Descent Algorithm</span>
+<span class="cover-topic-tag">Learning Rate Optimization</span>
+<span class="cover-topic-tag">Gradient Descent Variants (GD, SGD, MBGD)</span>
+<span class="cover-topic-tag">Modern Optimizers (Adam, RMSprop)</span>
+
+        </div>
+    </div>
+    <div class="cover-footer">
+        <div class="cover-author">Session Notes — Complete Reference</div>
+        <div class="cover-meta">Playlist: Maths for Machine Learning · Instructor: Nitish Singh (CampusX)</div>
+    </div>
+</div>
+
+<div class="toc-page">
+    <div class="toc-title">📑 Table of Contents</div>
+    
+        <div class="toc-section">
+            <span class="toc-section-num">01</span>
+            <span class="toc-section-title">Introduction to Mathematical Optimization</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">02</span>
+            <span class="toc-section-title">Convexity & Convex Optimization</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">03</span>
+            <span class="toc-section-title">Global vs Local Extrema</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">04</span>
+            <span class="toc-section-title">Saddle Points & Plateau Regions</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">05</span>
+            <span class="toc-section-title">Gradient Descent Algorithm</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">06</span>
+            <span class="toc-section-title">Learning Rate Optimization</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">07</span>
+            <span class="toc-section-title">Gradient Descent Variants (GD, SGD, MBGD)</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">08</span>
+            <span class="toc-section-title">Modern Optimizers (Adam, RMSprop)</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">09</span>
+            <span class="toc-section-title">Quick Reference Card</span>
+        </div>
+        
+</div>
+
+
+        <div class="section-wrapper">
+            <h1>01 · Introduction to Mathematical Optimization</h1>
+            <p>Optimization is the process of finding the inputs that minimize or maximize an objective function (e.g., minimizing a loss function in machine learning).</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>02 · Convexity & Convex Optimization</h1>
+            <p>A function is **convex** if a line segment drawn between any two points on the graph lies above or on the graph. Convex functions are easier to optimize because any local minimum is guaranteed to be the global minimum.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>03 · Global vs Local Extrema</h1>
+            <ul>
+                    <li><strong>Global Minimum:</strong> The absolute lowest value of the function over its entire domain.</li>
+                    <li><strong>Local Minimum:</strong> The lowest value of the function within a specific local neighborhood.</li>
+                </ul>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>04 · Saddle Points & Plateau Regions</h1>
+            <p>A **saddle point** is a point where the function's gradient is zero, but it is not a local extremum (it curves up in one direction and down in another). Saddle points are major obstacles when training deep neural networks.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>05 · Gradient Descent Algorithm</h1>
+            <p>Gradient Descent is an iterative optimization algorithm that updates parameters in the direction of the steepest descent (opposite to the gradient $
+abla f$):</p>
+                <div class="formula-box">
+                    <div class="formula-title">Gradient Descent Step</div>
+                    <div class="formula-content">
+                        θ_(new) = θ_(old) − η · ∇f(θ_(old))
+
+                        where η is the learning rate.
+                    </div>
+                </div>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>06 · Learning Rate Optimization</h1>
+            <ul>
+                    <li><strong>Too small learning rate:</strong> Very slow convergence.</li>
+                    <li><strong>Too large learning rate:</strong> Overshoots the minimum and may diverge.</li>
+                </ul>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>07 · Gradient Descent Variants (GD, SGD, MBGD)</h1>
+            <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Variant</th><th>Batch Size</th><th>Updates per Epoch</th><th>Convergence Behavior</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Batch GD</strong></td><td>Full dataset</td><td>1</td><td>Smooth and stable, but slow</td></tr>
+                            <tr><td><strong>Stochastic GD (SGD)</strong></td><td>1 sample</td><td>N</td><td>Noisy, helps escape local minima</td></tr>
+                            <tr><td><strong>Mini-Batch GD</strong></td><td>Batch size $B$</td><td>N/B</td><td>Best balance of speed and stability</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>08 · Modern Optimizers (Adam, RMSprop)</h1>
+            <p>Modern deep learning optimizers adapt the learning rate for each parameter using running averages of the gradients (momentum) and squared gradients (RMSprop).</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>09 · Quick Reference Card</h1>
+            <div class="quick-ref">
+                    <h3>🚀 Optimization Cheat Sheet</h3>
+                    <ul>
+                        <li><strong>Gradient Direction:</strong> $
+abla f(	heta)$ points in direction of steepest ascent.</li>
+                        <li><strong>Convex Function:</strong> Local minimum = Global minimum.</li>
+                        <li><strong>SGD:</strong> Updates parameters using a single random sample at a time.</li>
+                    </ul>
+                </div>
+        </div>
+        
+
+</body>
+</html>

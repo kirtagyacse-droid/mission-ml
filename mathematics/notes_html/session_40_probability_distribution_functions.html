@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Session 40 — Probability Distribution Functions — PDF, PMF & CDF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --secondary: #7c3aed;
+            --secondary-light: #f5f3ff;
+            --accent: #059669;
+            --accent-light: #ecfdf5;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --dark: #0f172a;
+            --dark-card: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text-main: #334155;
+            --text-light: #64748b;
+        }
+        @page { size: A4; margin: 18mm 15mm 20mm 15mm; }
+        @page cover-page { size: A4; margin: 0; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-main); background: white; margin: 0; padding: 0; line-height: 1.7; font-size: 10pt; }
+
+        /* ─── Cover ─── */
+        .cover-page { page-break-after: always; page: cover-page; height: 297mm; background: linear-gradient(135deg, #0f172a 0%, #1e1338 45%, #312e81 100%); color: white; padding: 50mm 30mm 40mm 30mm; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+        .cover-page::before { content: ""; position: absolute; top: -20%; right: -15%; width: 80%; height: 80%; background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, rgba(0,0,0,0) 70%); z-index: 1; }
+        .cover-page::after { content: ""; position: absolute; bottom: -10%; left: -8%; width: 45%; height: 45%; background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, rgba(0,0,0,0) 70%); z-index: 1; }
+        .cover-header { z-index: 2; }
+        .cover-badge { display: inline-block; background: linear-gradient(90deg, #6366f1, #10b981); color: white; font-family: 'Outfit', sans-serif; font-size: 9pt; font-weight: 700; padding: 6px 16px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; }
+        .cover-series { font-family: 'Outfit', sans-serif; font-size: 11pt; color: #94a3b8; font-weight: 400; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .cover-title h1 { font-family: 'Outfit', sans-serif; font-size: 34pt; line-height: 1.15; font-weight: 800; border: none; margin: 0 0 20px 0; padding: 0; background: linear-gradient(to right, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .cover-subtitle { font-size: 14pt; color: #94a3b8; font-weight: 400; margin-bottom: 25px; font-family: 'Outfit', sans-serif; line-height: 1.5; }
+        .cover-topics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; z-index: 2; }
+        .cover-topic-tag { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; font-size: 8pt; padding: 4px 12px; border-radius: 20px; font-family: 'Outfit', sans-serif; }
+        .cover-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; z-index: 2; }
+        .cover-author { font-family: 'Outfit', sans-serif; font-size: 13pt; font-weight: 600; color: white; margin-bottom: 5px; }
+        .cover-meta { font-size: 9pt; color: #64748b; }
+
+        /* ─── TOC ─── */
+        .toc-page { page-break-after: always; padding-top: 10px; }
+        .toc-title { font-family: 'Outfit', sans-serif; font-size: 20pt; font-weight: 800; color: var(--dark); margin-bottom: 25px; border-bottom: 3px solid var(--secondary); padding-bottom: 10px; }
+        .toc-section { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px dotted #cbd5e1; font-size: 10.5pt; }
+        .toc-section-num { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--secondary); min-width: 30px; }
+        .toc-section-title { flex: 1; font-weight: 500; color: var(--dark); }
+
+        /* ─── Content ─── */
+        .section-wrapper { page-break-before: always; padding-top: 5px; }
+        h1 { font-family: 'Outfit', sans-serif; font-size: 18pt; font-weight: 800; color: var(--dark); margin-top: 30px; margin-bottom: 12px; border-bottom: 2px solid var(--secondary); padding-bottom: 8px; page-break-after: avoid; }
+        h2 { font-family: 'Outfit', sans-serif; font-size: 13pt; font-weight: 700; color: var(--primary); margin-top: 22px; margin-bottom: 8px; page-break-after: avoid; }
+        h3 { font-family: 'Outfit', sans-serif; font-size: 11pt; font-weight: 600; color: var(--secondary); margin-top: 16px; margin-bottom: 6px; page-break-after: avoid; }
+        h4 { font-family: 'Outfit', sans-serif; font-size: 10pt; font-weight: 600; color: #475569; margin-top: 12px; margin-bottom: 5px; }
+        p { margin-top: 0; margin-bottom: 10px; color: var(--text-main); text-align: justify; }
+        li { margin-bottom: 5px; color: var(--text-main); }
+        ul, ol { margin-top: 4px; margin-bottom: 12px; padding-left: 22px; }
+        strong { color: #1e293b; }
+
+        .formula-box { background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%); border: 1px solid #c7d2fe; border-left: 4px solid var(--secondary); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 14px 0; page-break-inside: avoid; }
+        .formula-box .formula-title { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--primary-dark); font-size: 9pt; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .formula-box .formula-content { font-family: 'Fira Code', monospace; font-size: 10pt; color: #1e293b; line-height: 1.8; }
+
+        .callout { border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 14px 0; page-break-inside: avoid; }
+        .callout-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 9.5pt; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+        .callout-note { background-color: var(--primary-light); border-left: 4px solid var(--primary); }
+        .callout-note .callout-title { color: var(--primary-dark); }
+        .callout-tip { background-color: var(--accent-light); border-left: 4px solid var(--accent); }
+        .callout-tip .callout-title { color: #065f46; }
+        .callout-warning { background-color: var(--warning-light); border-left: 4px solid var(--warning); }
+        .callout-warning .callout-title { color: #92400e; }
+        .callout-example { background-color: #fdf4ff; border-left: 4px solid #a855f7; }
+        .callout-example .callout-title { color: #7e22ce; }
+
+        .table-wrapper { margin: 14px 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; page-break-inside: avoid; }
+        table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+        th { background-color: var(--dark); color: white; font-family: 'Outfit', sans-serif; font-weight: 600; text-transform: uppercase; font-size: 7.5pt; letter-spacing: 0.5px; padding: 10px 12px; border: none; }
+        td { padding: 8px 12px; border: none; border-bottom: 1px solid var(--border); color: #334155; vertical-align: top; }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background-color: var(--light); }
+
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; page-break-inside: avoid; }
+        .comparison-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px; background-color: var(--light); }
+        .comparison-card h4 { margin-top: 0; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+
+        .diagram-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin: 14px 0; text-align: center; font-family: 'Fira Code', monospace; font-size: 9pt; line-height: 1.8; page-break-inside: avoid; }
+        .diagram-box .diagram-title { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--dark); font-size: 10pt; margin-bottom: 10px; text-align: left; }
+
+        pre { background-color: var(--dark-card); color: #f8fafc; padding: 14px 16px; border-radius: 8px; border: 1px solid #334155; font-family: 'Fira Code', monospace; font-size: 8pt; line-height: 1.5; margin: 12px 0; overflow: hidden; white-space: pre-wrap; word-break: break-all; page-break-inside: avoid; }
+        code { font-family: 'Fira Code', monospace; font-size: 8.5pt; background-color: #f1f5f9; color: #0f172a; padding: 2px 5px; border-radius: 4px; }
+        pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 8pt; }
+        .code-comment { color: #6b7280; }
+        .code-keyword { color: #c084fc; }
+        .code-string { color: #34d399; }
+        .code-function { color: #60a5fa; }
+
+        .quick-ref { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: white; border-radius: 10px; padding: 20px; margin: 16px 0; page-break-inside: avoid; }
+        .quick-ref h3 { color: #c7d2fe; margin-top: 0; font-size: 12pt; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+        .quick-ref p, .quick-ref li { color: #e2e8f0; }
+        .quick-ref code { background: rgba(255,255,255,0.1); color: #a5b4fc; }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════ COVER PAGE ════════════════════ -->
+<div class="cover-page">
+    <div class="cover-header">
+        <div class="cover-badge">📐 Mathematics for Machine Learning</div>
+        <div class="cover-series">CampusX · Data Science Mentorship Program 2023 · Video 4 of 23</div>
+    </div>
+    <div class="cover-title">
+        <h1>PROBABILITY<br>DISTRIBUTION<br>FUNCTIONS</h1>
+        <div class="cover-subtitle">Session 40 — PDF, PMF & CDF · Random Variables · Density Estimation</div>
+        <div class="cover-topics">
+            <span class="cover-topic-tag">Random Variables</span>
+            <span class="cover-topic-tag">Discrete vs Continuous</span>
+            <span class="cover-topic-tag">PMF</span>
+            <span class="cover-topic-tag">PDF</span>
+            <span class="cover-topic-tag">CDF</span>
+            <span class="cover-topic-tag">Density Estimation</span>
+            <span class="cover-topic-tag">KDE</span>
+        </div>
+    </div>
+    <div class="cover-footer">
+        <div class="cover-author">Session Notes — Complete Reference</div>
+        <div class="cover-meta">Playlist: Maths for Machine Learning · Instructor: Nitish Singh (CampusX)</div>
+    </div>
+</div>
+
+<!-- ════════════════════ TOC ════════════════════ -->
+<div class="toc-page">
+    <div class="toc-title">📑 Table of Contents</div>
+    <div class="toc-section"><span class="toc-section-num">01</span><span class="toc-section-title">What is a Random Variable?</span></div>
+    <div class="toc-section"><span class="toc-section-num">02</span><span class="toc-section-title">Types of Random Variables — Discrete vs Continuous</span></div>
+    <div class="toc-section"><span class="toc-section-num">03</span><span class="toc-section-title">Probability Distributions — The Big Picture</span></div>
+    <div class="toc-section"><span class="toc-section-num">04</span><span class="toc-section-title">Probability Mass Function (PMF)</span></div>
+    <div class="toc-section"><span class="toc-section-num">05</span><span class="toc-section-title">CDF for Discrete Random Variables</span></div>
+    <div class="toc-section"><span class="toc-section-num">06</span><span class="toc-section-title">Probability Density Function (PDF)</span></div>
+    <div class="toc-section"><span class="toc-section-num">07</span><span class="toc-section-title">CDF for Continuous Random Variables</span></div>
+    <div class="toc-section"><span class="toc-section-num">08</span><span class="toc-section-title">Relationship Between PDF & CDF</span></div>
+    <div class="toc-section"><span class="toc-section-num">09</span><span class="toc-section-title">Density Estimation — Parametric vs Non-Parametric</span></div>
+    <div class="toc-section"><span class="toc-section-num">10</span><span class="toc-section-title">Kernel Density Estimation (KDE)</span></div>
+    <div class="toc-section"><span class="toc-section-num">11</span><span class="toc-section-title">Histogram vs KDE</span></div>
+    <div class="toc-section"><span class="toc-section-num">12</span><span class="toc-section-title">Python Implementation — Complete Code</span></div>
+    <div class="toc-section"><span class="toc-section-num">13</span><span class="toc-section-title">Quick Reference Card</span></div>
+</div>
+
+<!-- ════════════════════ SECTION 1 ════════════════════ -->
+<div class="section-wrapper">
+<h1>1 · What is a Random Variable?</h1>
+
+<p>A <strong>random variable</strong> is a function that maps outcomes from a random experiment's sample space to numerical values. It's the bridge between real-world events and mathematical analysis.</p>
+
+<h2>1.1 Formal Definition</h2>
+<div class="formula-box">
+    <div class="formula-title">Definition</div>
+    <div class="formula-content">
+        X : S → ℝ
+
+        A random variable X is a function from the sample space S
+        to the set of real numbers ℝ.
+    </div>
+</div>
+
+<h2>1.2 Why Do We Need Random Variables?</h2>
+<ul>
+    <li><strong>Quantification:</strong> Converts qualitative outcomes (Heads/Tails) into numbers (1/0)</li>
+    <li><strong>Mathematical operations:</strong> Enables computing means, variances, and probabilities</li>
+    <li><strong>Modelling:</strong> Provides the foundation for all probability distributions used in ML</li>
+    <li><strong>Universality:</strong> Different experiments can share the same mathematical structure</li>
+</ul>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — Coin Toss Experiment</div>
+    <p><strong>Experiment:</strong> Toss a coin 3 times.<br>
+    <strong>Sample space S:</strong> {HHH, HHT, HTH, THH, HTT, THT, TTH, TTT}<br>
+    <strong>Random variable X = "Number of heads"</strong><br>
+    X maps: HHH→3, HHT→2, HTH→2, THH→2, HTT→1, THT→1, TTH→1, TTT→0<br>
+    So X can take values {0, 1, 2, 3} — it converts outcomes to numbers.</p>
+</div>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 Notation Convention</div>
+    <p>• <strong>Capital X:</strong> Represents the random variable itself (the function)<br>
+    • <strong>Lowercase x:</strong> Represents a specific value the random variable can take<br>
+    • <strong>P(X = x):</strong> "The probability that the random variable X equals the value x"</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 2 ════════════════════ -->
+<div class="section-wrapper">
+<h1>2 · Types of Random Variables</h1>
+
+<div class="comparison-grid">
+    <div class="comparison-card">
+        <h4>📊 Discrete Random Variable</h4>
+        <p>Takes a <strong>countable</strong> number of distinct values (finite or countably infinite).</p>
+        <p><strong>Think:</strong> You can <em>count</em> the outcomes</p>
+        <p><strong>Examples:</strong></p>
+        <ul>
+            <li>Number of heads in 10 coin tosses (0–10)</li>
+            <li>Dice roll result (1–6)</li>
+            <li>Number of customers arriving per hour</li>
+            <li>Number of defective items in a batch</li>
+        </ul>
+        <p><strong>Described by:</strong> PMF (Probability Mass Function)</p>
+    </div>
+    <div class="comparison-card">
+        <h4>📈 Continuous Random Variable</h4>
+        <p>Takes <strong>uncountably infinite</strong> values within a range or interval.</p>
+        <p><strong>Think:</strong> You <em>measure</em> the outcomes</p>
+        <p><strong>Examples:</strong></p>
+        <ul>
+            <li>Height of a person (170.234… cm)</li>
+            <li>Temperature (36.7823…°C)</li>
+            <li>Time to complete a task (4.56789… min)</li>
+            <li>Weight of a product (500.123… g)</li>
+        </ul>
+        <p><strong>Described by:</strong> PDF (Probability Density Function)</p>
+    </div>
+</div>
+
+<div class="callout callout-warning">
+    <div class="callout-title">⚠️ Critical Difference</div>
+    <p>For <strong>discrete</strong> variables: P(X = specific value) can be > 0 → we can assign probability to each value.<br>
+    For <strong>continuous</strong> variables: P(X = any exact value) = 0 → probability exists only over <em>intervals</em>.</p>
+</div>
+
+<h2>2.1 How to Identify: Quick Decision Test</h2>
+<div class="diagram-box">
+    <div class="diagram-title">📊 Decision Flowchart</div>
+    <pre style="background: transparent; color: #334155; border: none; text-align: left; padding: 0; font-size: 9pt;">
+    Can you LIST all possible values?
+         │
+    ┌────┴────┐
+   YES        NO
+    │          │
+    ▼          ▼
+ DISCRETE  CONTINUOUS
+ (count)   (measure)
+    │          │
+   PMF        PDF
+    </pre>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 3 ════════════════════ -->
+<div class="section-wrapper">
+<h1>3 · Probability Distributions — The Big Picture</h1>
+
+<p>A <strong>probability distribution</strong> describes how the probabilities are spread (distributed) across all possible values of a random variable. It is the complete mathematical description of randomness.</p>
+
+<h2>3.1 The Three Core Functions</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Function</th><th>Full Name</th><th>Applies To</th><th>What It Tells You</th></tr></thead>
+    <tbody>
+        <tr><td><strong>PMF</strong></td><td>Probability Mass Function</td><td>Discrete RVs</td><td>P(X = x) — Probability at each specific value</td></tr>
+        <tr><td><strong>PDF</strong></td><td>Probability Density Function</td><td>Continuous RVs</td><td>f(x) — Density at each point (NOT probability directly)</td></tr>
+        <tr><td><strong>CDF</strong></td><td>Cumulative Distribution Function</td><td>Both</td><td>F(x) = P(X ≤ x) — Cumulative probability up to x</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="diagram-box">
+    <div class="diagram-title">📊 The Complete Map</div>
+    <pre style="background: transparent; color: #334155; border: none; text-align: left; padding: 0; font-size: 9pt;">
+                    PROBABILITY DISTRIBUTION
+                            │
+              ┌─────────────┴─────────────┐
+         DISCRETE                    CONTINUOUS
+              │                           │
+         ┌────┴────┐                ┌─────┴─────┐
+        PMF       CDF              PDF        CDF
+     P(X = x)   P(X ≤ x)        f(x)       F(x)
+                                = density  = P(X ≤ x)
+
+     CDF = Σ PMF (sum)         CDF = ∫ PDF (integral)
+     PMF = Δ CDF (diff)        PDF = d/dx CDF (derivative)
+    </pre>
+</div>
+
+<h2>3.2 Why Distributions Matter in ML</h2>
+<ul>
+    <li><strong>Feature modelling:</strong> Understanding if features follow known distributions (Normal, Poisson, etc.)</li>
+    <li><strong>Assumption checking:</strong> Many ML algorithms assume normally distributed data</li>
+    <li><strong>Anomaly detection:</strong> Points in the extreme tails of a distribution may be anomalies</li>
+    <li><strong>Generative models:</strong> Learn the underlying distribution to generate new data (GANs, VAEs)</li>
+    <li><strong>Bayesian inference:</strong> Prior and posterior distributions are central to Bayesian ML</li>
+</ul>
+</div>
+
+<!-- ════════════════════ SECTION 4 ════════════════════ -->
+<div class="section-wrapper">
+<h1>4 · Probability Mass Function (PMF)</h1>
+
+<p>The <strong>PMF</strong> is the probability function for <strong>discrete random variables</strong>. It assigns a probability to <em>each individual value</em> that the random variable can take.</p>
+
+<h2>4.1 Formal Definition</h2>
+<div class="formula-box">
+    <div class="formula-title">PMF Definition</div>
+    <div class="formula-content">
+        P(X = x) = p(x)      for each possible value x
+
+        where p(x) ≥ 0 for all x, and Σ p(x) = 1 (over all possible values)
+    </div>
+</div>
+
+<h2>4.2 Properties of PMF</h2>
+<ol>
+    <li><strong>Non-negativity:</strong> p(x) ≥ 0 for every possible value x</li>
+    <li><strong>Sum to 1:</strong> The sum of all probabilities equals exactly 1: Σ p(xᵢ) = 1</li>
+    <li><strong>Individual probability:</strong> Each p(x) gives the exact probability of that specific outcome</li>
+    <li><strong>Zero elsewhere:</strong> p(x) = 0 for values that are impossible</li>
+</ol>
+
+<h2>4.3 Examples of PMF</h2>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example 1 — Fair Die Roll</div>
+    <p><strong>Random variable X</strong> = face value when rolling a fair die</p>
+    <div class="table-wrapper" style="margin-top: 8px;">
+    <table>
+        <thead><tr><th>x</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
+        <tbody>
+            <tr><td><strong>P(X = x)</strong></td><td>1/6</td><td>1/6</td><td>1/6</td><td>1/6</td><td>1/6</td><td>1/6</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p style="margin-top: 8px;">✓ Each p(x) ≥ 0 &nbsp;&nbsp; ✓ Sum = 6 × (1/6) = 1</p>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example 2 — Two Coin Tosses (X = number of Heads)</div>
+    <p><strong>Sample space:</strong> {HH, HT, TH, TT} &nbsp; <strong>X values:</strong> {0, 1, 2}</p>
+    <div class="table-wrapper" style="margin-top: 8px;">
+    <table>
+        <thead><tr><th>x</th><th>0 (TT)</th><th>1 (HT, TH)</th><th>2 (HH)</th></tr></thead>
+        <tbody>
+            <tr><td><strong>P(X = x)</strong></td><td>1/4 = 0.25</td><td>2/4 = 0.50</td><td>1/4 = 0.25</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p style="margin-top: 8px;">✓ 0.25 + 0.50 + 0.25 = 1.00</p>
+</div>
+
+<h2>4.4 Visualising PMF</h2>
+<p>A PMF is visualised as a <strong>bar chart / stem plot</strong> — discrete spikes at each possible value. The height of each bar/spike represents the probability. Unlike a histogram, there is <strong>no width</strong> to the bars (they represent individual points, not ranges).</p>
+</div>
+
+<!-- ════════════════════ SECTION 5 ════════════════════ -->
+<div class="section-wrapper">
+<h1>5 · CDF for Discrete Random Variables</h1>
+
+<p>The <strong>Cumulative Distribution Function (CDF)</strong> gives the probability that the random variable is <strong>less than or equal to</strong> a given value.</p>
+
+<h2>5.1 Definition</h2>
+<div class="formula-box">
+    <div class="formula-title">CDF for Discrete Random Variables</div>
+    <div class="formula-content">
+        F(x) = P(X ≤ x) = Σ p(xᵢ)    for all xᵢ ≤ x
+    </div>
+</div>
+
+<h2>5.2 Example — CDF from the Coin Toss PMF</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>x</th><th>PMF: P(X = x)</th><th>CDF: F(x) = P(X ≤ x)</th></tr></thead>
+    <tbody>
+        <tr><td><strong>0</strong></td><td>0.25</td><td>0.25</td></tr>
+        <tr><td><strong>1</strong></td><td>0.50</td><td>0.25 + 0.50 = 0.75</td></tr>
+        <tr><td><strong>2</strong></td><td>0.25</td><td>0.75 + 0.25 = 1.00</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>5.3 Properties of Discrete CDF</h2>
+<ul>
+    <li><strong>Non-decreasing:</strong> F(x) can only stay the same or increase as x increases</li>
+    <li><strong>Step function:</strong> Jumps occur at each value where P(X = x) > 0</li>
+    <li><strong>Range:</strong> 0 ≤ F(x) ≤ 1</li>
+    <li><strong>Limits:</strong> F(−∞) = 0 and F(+∞) = 1</li>
+    <li><strong>Recovery:</strong> P(X = x) = F(x) − F(x⁻) (jump at x)</li>
+</ul>
+
+<h2>5.4 Using CDF to Find Probabilities</h2>
+<div class="formula-box">
+    <div class="formula-title">Useful CDF Identities</div>
+    <div class="formula-content">
+        P(X ≤ b)    = F(b)
+        P(X > a)    = 1 − F(a)
+        P(a < X ≤ b) = F(b) − F(a)
+    </div>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 6 ════════════════════ -->
+<div class="section-wrapper">
+<h1>6 · Probability Density Function (PDF)</h1>
+
+<p>The <strong>PDF</strong> is the probability function for <strong>continuous random variables</strong>. Unlike the PMF, the PDF does <em>not</em> give probability directly — it gives <strong>probability density</strong>.</p>
+
+<h2>6.1 The Key Insight</h2>
+<div class="callout callout-warning">
+    <div class="callout-title">⚠️ Crucial Understanding</div>
+    <p>For a continuous random variable, the probability of taking any <strong>exact</strong> value is <strong>ZERO</strong>.<br><br>
+    P(X = 170.0000…) = 0 &nbsp; (there are infinitely many possible values in any interval)<br><br>
+    Instead, we can only compute probability over an <strong>interval</strong>: P(a ≤ X ≤ b) = ∫ₐᵇ f(x) dx = <strong>area under the curve</strong>.</p>
+</div>
+
+<h2>6.2 Formal Definition</h2>
+<div class="formula-box">
+    <div class="formula-title">PDF Definition</div>
+    <div class="formula-content">
+        f(x) = probability density at point x
+
+        P(a ≤ X ≤ b) = ∫ₐᵇ f(x) dx  =  Area under f(x) from a to b
+    </div>
+</div>
+
+<h2>6.3 Properties of PDF</h2>
+<ol>
+    <li><strong>Non-negativity:</strong> f(x) ≥ 0 for all x</li>
+    <li><strong>Total area = 1:</strong> ∫₋∞⁺∞ f(x) dx = 1</li>
+    <li><strong>f(x) is NOT probability:</strong> f(x) can be greater than 1! (e.g., Uniform(0, 0.5) has f(x) = 2)</li>
+    <li><strong>Point probability = 0:</strong> P(X = c) = ∫ᶜᶜ f(x) dx = 0</li>
+    <li><strong>Consequence:</strong> P(a ≤ X ≤ b) = P(a < X < b) (endpoints don't matter for continuous RVs)</li>
+</ol>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — Uniform Distribution on [0, 1]</div>
+    <p><strong>PDF:</strong> f(x) = 1 for 0 ≤ x ≤ 1, and f(x) = 0 elsewhere<br><br>
+    <strong>Find P(0.3 ≤ X ≤ 0.7):</strong><br>
+    = ∫₀.₃⁰·⁷ 1 · dx = [x]₀.₃⁰·⁷ = 0.7 − 0.3 = <strong>0.4</strong><br><br>
+    <strong>Verify total area:</strong> ∫₀¹ 1 · dx = 1 − 0 = 1 ✓</p>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — Triangular PDF</div>
+    <p><strong>PDF:</strong> f(x) = 2x for 0 ≤ x ≤ 1, and f(x) = 0 elsewhere<br><br>
+    <strong>Check it's valid:</strong> ∫₀¹ 2x · dx = [x²]₀¹ = 1 − 0 = 1 ✓<br><br>
+    <strong>Find P(X ≤ 0.5):</strong><br>
+    = ∫₀⁰·⁵ 2x · dx = [x²]₀⁰·⁵ = 0.25<br>
+    Only 25% of the probability mass lies in the first half — the distribution is skewed towards 1.</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 7 ════════════════════ -->
+<div class="section-wrapper">
+<h1>7 · CDF for Continuous Random Variables</h1>
+
+<h2>7.1 Definition</h2>
+<div class="formula-box">
+    <div class="formula-title">CDF for Continuous Random Variables</div>
+    <div class="formula-content">
+        F(x) = P(X ≤ x) = ∫₋∞ˣ f(t) dt
+    </div>
+</div>
+
+<h2>7.2 Properties of Continuous CDF</h2>
+<ul>
+    <li><strong>Continuous function:</strong> No jumps (unlike discrete CDF), smooth and continuous everywhere</li>
+    <li><strong>Non-decreasing:</strong> F(a) ≤ F(b) when a ≤ b</li>
+    <li><strong>Range:</strong> 0 ≤ F(x) ≤ 1</li>
+    <li><strong>Limits:</strong> lim(x→−∞) F(x) = 0 and lim(x→+∞) F(x) = 1</li>
+    <li><strong>S-shaped:</strong> Typically resembles an S-curve (sigmoid) for bell-shaped PDFs</li>
+</ul>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — CDF for f(x) = 2x on [0, 1]</div>
+    <p><strong>CDF:</strong> F(x) = ∫₀ˣ 2t · dt = [t²]₀ˣ = x²  for 0 ≤ x ≤ 1<br><br>
+    <strong>Complete CDF:</strong><br>
+    F(x) = 0 &nbsp;&nbsp;&nbsp; for x < 0<br>
+    F(x) = x² &nbsp; for 0 ≤ x ≤ 1<br>
+    F(x) = 1 &nbsp;&nbsp;&nbsp; for x > 1<br><br>
+    <strong>Verify:</strong> F(0) = 0 ✓ &nbsp; F(1) = 1 ✓ &nbsp; F(0.5) = 0.25 (matches earlier calculation ✓)</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 8 ════════════════════ -->
+<div class="section-wrapper">
+<h1>8 · Relationship Between PDF & CDF</h1>
+
+<p>The PDF and CDF are two sides of the same coin — they are related through calculus operations.</p>
+
+<h2>8.1 The Fundamental Relationship</h2>
+<div class="formula-box">
+    <div class="formula-title">PDF ↔ CDF Conversion</div>
+    <div class="formula-content">
+        PDF → CDF:    F(x) = ∫₋∞ˣ f(t) dt    (Integrate the PDF)
+        CDF → PDF:    f(x) = dF(x)/dx         (Differentiate the CDF)
+    </div>
+</div>
+
+<div class="diagram-box">
+    <div class="diagram-title">📊 Visual Relationship</div>
+    <pre style="background: transparent; color: #334155; border: none; text-align: left; padding: 0; font-size: 9pt;">
+         PDF f(x)                           CDF F(x)
+    ┌────────────┐                    ┌────────────┐
+    │     ╱╲     │    integrate →     │        ╱───│ 1.0
+    │    ╱  ╲    │   ─────────────→   │      ╱    │
+    │   ╱    ╲   │                    │    ╱      │
+    │  ╱      ╲  │   ←─────────────   │  ╱        │
+    │_╱________╲_│    differentiate    │╱__________│ 0.0
+    └────────────┘                    └────────────┘
+
+    Area under PDF       =       Height of CDF at that point
+    from −∞ to x
+    </pre>
+</div>
+
+<h2>8.2 Analogous Relationship for Discrete Variables</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Operation</th><th>Discrete</th><th>Continuous</th></tr></thead>
+    <tbody>
+        <tr><td><strong>PMF/PDF → CDF</strong></td><td>F(x) = Σ p(xᵢ) for xᵢ ≤ x (Summation)</td><td>F(x) = ∫₋∞ˣ f(t) dt (Integration)</td></tr>
+        <tr><td><strong>CDF → PMF/PDF</strong></td><td>P(X = x) = F(x) − F(x⁻) (Difference)</td><td>f(x) = dF(x)/dx (Differentiation)</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 Key Takeaway for ML</div>
+    <p>In practice, you rarely compute integrals by hand. Libraries like <code>scipy.stats</code> provide both the PDF (<code>.pdf()</code>) and CDF (<code>.cdf()</code>) for any named distribution. Understanding their relationship helps you reason about data distributions, compute percentiles, and set thresholds for classification.</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 9 ════════════════════ -->
+<div class="section-wrapper">
+<h1>9 · Density Estimation — Parametric vs Non-Parametric</h1>
+
+<p><strong>Density estimation</strong> is the problem of reconstructing the underlying probability distribution from a finite set of observed data points. This is one of the most fundamental tasks in statistics and ML.</p>
+
+<h2>9.1 The Problem</h2>
+<p>Given observed data {x₁, x₂, ..., xₙ}, what is the true underlying PDF f(x) that generated this data?</p>
+
+<h2>9.2 Two Approaches</h2>
+
+<div class="comparison-grid">
+    <div class="comparison-card">
+        <h4>📊 Parametric Density Estimation</h4>
+        <p><strong>Assumption:</strong> Data follows a specific known distribution (e.g., Normal, Exponential, Poisson).</p>
+        <p><strong>Task:</strong> Estimate only the <em>parameters</em> (μ, σ for Normal).</p>
+        <p><strong>Pros:</strong></p>
+        <ul>
+            <li>Efficient — needs fewer data points</li>
+            <li>Smooth, analytically tractable</li>
+            <li>Easy to interpret</li>
+        </ul>
+        <p><strong>Cons:</strong></p>
+        <ul>
+            <li>If assumption is wrong, estimate is biased</li>
+            <li>Inflexible — can't capture multimodal or unusual shapes</li>
+        </ul>
+        <p><strong>Example:</strong> Fitting μ̂ = X̄ and σ̂ = s to assume data is Normal</p>
+    </div>
+    <div class="comparison-card">
+        <h4>📈 Non-Parametric Density Estimation</h4>
+        <p><strong>Assumption:</strong> None! Let the data "speak for itself."</p>
+        <p><strong>Task:</strong> Estimate the entire PDF shape from data.</p>
+        <p><strong>Pros:</strong></p>
+        <ul>
+            <li>Flexible — captures any distribution shape</li>
+            <li>Works for multimodal, skewed, or arbitrary distributions</li>
+            <li>No wrong assumption possible</li>
+        </ul>
+        <p><strong>Cons:</strong></p>
+        <ul>
+            <li>Needs more data to be accurate</li>
+            <li>Sensitive to hyperparameters (bandwidth)</li>
+            <li>Computationally heavier</li>
+        </ul>
+        <p><strong>Examples:</strong> Histogram, KDE</p>
+    </div>
+</div>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 When to Use Which?</div>
+    <p>• <strong>Parametric:</strong> When you have domain knowledge that data follows a specific distribution (e.g., measurement errors are typically Normal)<br>
+    • <strong>Non-parametric:</strong> During exploratory data analysis (EDA), when you don't know the distribution shape, or when data is multimodal/complex</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 10 ════════════════════ -->
+<div class="section-wrapper">
+<h1>10 · Kernel Density Estimation (KDE)</h1>
+
+<p><strong>KDE</strong> is the most popular non-parametric density estimation method. It produces a smooth, continuous estimate of the PDF by placing a kernel (small bump) on each data point and summing them up.</p>
+
+<h2>10.1 The Intuition</h2>
+<ol>
+    <li><strong>Place a kernel</strong> (a small bell curve or other symmetric shape) centered on <em>each</em> data point</li>
+    <li><strong>Sum all kernels</strong> to get a combined curve</li>
+    <li><strong>Normalise</strong> so the total area under the curve equals 1</li>
+</ol>
+
+<h2>10.2 The Formula</h2>
+<div class="formula-box">
+    <div class="formula-title">KDE Formula</div>
+    <div class="formula-content">
+        f̂(x) = (1 / n·h) · Σᵢ K((x − xᵢ) / h)
+
+        where:
+        n     = number of data points
+        h     = bandwidth (smoothing parameter)
+        K(·)  = kernel function (usually Gaussian)
+        xᵢ    = individual data points
+    </div>
+</div>
+
+<h2>10.3 Common Kernel Functions</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Kernel</th><th>Shape</th><th>Formula K(u)</th><th>Usage</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Gaussian</strong></td><td>Bell curve</td><td>(1/√2π) · e^(−u²/2)</td><td>Most common, default in most libraries</td></tr>
+        <tr><td><strong>Epanechnikov</strong></td><td>Parabolic</td><td>¾(1 − u²) for |u| ≤ 1</td><td>Theoretically optimal (MSE-minimising)</td></tr>
+        <tr><td><strong>Uniform (Box)</strong></td><td>Rectangle</td><td>½ for |u| ≤ 1</td><td>Simplest, but not smooth</td></tr>
+        <tr><td><strong>Triangular</strong></td><td>Triangle</td><td>(1 − |u|) for |u| ≤ 1</td><td>Simple and smooth</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>10.4 The Bandwidth Parameter (h) — Most Critical</h2>
+<p>Bandwidth controls the <strong>width</strong> of each kernel, and thus the <strong>smoothness</strong> of the estimated PDF.</p>
+
+<div class="comparison-grid">
+    <div class="comparison-card">
+        <h4>🔍 Small Bandwidth (h → 0)</h4>
+        <ul>
+            <li>Very narrow kernels → spiky, noisy curve</li>
+            <li><strong>Overfitting</strong> — captures noise, not signal</li>
+            <li>High variance, low bias</li>
+            <li>Shows every minor fluctuation</li>
+        </ul>
+    </div>
+    <div class="comparison-card">
+        <h4>🔎 Large Bandwidth (h → ∞)</h4>
+        <ul>
+            <li>Very wide kernels → overly smooth curve</li>
+            <li><strong>Underfitting</strong> — hides real structure</li>
+            <li>Low variance, high bias</li>
+            <li>May miss multiple modes/peaks</li>
+        </ul>
+    </div>
+</div>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 The Bias-Variance Trade-off in KDE</div>
+    <p>The bandwidth selection is a classic <strong>bias-variance trade-off</strong>:<br>
+    • Too small h → High variance (overfitting)<br>
+    • Too large h → High bias (underfitting)<br>
+    • Optimal h → Balances both<br><br>
+    <strong>Silverman's Rule of Thumb:</strong> h = 1.06 · σ · n^(−1/5) — a good default for roughly normal data.</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 11 ════════════════════ -->
+<div class="section-wrapper">
+<h1>11 · Histogram vs KDE</h1>
+
+<p>Both histograms and KDE are used for non-parametric density estimation, but they differ fundamentally in their approach and output quality.</p>
+
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Feature</th><th>Histogram</th><th>KDE</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Nature</strong></td><td>Discrete (binned rectangles)</td><td>Continuous (smooth curve)</td></tr>
+        <tr><td><strong>Output</strong></td><td>Step function — discontinuous</td><td>Smooth function — differentiable</td></tr>
+        <tr><td><strong>Key Parameter</strong></td><td>Number of bins / bin width</td><td>Bandwidth (h) + kernel choice</td></tr>
+        <tr><td><strong>Sensitivity</strong></td><td>Sensitive to bin edges & starting point</td><td>Sensitive to bandwidth</td></tr>
+        <tr><td><strong>Flexibility</strong></td><td>Limited — shape depends heavily on bins</td><td>High — smooth, can use different kernels</td></tr>
+        <tr><td><strong>Edge Effects</strong></td><td>Sharp cutoffs at boundaries</td><td>Bleeds beyond data range (can be fixed)</td></tr>
+        <tr><td><strong>Computation</strong></td><td>Very fast (O(n))</td><td>Slower (O(n²) naively, but fast with FFT)</td></tr>
+        <tr><td><strong>Best For</strong></td><td>Quick look at distribution shape</td><td>Publication-quality density estimates</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 The Histogram is a Special Case of KDE</div>
+    <p>A histogram can be viewed as KDE with a <strong>Uniform (box) kernel</strong> where bandwidth equals the bin width. KDE generalises this idea by using smoother kernels and centering them on actual data points rather than on bin edges.</p>
+</div>
+
+<h2>11.1 When to Use Which</h2>
+<ul>
+    <li><strong>Histogram:</strong> Quick EDA, initial data exploration, when speed matters</li>
+    <li><strong>KDE:</strong> When you need a smooth density estimate, comparing distributions, presenting results</li>
+    <li><strong>Both together:</strong> Best practice — overlay KDE on a histogram for maximum information</li>
+</ul>
+</div>
+
+<!-- ════════════════════ SECTION 12 ════════════════════ -->
+<div class="section-wrapper">
+<h1>12 · Python Implementation — Complete Code</h1>
+
+<h2>12.1 PMF — Discrete Random Variable</h2>
+<pre><code><span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np
+<span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt
+<span class="code-keyword">from</span> scipy <span class="code-keyword">import</span> stats
+
+<span class="code-comment"># ── PMF of a Fair Die ──</span>
+x_die = np.arange(1, 7)
+pmf_die = np.ones(6) / 6     <span class="code-comment"># uniform PMF: 1/6 each</span>
+
+plt.figure(figsize=(8, 4))
+plt.stem(x_die, pmf_die, linefmt=<span class="code-string">'#3b82f6'</span>, markerfmt=<span class="code-string">'o'</span>, basefmt=<span class="code-string">'k'</span>)
+plt.title(<span class="code-string">'PMF — Fair Die Roll'</span>, fontsize=14, fontweight=<span class="code-string">'bold'</span>)
+plt.xlabel(<span class="code-string">'Outcome (x)'</span>)
+plt.ylabel(<span class="code-string">'P(X = x)'</span>)
+plt.ylim(0, 0.3)
+plt.tight_layout()
+plt.show()
+
+<span class="code-comment"># ── PMF using scipy — Binomial(n=10, p=0.5) ──</span>
+n, p = 10, 0.5
+x_binom = np.arange(0, n+1)
+pmf_binom = stats.binom.pmf(x_binom, n, p)
+
+plt.figure(figsize=(8, 4))
+plt.bar(x_binom, pmf_binom, color=<span class="code-string">'#8b5cf6'</span>, edgecolor=<span class="code-string">'white'</span>)
+plt.title(<span class="code-string">'PMF — Binomial(n=10, p=0.5)'</span>, fontsize=14, fontweight=<span class="code-string">'bold'</span>)
+plt.xlabel(<span class="code-string">'Number of Successes'</span>)
+plt.ylabel(<span class="code-string">'P(X = x)'</span>)
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h2>12.2 PDF — Continuous Random Variable</h2>
+<pre><code><span class="code-comment"># ── PDF of Normal Distribution ──</span>
+x = np.linspace(-4, 4, 1000)
+pdf_norm = stats.norm.pdf(x, loc=0, scale=1)    <span class="code-comment"># μ=0, σ=1</span>
+
+plt.figure(figsize=(8, 4))
+plt.plot(x, pdf_norm, color=<span class="code-string">'#3b82f6'</span>, linewidth=2)
+plt.fill_between(x, pdf_norm, alpha=0.2, color=<span class="code-string">'#3b82f6'</span>)
+plt.title(<span class="code-string">'PDF — Standard Normal Distribution N(0, 1)'</span>, fontsize=14)
+plt.xlabel(<span class="code-string">'x'</span>)
+plt.ylabel(<span class="code-string">'f(x) — Density'</span>)
+plt.tight_layout()
+plt.show()
+
+<span class="code-comment"># ── Probability over an interval ──</span>
+prob = stats.norm.cdf(1) - stats.norm.cdf(-1)
+<span class="code-function">print</span>(f<span class="code-string">"P(-1 ≤ X ≤ 1) = {prob:.4f}"</span>)   <span class="code-comment"># ≈ 0.6827 (68.27%)</span>
+</code></pre>
+
+<h2>12.3 CDF — Both Discrete & Continuous</h2>
+<pre><code><span class="code-comment"># ── Discrete CDF — Binomial ──</span>
+cdf_binom = stats.binom.cdf(x_binom, n, p)
+
+<span class="code-comment"># ── Continuous CDF — Normal ──</span>
+cdf_norm = stats.norm.cdf(x, loc=0, scale=1)
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+<span class="code-comment"># Discrete CDF (step function)</span>
+axes[0].step(x_binom, cdf_binom, where=<span class="code-string">'mid'</span>, color=<span class="code-string">'#8b5cf6'</span>, linewidth=2)
+axes[0].set_title(<span class="code-string">'CDF — Binomial(10, 0.5)'</span>, fontsize=13)
+axes[0].set_xlabel(<span class="code-string">'x'</span>); axes[0].set_ylabel(<span class="code-string">'F(x) = P(X ≤ x)'</span>)
+
+<span class="code-comment"># Continuous CDF (smooth S-curve)</span>
+axes[1].plot(x, cdf_norm, color=<span class="code-string">'#3b82f6'</span>, linewidth=2)
+axes[1].set_title(<span class="code-string">'CDF — Normal(0, 1)'</span>, fontsize=13)
+axes[1].set_xlabel(<span class="code-string">'x'</span>); axes[1].set_ylabel(<span class="code-string">'F(x) = P(X ≤ x)'</span>)
+
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h2>12.4 KDE — Kernel Density Estimation</h2>
+<pre><code><span class="code-keyword">import</span> seaborn <span class="code-keyword">as</span> sns
+
+<span class="code-comment"># Generate sample data (mixture of two normals)</span>
+np.random.seed(42)
+data = np.concatenate([
+    np.random.normal(loc=2, scale=0.8, size=300),
+    np.random.normal(loc=6, scale=1.2, size=200)
+])
+
+fig, axes = plt.subplots(1, 3, figsize=(16, 4))
+
+<span class="code-comment"># 1. Histogram only</span>
+axes[0].hist(data, bins=30, density=<span class="code-keyword">True</span>, color=<span class="code-string">'#94a3b8'</span>, edgecolor=<span class="code-string">'white'</span>)
+axes[0].set_title(<span class="code-string">'Histogram Only'</span>)
+
+<span class="code-comment"># 2. KDE only</span>
+sns.kdeplot(data, ax=axes[1], color=<span class="code-string">'#3b82f6'</span>, linewidth=2, fill=<span class="code-keyword">True</span>, alpha=0.3)
+axes[1].set_title(<span class="code-string">'KDE Only'</span>)
+
+<span class="code-comment"># 3. Histogram + KDE overlay (best practice!)</span>
+axes[2].hist(data, bins=30, density=<span class="code-keyword">True</span>, color=<span class="code-string">'#94a3b8'</span>, edgecolor=<span class="code-string">'white'</span>, alpha=0.7)
+sns.kdeplot(data, ax=axes[2], color=<span class="code-string">'#ef4444'</span>, linewidth=2)
+axes[2].set_title(<span class="code-string">'Histogram + KDE'</span>)
+
+plt.suptitle(<span class="code-string">'Comparing Density Estimation Methods'</span>, fontsize=14, fontweight=<span class="code-string">'bold'</span>)
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h2>12.5 Bandwidth Effect on KDE</h2>
+<pre><code><span class="code-comment"># Demonstrate bandwidth effect</span>
+fig, axes = plt.subplots(1, 3, figsize=(16, 4))
+bandwidths = [0.1, 0.5, 2.0]
+titles = [<span class="code-string">'h=0.1 (Undersmoothed)'</span>, <span class="code-string">'h=0.5 (Good)'</span>, <span class="code-string">'h=2.0 (Oversmoothed)'</span>]
+
+<span class="code-keyword">for</span> ax, bw, title <span class="code-keyword">in</span> zip(axes, bandwidths, titles):
+    ax.hist(data, bins=50, density=<span class="code-keyword">True</span>, color=<span class="code-string">'#e2e8f0'</span>, edgecolor=<span class="code-string">'white'</span>)
+    sns.kdeplot(data, bw_adjust=bw, ax=ax, color=<span class="code-string">'#3b82f6'</span>, linewidth=2)
+    ax.set_title(title, fontsize=11, fontweight=<span class="code-string">'bold'</span>)
+
+plt.suptitle(<span class="code-string">'Effect of Bandwidth on KDE'</span>, fontsize=14, fontweight=<span class="code-string">'bold'</span>)
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h2>12.6 Using scipy.stats for Any Distribution</h2>
+<pre><code><span class="code-comment"># ── Complete workflow with scipy.stats ──</span>
+dist = stats.norm(loc=100, scale=15)     <span class="code-comment"># IQ scores: μ=100, σ=15</span>
+
+<span class="code-comment"># PDF value at a point</span>
+density_at_100 = dist.pdf(100)           <span class="code-comment"># f(100) — peak density</span>
+
+<span class="code-comment"># CDF — cumulative probability</span>
+prob_below_130 = dist.cdf(130)           <span class="code-comment"># P(X ≤ 130) ≈ 0.9772</span>
+
+<span class="code-comment"># Survival function (complement of CDF)</span>
+prob_above_130 = dist.sf(130)            <span class="code-comment"># P(X > 130) ≈ 0.0228</span>
+
+<span class="code-comment"># Percent point function (inverse CDF = quantile)</span>
+iq_95th = dist.ppf(0.95)                <span class="code-comment"># 95th percentile ≈ 124.67</span>
+
+<span class="code-comment"># Interval probability</span>
+prob_85_to_115 = dist.cdf(115) - dist.cdf(85)  <span class="code-comment"># P(85 ≤ X ≤ 115) ≈ 0.6827</span>
+
+<span class="code-function">print</span>(f<span class="code-string">"P(IQ ≤ 130) = {prob_below_130:.4f}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"P(IQ > 130) = {prob_above_130:.4f}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"95th percentile IQ = {iq_95th:.2f}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"P(85 ≤ IQ ≤ 115) = {prob_85_to_115:.4f}"</span>)
+</code></pre>
+</div>
+
+<!-- ════════════════════ SECTION 13 ════════════════════ -->
+<div class="section-wrapper">
+<h1>13 · Quick Reference Card</h1>
+
+<div class="quick-ref">
+    <h3>🚀 Session 40 — PDF, PMF & CDF Cheat Sheet</h3>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Random Variables</h4>
+    <ul>
+        <li><strong>Discrete:</strong> Countable values → use PMF</li>
+        <li><strong>Continuous:</strong> Uncountable values in a range → use PDF</li>
+        <li><strong>CDF</strong> works for both: F(x) = P(X ≤ x)</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">The Three Functions</h4>
+    <ul>
+        <li><strong>PMF:</strong> P(X = x) = p(x), Σp(x) = 1 (discrete only)</li>
+        <li><strong>PDF:</strong> f(x) = density (NOT probability!), ∫f(x)dx = 1, f(x) CAN be > 1</li>
+        <li><strong>CDF:</strong> F(x) = P(X ≤ x), range [0, 1], non-decreasing</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Key Conversions</h4>
+    <ul>
+        <li>PDF → CDF: <strong>Integrate</strong> → F(x) = ∫f(t)dt</li>
+        <li>CDF → PDF: <strong>Differentiate</strong> → f(x) = dF/dx</li>
+        <li>P(a ≤ X ≤ b) = F(b) − F(a) = ∫ₐᵇ f(x)dx</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Density Estimation</h4>
+    <ul>
+        <li><strong>Parametric:</strong> Assume a distribution, estimate parameters (μ, σ)</li>
+        <li><strong>Non-parametric:</strong> Let data speak — Histogram, KDE</li>
+        <li><strong>KDE:</strong> f̂(x) = (1/nh) Σ K((x−xᵢ)/h) — bandwidth h is critical</li>
+        <li>Small h → overfitting, Large h → underfitting</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Python Quick Reference</h4>
+    <ul>
+        <li><code>stats.norm.pdf(x, μ, σ)</code> — PDF value at x</li>
+        <li><code>stats.norm.cdf(x, μ, σ)</code> — P(X ≤ x)</li>
+        <li><code>stats.norm.ppf(q, μ, σ)</code> — Inverse CDF (quantile)</li>
+        <li><code>stats.norm.sf(x, μ, σ)</code> — P(X > x) = 1 − CDF</li>
+        <li><code>sns.kdeplot(data, bw_adjust=h)</code> — KDE plot</li>
+        <li><code>sns.histplot(data, kde=True)</code> — Histogram + KDE overlay</li>
+    </ul>
+</div>
+
+<div class="callout callout-note" style="margin-top: 20px;">
+    <div class="callout-title">📚 What's Next? → Normal Distribution (Session 41)</div>
+    <p>The next session dives deep into the <strong>Normal (Gaussian) Distribution</strong> — the most important distribution in statistics and ML. Topics include the bell curve, the 68-95-99.7 rule, standard normal distribution, Z-scores, and the Central Limit Theorem.</p>
+</div>
+</div>
+
+</body>
+</html>

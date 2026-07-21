@@ -70,10 +70,14 @@ export default function ItemRow({ item, onProgressChange }: Props) {
   return (
     <div className="group">
       <div
-        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 border-l-2 ${
+          showPlayer 
+            ? "bg-[#0d0417]/50 border-[--color-accent-chartreuse]" 
+            : "border-transparent hover:border-[--color-accent-pink]/30"
+        } ${
           isVideo
-            ? "hover:bg-white/5 cursor-pointer"
-            : "hover:bg-white/3"
+            ? "hover:bg-[--color-accent-pink]/5 cursor-pointer"
+            : "hover:bg-[--color-accent-pink]/3"
         }`}
         onClick={() => {
           if (isVideo) setShowPlayer(!showPlayer);
@@ -85,20 +89,20 @@ export default function ItemRow({ item, onProgressChange }: Props) {
             e.stopPropagation();
             toggleCompleted();
           }}
-          className={`flex-shrink-0 w-5 h-5 rounded-md border transition-all flex items-center justify-center ${
+          className={`flex-shrink-0 w-5 h-5 rounded-md border transition-all flex items-center justify-center cursor-pointer ${
             isCompleted
-              ? "bg-[--color-accent-green] border-[--color-accent-green] check-pop"
-              : "border-white/20 hover:border-white/40"
+              ? "bg-[--color-accent-chartreuse] border-[--color-accent-chartreuse] check-pop"
+              : "border-white/10 hover:border-[--color-accent-pink]/40"
           } ${isToggling ? "opacity-50" : ""}`}
           title={isCompleted ? "Mark as incomplete" : "Mark as complete"}
         >
           {isCompleted && (
             <svg
-              className="w-3 h-3 text-white"
+              className="w-3.5 h-3.5 text-[#05020a] font-bold"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              strokeWidth={3}
+              strokeWidth={3.5}
             >
               <path
                 strokeLinecap="round"
@@ -118,7 +122,7 @@ export default function ItemRow({ item, onProgressChange }: Props) {
         <span
           className={`flex-1 text-sm truncate transition-colors ${
             isCompleted
-              ? "text-[--color-text-muted] line-through"
+              ? "text-[--color-text-muted] line-through decoration-[--color-accent-pink]/25"
               : "text-[--color-text-primary]"
           }`}
         >
@@ -129,17 +133,17 @@ export default function ItemRow({ item, onProgressChange }: Props) {
         {isVideo && (
           <div className="flex items-center gap-2 flex-shrink-0">
             {watchPercent > 0 && watchPercent < 90 && (
-              <span className="text-[10px] font-mono text-[--color-accent-cyan] bg-cyan-500/10 px-1.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-mono text-[--color-accent-chartreuse] bg-[--color-accent-chartreuse]/10 px-1.5 py-0.5 rounded-full border border-[--color-accent-chartreuse]/10">
                 {Math.round(watchPercent)}%
               </span>
             )}
             <svg
-              className={`w-4 h-4 transition-transform ${
+              className={`w-4.5 h-4.5 transition-transform ${
                 showPlayer ? "rotate-90" : ""
               } ${
                 isCompleted
-                  ? "text-[--color-accent-green]"
-                  : "text-[--color-text-muted]"
+                  ? "text-[--color-accent-chartreuse] drop-shadow-[0_0_5px_rgba(206,255,50,0.3)]"
+                  : "text-[--color-accent-pink]"
               }`}
               fill="currentColor"
               viewBox="0 0 24 24"
@@ -159,14 +163,14 @@ export default function ItemRow({ item, onProgressChange }: Props) {
 
       {/* Inline YouTube Player */}
       {showPlayer && isVideo && item.youtubeVideoId && (
-        <div className="expand-enter mx-3 mb-3 mt-1">
+        <div className="expand-enter mx-3 mb-3 mt-2 p-3 rounded-xl bg-[#07030d] border border-[--color-border-glass] shadow-inner">
           <TrackedYouTubePlayer
             videoId={item.youtubeVideoId}
             itemId={item.id}
             initialPosition={lastPosition}
             onProgressUpdate={handleProgressUpdate}
           />
-          <div className="mt-2 flex items-center justify-between px-1">
+          <div className="mt-2.5 flex items-center justify-between px-1">
             <p className="text-[10px] text-[--color-text-muted]">
               {lastPosition > 0
                 ? `Resuming from ${formatTime(lastPosition)}`
@@ -178,7 +182,7 @@ export default function ItemRow({ item, onProgressChange }: Props) {
                   e.stopPropagation();
                   toggleCompleted();
                 }}
-                className="text-[10px] text-[--color-text-muted] hover:text-[--color-accent-green] transition-colors"
+                className="text-[10px] font-bold text-[--color-accent-carnation] hover:text-[--color-accent-chartreuse] transition-colors cursor-pointer"
               >
                 ✓ Mark as watched
               </button>

@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Session 39 — Descriptive Statistics Part 2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --secondary: #7c3aed;
+            --secondary-light: #f5f3ff;
+            --accent: #059669;
+            --accent-light: #ecfdf5;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --dark: #0f172a;
+            --dark-card: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text-main: #334155;
+            --text-light: #64748b;
+        }
+        @page { size: A4; margin: 18mm 15mm 20mm 15mm; }
+        @page cover-page { size: A4; margin: 0; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-main); background: white; margin: 0; padding: 0; line-height: 1.7; font-size: 10pt; }
+
+        /* ─── Cover ─── */
+        .cover-page { page-break-after: always; page: cover-page; height: 297mm; background: linear-gradient(135deg, #0f172a 0%, #1a1636 45%, #2e1065 100%); color: white; padding: 50mm 30mm 40mm 30mm; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+        .cover-page::before { content: ""; position: absolute; top: -25%; right: -20%; width: 85%; height: 85%; background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, rgba(0,0,0,0) 70%); z-index: 1; }
+        .cover-page::after { content: ""; position: absolute; bottom: -15%; left: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, rgba(0,0,0,0) 70%); z-index: 1; }
+        .cover-header { z-index: 2; }
+        .cover-badge { display: inline-block; background: linear-gradient(90deg, #8b5cf6, #3b82f6); color: white; font-family: 'Outfit', sans-serif; font-size: 9pt; font-weight: 700; padding: 6px 16px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; }
+        .cover-series { font-family: 'Outfit', sans-serif; font-size: 11pt; color: #94a3b8; font-weight: 400; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .cover-title h1 { font-family: 'Outfit', sans-serif; font-size: 36pt; line-height: 1.15; font-weight: 800; border: none; margin: 0 0 20px 0; padding: 0; background: linear-gradient(to right, #ffffff, #c7d2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .cover-subtitle { font-size: 14pt; color: #94a3b8; font-weight: 400; margin-bottom: 25px; font-family: 'Outfit', sans-serif; line-height: 1.5; }
+        .cover-topics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; z-index: 2; }
+        .cover-topic-tag { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; font-size: 8pt; padding: 4px 12px; border-radius: 20px; font-family: 'Outfit', sans-serif; }
+        .cover-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; z-index: 2; }
+        .cover-author { font-family: 'Outfit', sans-serif; font-size: 13pt; font-weight: 600; color: white; margin-bottom: 5px; }
+        .cover-meta { font-size: 9pt; color: #64748b; }
+
+        /* ─── TOC ─── */
+        .toc-page { page-break-after: always; padding-top: 10px; }
+        .toc-title { font-family: 'Outfit', sans-serif; font-size: 20pt; font-weight: 800; color: var(--dark); margin-bottom: 25px; border-bottom: 3px solid var(--secondary); padding-bottom: 10px; }
+        .toc-section { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px dotted #cbd5e1; font-size: 10.5pt; }
+        .toc-section-num { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--secondary); min-width: 30px; }
+        .toc-section-title { flex: 1; font-weight: 500; color: var(--dark); }
+
+        /* ─── Content ─── */
+        .content-container { padding: 0; }
+        .section-wrapper { page-break-before: always; padding-top: 5px; }
+        h1 { font-family: 'Outfit', sans-serif; font-size: 18pt; font-weight: 800; color: var(--dark); margin-top: 30px; margin-bottom: 12px; border-bottom: 2px solid var(--secondary); padding-bottom: 8px; page-break-after: avoid; }
+        h2 { font-family: 'Outfit', sans-serif; font-size: 13pt; font-weight: 700; color: var(--primary); margin-top: 22px; margin-bottom: 8px; page-break-after: avoid; }
+        h3 { font-family: 'Outfit', sans-serif; font-size: 11pt; font-weight: 600; color: var(--secondary); margin-top: 16px; margin-bottom: 6px; page-break-after: avoid; }
+        h4 { font-family: 'Outfit', sans-serif; font-size: 10pt; font-weight: 600; color: #475569; margin-top: 12px; margin-bottom: 5px; }
+        p { margin-top: 0; margin-bottom: 10px; color: var(--text-main); text-align: justify; }
+        li { margin-bottom: 5px; color: var(--text-main); }
+        ul, ol { margin-top: 4px; margin-bottom: 12px; padding-left: 22px; }
+        strong { color: #1e293b; }
+
+        /* ─── Formula boxes ─── */
+        .formula-box { background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%); border: 1px solid #c7d2fe; border-left: 4px solid var(--secondary); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 14px 0; page-break-inside: avoid; }
+        .formula-box .formula-title { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--primary-dark); font-size: 9pt; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .formula-box .formula-content { font-family: 'Fira Code', monospace; font-size: 10pt; color: #1e293b; line-height: 1.8; }
+
+        /* ─── Callouts ─── */
+        .callout { border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 14px 0; page-break-inside: avoid; }
+        .callout-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 9.5pt; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+        .callout-note { background-color: var(--primary-light); border-left: 4px solid var(--primary); }
+        .callout-note .callout-title { color: var(--primary-dark); }
+        .callout-tip { background-color: var(--accent-light); border-left: 4px solid var(--accent); }
+        .callout-tip .callout-title { color: #065f46; }
+        .callout-warning { background-color: var(--warning-light); border-left: 4px solid var(--warning); }
+        .callout-warning .callout-title { color: #92400e; }
+        .callout-example { background-color: #fdf4ff; border-left: 4px solid #a855f7; }
+        .callout-example .callout-title { color: #7e22ce; }
+
+        /* ─── Tables ─── */
+        .table-wrapper { margin: 14px 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; page-break-inside: avoid; }
+        table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+        th { background-color: var(--dark); color: white; font-family: 'Outfit', sans-serif; font-weight: 600; text-transform: uppercase; font-size: 7.5pt; letter-spacing: 0.5px; padding: 10px 12px; border: none; }
+        td { padding: 8px 12px; border: none; border-bottom: 1px solid var(--border); color: #334155; vertical-align: top; }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background-color: var(--light); }
+
+        /* ─── Comparison ─── */
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; page-break-inside: avoid; }
+        .comparison-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px; background-color: var(--light); }
+        .comparison-card h4 { margin-top: 0; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+
+        /* ─── Diagram ─── */
+        .diagram-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin: 14px 0; text-align: center; font-family: 'Fira Code', monospace; font-size: 9pt; line-height: 1.8; page-break-inside: avoid; }
+        .diagram-box .diagram-title { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--dark); font-size: 10pt; margin-bottom: 10px; text-align: left; }
+
+        /* ─── Code ─── */
+        pre { background-color: var(--dark-card); color: #f8fafc; padding: 14px 16px; border-radius: 8px; border: 1px solid #334155; font-family: 'Fira Code', monospace; font-size: 8pt; line-height: 1.5; margin: 12px 0; overflow: hidden; white-space: pre-wrap; word-break: break-all; page-break-inside: avoid; }
+        code { font-family: 'Fira Code', monospace; font-size: 8.5pt; background-color: #f1f5f9; color: #0f172a; padding: 2px 5px; border-radius: 4px; }
+        pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: 8pt; }
+        .code-comment { color: #6b7280; }
+        .code-keyword { color: #c084fc; }
+        .code-string { color: #34d399; }
+        .code-function { color: #60a5fa; }
+
+        /* ─── Quick Ref ─── */
+        .quick-ref { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: white; border-radius: 10px; padding: 20px; margin: 16px 0; page-break-inside: avoid; }
+        .quick-ref h3 { color: #c7d2fe; margin-top: 0; font-size: 12pt; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+        .quick-ref p, .quick-ref li { color: #e2e8f0; }
+        .quick-ref code { background: rgba(255,255,255,0.1); color: #a5b4fc; }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════ COVER PAGE ════════════════════ -->
+<div class="cover-page">
+    <div class="cover-header">
+        <div class="cover-badge">📐 Mathematics for Machine Learning</div>
+        <div class="cover-series">CampusX · Data Science Mentorship Program 2023 · Video 3 of 23</div>
+    </div>
+    <div class="cover-title">
+        <h1>DESCRIPTIVE<br>STATISTICS<br>PART 2</h1>
+        <div class="cover-subtitle">Session 39 — Bivariate analysis, covariance, correlation, and multi-variable visualization</div>
+        <div class="cover-topics">
+            <span class="cover-topic-tag">Percentiles · Quartiles</span>
+            <span class="cover-topic-tag">Box Plot Deep Dive</span>
+            <span class="cover-topic-tag">Scatter Plots</span>
+            <span class="cover-topic-tag">Covariance</span>
+            <span class="cover-topic-tag">Pearson Correlation</span>
+            <span class="cover-topic-tag">Correlation ≠ Causation</span>
+            <span class="cover-topic-tag">Pair Plots · Heatmaps</span>
+        </div>
+    </div>
+    <div class="cover-footer">
+        <div class="cover-author">Session Notes — Complete Reference</div>
+        <div class="cover-meta">Playlist: Maths for Machine Learning · Duration: 1h 55m · Instructor: Nitish Singh (CampusX)</div>
+    </div>
+</div>
+
+<!-- ════════════════════ TOC ════════════════════ -->
+<div class="toc-page">
+    <div class="toc-title">📑 Table of Contents</div>
+    <div class="toc-section"><span class="toc-section-num">01</span><span class="toc-section-title">Recap — Quantiles & Percentiles</span></div>
+    <div class="toc-section"><span class="toc-section-num">02</span><span class="toc-section-title">Box Plot — Deep Dive & Variations</span></div>
+    <div class="toc-section"><span class="toc-section-num">03</span><span class="toc-section-title">Introduction to Bivariate Analysis</span></div>
+    <div class="toc-section"><span class="toc-section-num">04</span><span class="toc-section-title">Scatter Plots — Exploring Numerical-Numerical Relationships</span></div>
+    <div class="toc-section"><span class="toc-section-num">05</span><span class="toc-section-title">Covariance — Direction of Joint Variability</span></div>
+    <div class="toc-section"><span class="toc-section-num">06</span><span class="toc-section-title">Pearson Correlation Coefficient</span></div>
+    <div class="toc-section"><span class="toc-section-num">07</span><span class="toc-section-title">Correlation vs Causation</span></div>
+    <div class="toc-section"><span class="toc-section-num">08</span><span class="toc-section-title">Spurious Correlations & Confounding Variables</span></div>
+    <div class="toc-section"><span class="toc-section-num">09</span><span class="toc-section-title">Simpson's Paradox</span></div>
+    <div class="toc-section"><span class="toc-section-num">10</span><span class="toc-section-title">Bivariate Analysis — Numerical vs Categorical</span></div>
+    <div class="toc-section"><span class="toc-section-num">11</span><span class="toc-section-title">Bivariate Analysis — Categorical vs Categorical</span></div>
+    <div class="toc-section"><span class="toc-section-num">12</span><span class="toc-section-title">Multivariate Visualization — Pair Plots, Heatmaps & Beyond</span></div>
+    <div class="toc-section"><span class="toc-section-num">13</span><span class="toc-section-title">Python Implementation — Complete Code</span></div>
+    <div class="toc-section"><span class="toc-section-num">14</span><span class="toc-section-title">Quick Reference Card</span></div>
+</div>
+
+<!-- ════════════════════ SECTION 1 ════════════════════ -->
+<div class="section-wrapper">
+<h1>1 · Recap — Quantiles & Percentiles</h1>
+<p>Before diving into bivariate analysis, this session begins with a recap of quantiles and percentiles from Part 1, solidifying these foundational concepts.</p>
+
+<h2>1.1 Quantiles — Generalised Concept</h2>
+<p><strong>Quantiles</strong> are cut points dividing a probability distribution into equal-probability intervals. They are the generalisation of percentiles.</p>
+
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Quantile Type</th><th>Number of Divisions</th><th>Example</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Quartiles</strong></td><td>4 equal parts</td><td>Q1, Q2, Q3</td></tr>
+        <tr><td><strong>Quintiles</strong></td><td>5 equal parts</td><td>Used in finance (income brackets)</td></tr>
+        <tr><td><strong>Deciles</strong></td><td>10 equal parts</td><td>D1 through D9</td></tr>
+        <tr><td><strong>Percentiles</strong></td><td>100 equal parts</td><td>P1 through P99</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>1.2 Percentile Calculation Methods</h2>
+<p>There are multiple methods to calculate percentiles. The two most common:</p>
+
+<div class="comparison-grid">
+    <div class="comparison-card">
+        <h4>📊 Nearest-Rank Method</h4>
+        <p>Position = ⌈(k/100) × n⌉</p>
+        <p>Take the value at the <strong>ceiling</strong> of the computed position. Always returns an actual data value.</p>
+    </div>
+    <div class="comparison-card">
+        <h4>📊 Interpolation Method</h4>
+        <p>Position = (k/100) × (n + 1)</p>
+        <p>If position is not a whole number, <strong>interpolate</strong> between the two nearest values. More precise; used by NumPy/Pandas by default.</p>
+    </div>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — 30th Percentile</div>
+    <p>Dataset (sorted): {2, 4, 6, 8, 10, 12, 14, 16, 18, 20}, n = 10<br>
+    <strong>Interpolation:</strong> Position = (30/100) × 11 = 3.3 → Between 3rd (6) and 4th (8) values<br>
+    P30 = 6 + 0.3 × (8 − 6) = 6 + 0.6 = <strong>6.6</strong></p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 2 ════════════════════ -->
+<div class="section-wrapper">
+<h1>2 · Box Plot — Deep Dive & Variations</h1>
+
+<p>This session extends the box plot concepts from Part 1 with practical applications and comparison techniques.</p>
+
+<h2>2.1 Side-by-Side Box Plots</h2>
+<p>One of the most powerful uses of box plots: comparing the distribution of a <strong>numerical variable across categories</strong>.</p>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Use Case</div>
+    <p>Comparing <strong>salary distributions</strong> across departments (Engineering, Marketing, Sales). Each department gets its own box, plotted side-by-side on the same axis. You can instantly compare medians, spreads, and outliers.</p>
+</div>
+
+<h2>2.2 What You Can Read from Side-by-Side Box Plots</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Observation</th><th>Interpretation</th></tr></thead>
+    <tbody>
+        <tr><td>Median lines at different heights</td><td>The groups have <strong>different central values</strong></td></tr>
+        <tr><td>One box much wider (taller) than others</td><td>That group has <strong>more variability</strong></td></tr>
+        <tr><td>Boxes don't overlap at all</td><td>Groups are likely <strong>significantly different</strong></td></tr>
+        <tr><td>Boxes overlap heavily</td><td>Groups may <strong>not be significantly different</strong></td></tr>
+        <tr><td>One group has many outlier dots</td><td>That group has <strong>more extreme values</strong></td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>2.3 Modified Box Plot (Tukey's Box Plot)</h2>
+<p>The standard box plot uses the <strong>1.5×IQR rule</strong> for whisker limits and outlier detection. Tukey also defined:</p>
+<ul>
+    <li><strong>Mild outliers:</strong> Between 1.5×IQR and 3×IQR from Q1/Q3</li>
+    <li><strong>Extreme outliers:</strong> Beyond 3×IQR from Q1/Q3</li>
+</ul>
+
+<div class="formula-box">
+    <div class="formula-title">Outlier Classification</div>
+    <div class="formula-content">
+        Mild Outlier:    Q1 − 3·IQR < x < Q1 − 1.5·IQR  OR  Q3 + 1.5·IQR < x < Q3 + 3·IQR
+        Extreme Outlier: x < Q1 − 3·IQR  OR  x > Q3 + 3·IQR
+    </div>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 3 ════════════════════ -->
+<div class="section-wrapper">
+<h1>3 · Introduction to Bivariate Analysis</h1>
+
+<p>While <strong>univariate analysis</strong> examines one variable at a time, <strong>bivariate analysis</strong> explores the relationship between <strong>two variables simultaneously</strong>. This is critical in ML for understanding feature interactions and dependencies.</p>
+
+<h2>3.1 The Three Combinations</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Variable 1</th><th>Variable 2</th><th>Key Techniques</th><th>Key Visualizations</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Numerical</strong></td><td><strong>Numerical</strong></td><td>Covariance, Correlation</td><td>Scatter Plot, Line Plot</td></tr>
+        <tr><td><strong>Numerical</strong></td><td><strong>Categorical</strong></td><td>Group statistics, ANOVA</td><td>Box Plot, Violin Plot, Bar Plot</td></tr>
+        <tr><td><strong>Categorical</strong></td><td><strong>Categorical</strong></td><td>Contingency Table, Chi-Square</td><td>Grouped Bar Chart, Stacked Bar, Heatmap</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 Why Bivariate Analysis Matters in ML</div>
+    <p>Feature relationships are the backbone of ML models. Understanding how features interact helps with: <strong>Feature selection</strong> (keep correlated features with target), <strong>Multicollinearity detection</strong> (avoid highly correlated features in linear models), <strong>Feature engineering</strong> (create interaction features), and <strong>Model interpretability</strong>.</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 4 ════════════════════ -->
+<div class="section-wrapper">
+<h1>4 · Scatter Plots — Exploring Numerical-Numerical Relationships</h1>
+
+<p>A <strong>scatter plot</strong> displays individual data points on a 2D plane, with each axis representing a different numerical variable. It's the primary tool for visually assessing the relationship between two continuous variables.</p>
+
+<h2>4.1 What Scatter Plots Reveal</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Pattern</th><th>Interpretation</th><th>Visual</th></tr></thead>
+    <tbody>
+        <tr><td>Points rise from left to right</td><td><strong>Positive relationship</strong> — as X increases, Y increases</td><td>↗ upward trend</td></tr>
+        <tr><td>Points fall from left to right</td><td><strong>Negative relationship</strong> — as X increases, Y decreases</td><td>↘ downward trend</td></tr>
+        <tr><td>Points form a tight band</td><td><strong>Strong relationship</strong></td><td>Narrow cloud</td></tr>
+        <tr><td>Points widely scattered</td><td><strong>Weak relationship</strong></td><td>Diffuse cloud</td></tr>
+        <tr><td>Random cloud, no pattern</td><td><strong>No linear relationship</strong></td><td>Uniform blob</td></tr>
+        <tr><td>Curved pattern</td><td><strong>Non-linear relationship</strong> (correlation won't capture this!)</td><td>Parabola/curve</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>4.2 Adding Dimensions to Scatter Plots</h2>
+<ul>
+    <li><strong>Color (hue):</strong> Encode a third categorical variable using colour</li>
+    <li><strong>Size:</strong> Encode a fourth numerical variable using point size (bubble chart)</li>
+    <li><strong>Shape:</strong> Use different markers for categories</li>
+    <li><strong>Regression line:</strong> Overlay a best-fit line to show the trend</li>
+</ul>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 Pro Tip</div>
+    <p>Always look at the <strong>scatter plot before computing correlation</strong>. Correlation only captures <strong>linear</strong> relationships. A strong curved relationship will show r ≈ 0, which is misleading. The scatter plot will reveal the true pattern.</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 5 ════════════════════ -->
+<div class="section-wrapper">
+<h1>5 · Covariance — Direction of Joint Variability</h1>
+
+<p><strong>Covariance</strong> measures how two variables <strong>change together</strong>. It tells you the <strong>direction</strong> of the linear relationship between two variables.</p>
+
+<h2>5.1 The Formula</h2>
+<div class="formula-box">
+    <div class="formula-title">Formula — Covariance</div>
+    <div class="formula-content">
+        Population:  Cov(X,Y) = Σ[(Xᵢ − μₓ)(Yᵢ − μᵧ)] / N
+
+        Sample:      Cov(X,Y) = Σ[(Xᵢ − X̄)(Yᵢ − Ȳ)] / (n − 1)
+    </div>
+</div>
+
+<h2>5.2 Intuition Behind the Formula</h2>
+<p>For each data point, we compute the product of its deviations from both means:</p>
+
+<div class="diagram-box">
+    <div class="diagram-title">📊 How the Sign of Covariance is Determined</div>
+    <pre style="background: transparent; color: #334155; border: none; text-align: left; padding: 0; font-size: 9pt;">
+                        Ȳ
+                        │
+        Quadrant II     │     Quadrant I
+     (Xᵢ − X̄) < 0     │  (Xᵢ − X̄) > 0
+     (Yᵢ − Ȳ) > 0     │  (Yᵢ − Ȳ) > 0
+     Product: (−)(+)=−  │  Product: (+)(+)=+
+                        │
+    ────────────────────X̄────────────────────
+                        │
+        Quadrant III    │     Quadrant IV
+     (Xᵢ − X̄) < 0     │  (Xᵢ − X̄) > 0
+     (Yᵢ − Ȳ) < 0     │  (Yᵢ − Ȳ) < 0
+     Product: (−)(−)=+  │  Product: (+)(−)=−
+                        │
+
+  Positive Cov → Most points in Quadrants I & III (same direction)
+  Negative Cov → Most points in Quadrants II & IV (opposite direction)
+    </pre>
+</div>
+
+<h2>5.3 Interpretation</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Value</th><th>Meaning</th><th>Example</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Cov(X,Y) > 0</strong></td><td>X and Y move in the <strong>same direction</strong></td><td>Study hours ↑ → Exam score ↑</td></tr>
+        <tr><td><strong>Cov(X,Y) < 0</strong></td><td>X and Y move in <strong>opposite directions</strong></td><td>Price ↑ → Demand ↓</td></tr>
+        <tr><td><strong>Cov(X,Y) = 0</strong></td><td><strong>No linear relationship</strong></td><td>Shoe size & IQ</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>5.4 Special Property — Covariance with Itself</h2>
+<div class="formula-box">
+    <div class="formula-title">Important Property</div>
+    <div class="formula-content">
+        Cov(X, X) = Σ[(Xᵢ − X̄)(Xᵢ − X̄)] / (n−1) = Σ[(Xᵢ − X̄)²] / (n−1) = Var(X)
+
+        The covariance of a variable with itself equals its VARIANCE!
+    </div>
+</div>
+
+<h2>5.5 Limitations of Covariance</h2>
+<div class="callout callout-warning">
+    <div class="callout-title">⚠️ Critical Limitation</div>
+    <p>Covariance is <strong>NOT standardised</strong>. Its magnitude depends on the <strong>units and scale</strong> of the variables. A covariance of 1000 might be "small" for one pair and "large" for another. You cannot compare covariances across different variable pairs or datasets. <strong>Solution → Use Correlation instead.</strong></p>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Step-by-Step Example</div>
+    <p><strong>Data:</strong> X = {1, 2, 3, 4, 5}, Y = {2, 4, 5, 4, 5}<br>
+    X̄ = 3, Ȳ = 4<br><br>
+    <strong>Deviations & Products:</strong><br>
+    (1−3)(2−4) = (−2)(−2) = 4<br>
+    (2−3)(4−4) = (−1)(0) = 0<br>
+    (3−3)(5−4) = (0)(1) = 0<br>
+    (4−3)(4−4) = (1)(0) = 0<br>
+    (5−3)(5−4) = (2)(1) = 2<br><br>
+    Σ products = 4 + 0 + 0 + 0 + 2 = 6<br>
+    <strong>Cov(X,Y) = 6 / (5−1) = 6/4 = 1.5</strong> (positive → same direction ✓)</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 6 ════════════════════ -->
+<div class="section-wrapper">
+<h1>6 · Pearson Correlation Coefficient (r)</h1>
+
+<p>The <strong>Pearson Correlation Coefficient (r)</strong> solves the limitations of covariance by <strong>normalising</strong> it — producing a standardised, unit-free measure of the <strong>strength and direction</strong> of the linear relationship.</p>
+
+<h2>6.1 The Formula</h2>
+<div class="formula-box">
+    <div class="formula-title">Formula — Pearson Correlation Coefficient</div>
+    <div class="formula-content">
+        r = Cov(X, Y) / (σₓ · σᵧ)
+
+        r = [Σ(Xᵢ − X̄)(Yᵢ − Ȳ)] / √[Σ(Xᵢ − X̄)² · Σ(Yᵢ − Ȳ)²]
+    </div>
+</div>
+
+<h2>6.2 The Range: −1 to +1</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Value of r</th><th>Strength</th><th>Direction</th><th>Interpretation</th></tr></thead>
+    <tbody>
+        <tr><td><strong>r = +1</strong></td><td>Perfect</td><td>Positive</td><td>All points lie on an upward-sloping line</td></tr>
+        <tr><td><strong>+0.7 to +1</strong></td><td>Strong</td><td>Positive</td><td>Clear upward trend with tight clustering</td></tr>
+        <tr><td><strong>+0.4 to +0.7</strong></td><td>Moderate</td><td>Positive</td><td>Noticeable upward trend but with scatter</td></tr>
+        <tr><td><strong>+0.1 to +0.4</strong></td><td>Weak</td><td>Positive</td><td>Slight upward trend, lots of scatter</td></tr>
+        <tr><td><strong>r = 0</strong></td><td>None</td><td>—</td><td>No linear relationship whatsoever</td></tr>
+        <tr><td><strong>−0.1 to −0.4</strong></td><td>Weak</td><td>Negative</td><td>Slight downward trend</td></tr>
+        <tr><td><strong>−0.4 to −0.7</strong></td><td>Moderate</td><td>Negative</td><td>Noticeable downward trend</td></tr>
+        <tr><td><strong>−0.7 to −1</strong></td><td>Strong</td><td>Negative</td><td>Clear downward trend</td></tr>
+        <tr><td><strong>r = −1</strong></td><td>Perfect</td><td>Negative</td><td>All points lie on a downward-sloping line</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>6.3 Properties of Pearson's r</h2>
+<ul>
+    <li><strong>Unit-free:</strong> Doesn't depend on the scale or units of measurement</li>
+    <li><strong>Bounded:</strong> Always between −1 and +1</li>
+    <li><strong>Symmetric:</strong> r(X,Y) = r(Y,X)</li>
+    <li><strong>Not affected by linear transformations:</strong> Multiplying X by a constant or adding a constant doesn't change |r|</li>
+    <li><strong>Only captures LINEAR relationships:</strong> A parabolic relationship can have r = 0</li>
+</ul>
+
+<h2>6.4 Covariance vs Correlation — Side by Side</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Feature</th><th>Covariance</th><th>Correlation (r)</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Range</strong></td><td>−∞ to +∞</td><td>−1 to +1</td></tr>
+        <tr><td><strong>Units</strong></td><td>Product of units of X and Y</td><td>Unit-free (dimensionless)</td></tr>
+        <tr><td><strong>Tells Direction?</strong></td><td>✅ Yes</td><td>✅ Yes</td></tr>
+        <tr><td><strong>Tells Strength?</strong></td><td>❌ No (scale-dependent)</td><td>✅ Yes</td></tr>
+        <tr><td><strong>Comparable?</strong></td><td>❌ Cannot compare across datasets</td><td>✅ Directly comparable</td></tr>
+        <tr><td><strong>Formula</strong></td><td>Σ(Xᵢ−X̄)(Yᵢ−Ȳ) / (n−1)</td><td>Cov(X,Y) / (σₓ · σᵧ)</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Continuing Previous Example</div>
+    <p>Cov(X,Y) = 1.5, σₓ = √2.5 ≈ 1.581, σᵧ = √1.5 ≈ 1.225<br>
+    <strong>r = 1.5 / (1.581 × 1.225) = 1.5 / 1.937 ≈ 0.775</strong><br>
+    Interpretation: <strong>Strong positive</strong> linear relationship</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 7 ════════════════════ -->
+<div class="section-wrapper">
+<h1>7 · Correlation vs Causation</h1>
+
+<p>One of the most important concepts in all of statistics and data science: <strong>"Correlation does NOT imply Causation."</strong></p>
+
+<div class="callout callout-warning">
+    <div class="callout-title">⚠️ The Golden Rule</div>
+    <p>Just because two variables are correlated (move together) does <strong>NOT</strong> mean one <em>causes</em> the other. This is one of the most common mistakes in data interpretation, journalism, and even published research.</p>
+</div>
+
+<h2>7.1 Three Possible Explanations for Correlation</h2>
+
+<div class="comparison-grid">
+    <div class="comparison-card">
+        <h4>1. Direct Causation</h4>
+        <p>X actually does cause Y.</p>
+        <p><strong>Example:</strong> Smoking → Lung cancer<br>
+        (Established through controlled experiments and decades of evidence)</p>
+    </div>
+    <div class="comparison-card">
+        <h4>2. Reverse Causation</h4>
+        <p>Y actually causes X (not the other way around).</p>
+        <p><strong>Example:</strong> "Countries with more hospitals have more deaths" — more hospitals are <em>built because</em> of higher population (more people → more hospitals AND more deaths)</p>
+    </div>
+</div>
+
+<div class="comparison-grid">
+    <div class="comparison-card">
+        <h4>3. Confounding Variable</h4>
+        <p>A <strong>hidden third variable Z</strong> causes both X and Y, creating a false appearance of X→Y relationship.</p>
+        <p><strong>Example:</strong> Ice cream sales ↑ and drowning deaths ↑ (both caused by hot weather, the confounder)</p>
+    </div>
+    <div class="comparison-card">
+        <h4>4. Pure Coincidence</h4>
+        <p>Two variables happen to correlate by <strong>random chance</strong>, especially with many variables tested.</p>
+        <p><strong>Example:</strong> Nicolas Cage movies vs swimming pool drownings (spurious correlation)</p>
+    </div>
+</div>
+
+<h2>7.2 How to Establish Causation</h2>
+<ul>
+    <li><strong>Randomised Controlled Trials (RCTs):</strong> The gold standard — randomly assign subjects to treatment/control groups</li>
+    <li><strong>Natural Experiments:</strong> Exploit random variation in real-world events</li>
+    <li><strong>Temporal precedence:</strong> Cause must come <em>before</em> the effect</li>
+    <li><strong>Dose-response relationship:</strong> More of the cause → more of the effect</li>
+    <li><strong>Control for confounders:</strong> Use multivariate analysis to hold other variables constant</li>
+</ul>
+</div>
+
+<!-- ════════════════════ SECTION 8 ════════════════════ -->
+<div class="section-wrapper">
+<h1>8 · Spurious Correlations & Confounding Variables</h1>
+
+<h2>8.1 Spurious Correlation</h2>
+<p>A <strong>spurious correlation</strong> is a statistical relationship between two variables that appears meaningful but is actually caused by coincidence or a hidden confounding variable.</p>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Famous Spurious Correlations</div>
+    <p>• <strong>Per capita cheese consumption</strong> correlates with <strong>people dying tangled in bedsheets</strong> (r ≈ 0.95)<br>
+    • <strong>Number of Nicolas Cage films</strong> correlates with <strong>pool drowning deaths</strong> (r ≈ 0.67)<br>
+    • <strong>Divorce rate in Maine</strong> correlates with <strong>margarine consumption</strong> (r ≈ 0.99)<br><br>
+    These are completely coincidental! With thousands of variables, some are bound to correlate by chance.</p>
+</div>
+
+<h2>8.2 Confounding Variables (Lurking Variables)</h2>
+<p>A <strong>confounding variable</strong> is a hidden third variable that influences <em>both</em> the independent and dependent variables, making it appear that they are directly related.</p>
+
+<div class="diagram-box">
+    <div class="diagram-title">📊 Confounding Variable Structure</div>
+    <pre style="background: transparent; color: #334155; border: none; text-align: center; padding: 0; font-size: 10pt;">
+        Confounding Variable (Z)
+              ╱              ╲
+             ↓                ↓
+         Variable X  ← ? →  Variable Y
+          (appears causal, but isn't)
+
+    Example:
+        Hot Weather (Z)
+           ╱          ╲
+          ↓            ↓
+    Ice Cream    Swimming Pool
+      Sales ↑      Drownings ↑
+    </pre>
+</div>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 How to Handle Confounders in ML</div>
+    <p>• <strong>Include confounders as features</strong> in your model so the model can account for them<br>
+    • <strong>Stratified analysis:</strong> Analyse subgroups separately<br>
+    • <strong>Domain knowledge:</strong> Consult subject matter experts to identify potential confounders<br>
+    • <strong>Multivariate regression:</strong> Hold confounders constant while examining the relationship of interest</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 9 ════════════════════ -->
+<div class="section-wrapper">
+<h1>9 · Simpson's Paradox</h1>
+
+<p><strong>Simpson's Paradox</strong> is a phenomenon where a trend that appears in <strong>each subgroup of data</strong> <em>reverses</em> or <em>disappears</em> when the subgroups are combined. It is one of the most counterintuitive results in statistics.</p>
+
+<div class="callout callout-warning">
+    <div class="callout-title">⚠️ Why It's Dangerous</div>
+    <p>If you only look at <strong>aggregate data</strong> without examining subgroups, you can draw the <strong>exact opposite conclusion</strong> from what's actually true. This can lead to wrong decisions in healthcare, policy-making, ML model evaluation, and business.</p>
+</div>
+
+<h2>9.1 Classic Example — UC Berkeley Admissions</h2>
+<div class="callout callout-example">
+    <div class="callout-title">📝 The Famous Example</div>
+    <p><strong>Aggregate data:</strong> Overall, men had a higher admission rate than women → appears discriminatory.<br><br>
+    <strong>Department-level data:</strong> When examined department by department, women actually had <strong>equal or higher</strong> admission rates in most departments!<br><br>
+    <strong>Explanation:</strong> Women applied disproportionately to <strong>more competitive departments</strong> (lower acceptance rates), while men applied more to <strong>easier-to-enter departments</strong>. The <em>confounding variable</em> was the <strong>choice of department</strong>.</p>
+</div>
+
+<h2>9.2 How to Detect Simpson's Paradox</h2>
+<ul>
+    <li><strong>Always stratify:</strong> Break data down by relevant categorical variables</li>
+    <li><strong>Compare aggregate vs subgroup trends:</strong> If they disagree, investigate</li>
+    <li><strong>Use Seaborn's <code>hue</code> parameter:</strong> In pair plots and scatter plots, colour by categories to visually detect reversal</li>
+    <li><strong>Domain knowledge:</strong> Ask "what confounders could be driving this?"</li>
+</ul>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 ML Lesson</div>
+    <p>When evaluating model performance, <strong>always check metrics at the subgroup level</strong> (by gender, age group, etc.) — not just aggregate accuracy. A model might perform well overall but fail on specific subgroups (fairness problem).</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 10 ════════════════════ -->
+<div class="section-wrapper">
+<h1>10 · Bivariate Analysis — Numerical vs Categorical</h1>
+
+<p>When one variable is <strong>numerical</strong> and the other is <strong>categorical</strong>, the goal is to see how the numerical variable's distribution differs across categories.</p>
+
+<h2>10.1 Key Techniques</h2>
+
+<h3>Side-by-Side Box Plots</h3>
+<p>The most effective visualization — shows median, spread, quartiles, and outliers for each category.</p>
+
+<h3>Violin Plots</h3>
+<p>Combines a box plot with a KDE (kernel density estimate). Shows the full distribution shape, not just summary statistics. Wider sections indicate more data points at that value.</p>
+
+<h3>Bar Plot with Error Bars</h3>
+<p>Shows the <strong>mean</strong> of the numerical variable per category with confidence interval error bars. Useful for quick comparisons but <strong>hides the distribution shape</strong>.</p>
+
+<h3>Dist Plots / Histograms per Category</h3>
+<p>Overlay histograms or KDE curves for each category to compare full distributions.</p>
+
+<h2>10.2 Statistical Summary per Group</h2>
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — Salary by Department</div>
+    <p>Use <code>df.groupby('department')['salary'].describe()</code> to get a complete statistical summary (count, mean, std, min, 25%, 50%, 75%, max) for each department. Then visualise with box plots to confirm the patterns.</p>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 11 ════════════════════ -->
+<div class="section-wrapper">
+<h1>11 · Bivariate Analysis — Categorical vs Categorical</h1>
+
+<p>When both variables are <strong>categorical</strong>, we examine how the frequency distribution of one variable changes across the levels of the other.</p>
+
+<h2>11.1 Contingency Table (Cross-tabulation)</h2>
+<p>A <strong>contingency table</strong> (crosstab) is a matrix that displays the frequency distribution of two categorical variables simultaneously.</p>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — Gender × Survival on Titanic</div>
+    <div class="table-wrapper" style="margin-top: 8px;">
+    <table>
+        <thead><tr><th></th><th>Survived</th><th>Did Not Survive</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td><strong>Female</strong></td><td>233</td><td>81</td><td>314</td></tr>
+            <tr><td><strong>Male</strong></td><td>109</td><td>468</td><td>577</td></tr>
+            <tr><td><strong>Total</strong></td><td>342</td><td>549</td><td>891</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p style="margin-top:8px;">This immediately reveals: 74% of females survived vs only 19% of males — a strong relationship between Gender and Survival.</p>
+</div>
+
+<h2>11.2 Visualizations for Categorical × Categorical</h2>
+
+<h3>Grouped (Clustered) Bar Chart</h3>
+<p>Bars for each combination plotted side by side. Best for comparing frequencies across groups.</p>
+
+<h3>Stacked Bar Chart</h3>
+<p>Bars stacked on top of each other. Shows both individual and total frequencies. Good for seeing proportions.</p>
+
+<h3>Heatmap of the Crosstab</h3>
+<p>Colour-coded matrix showing the crosstab values. Darker colours = higher frequencies. Best for large number of categories.</p>
+</div>
+
+<!-- ════════════════════ SECTION 12 ════════════════════ -->
+<div class="section-wrapper">
+<h1>12 · Multivariate Visualization — Pair Plots, Heatmaps & Beyond</h1>
+
+<p>When you need to examine relationships among <strong>three or more variables</strong> simultaneously, you need specialised visualisation tools.</p>
+
+<h2>12.1 Pair Plot (Seaborn <code>pairplot</code>)</h2>
+<p>Creates a <strong>matrix of scatter plots</strong> for every pair of numerical variables. The diagonal shows the distribution of each individual variable (histogram or KDE).</p>
+
+<h3>What It Reveals</h3>
+<ul>
+    <li><strong>All pairwise relationships</strong> at a glance</li>
+    <li><strong>Clusters</strong> when coloured by a categorical variable (hue)</li>
+    <li><strong>Outliers</strong> visible in individual scatter panels</li>
+    <li><strong>Distribution shapes</strong> on the diagonal</li>
+    <li><strong>Simpson's paradox</strong> — trends may reverse when hue is applied</li>
+</ul>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 Key Parameters</div>
+    <p><code>hue</code> — colour by a categorical variable (essential for subgroup analysis)<br>
+    <code>vars</code> — select specific columns to plot<br>
+    <code>diag_kind</code> — 'hist' or 'kde' for diagonal plots<br>
+    <code>kind</code> — 'scatter' or 'reg' (adds regression lines)</p>
+</div>
+
+<h2>12.2 Correlation Heatmap</h2>
+<p>A <strong>colour-coded matrix</strong> showing the Pearson correlation coefficient between every pair of numerical variables.</p>
+
+<h3>Reading a Heatmap</h3>
+<ul>
+    <li><strong>Dark red/positive:</strong> Strong positive correlation</li>
+    <li><strong>Dark blue/negative:</strong> Strong negative correlation</li>
+    <li><strong>White/neutral:</strong> No correlation</li>
+    <li><strong>Diagonal:</strong> Always 1 (variable correlated with itself)</li>
+    <li><strong>Symmetric:</strong> r(X,Y) = r(Y,X), so the matrix is symmetric about the diagonal</li>
+</ul>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 ML Use Case — Feature Selection</div>
+    <p>Use the correlation heatmap to:<br>
+    • <strong>Find features correlated with the target</strong> (keep them)<br>
+    • <strong>Find highly correlated features with each other</strong> (remove one to avoid multicollinearity)<br>
+    • A rule of thumb: features with |r| > 0.85 between them often cause problems in linear models</p>
+</div>
+
+<h2>12.3 Other Multi-Variable Techniques</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Technique</th><th>Best For</th><th>Library</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Pair Plot</strong></td><td>All pairwise scatter plots + distributions</td><td><code>sns.pairplot()</code></td></tr>
+        <tr><td><strong>Correlation Heatmap</strong></td><td>Correlation matrix visualisation</td><td><code>sns.heatmap(df.corr())</code></td></tr>
+        <tr><td><strong>Parallel Coordinates</strong></td><td>Comparing patterns across many features</td><td><code>pd.plotting.parallel_coordinates()</code></td></tr>
+        <tr><td><strong>3D Scatter Plot</strong></td><td>Three numerical variables</td><td><code>plt.axes(projection='3d')</code></td></tr>
+        <tr><td><strong>Facet Grid</strong></td><td>Repeated plots for subsets</td><td><code>sns.FacetGrid()</code></td></tr>
+    </tbody>
+</table>
+</div>
+</div>
+
+<!-- ════════════════════ SECTION 13 ════════════════════ -->
+<div class="section-wrapper">
+<h1>13 · Python Implementation — Complete Code</h1>
+
+<h2>13.1 Covariance & Correlation</h2>
+<pre><code><span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np
+<span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd
+
+<span class="code-comment"># Sample data</span>
+df = pd.DataFrame({
+    <span class="code-string">'study_hours'</span>: [1, 2, 3, 4, 5, 6, 7, 8],
+    <span class="code-string">'exam_score'</span>:  [40, 45, 55, 60, 70, 75, 85, 90],
+    <span class="code-string">'sleep_hours'</span>: [9, 8, 7, 7, 6, 6, 5, 5]
+})
+
+<span class="code-comment"># ── Covariance Matrix ──</span>
+<span class="code-function">print</span>(<span class="code-string">"Covariance Matrix:"</span>)
+<span class="code-function">print</span>(df.cov())
+
+<span class="code-comment"># ── Correlation Matrix (Pearson) ──</span>
+<span class="code-function">print</span>(<span class="code-string">"\nCorrelation Matrix:"</span>)
+<span class="code-function">print</span>(df.corr())        <span class="code-comment"># default: method='pearson'</span>
+
+<span class="code-comment"># ── Individual correlation ──</span>
+r = df[<span class="code-string">'study_hours'</span>].corr(df[<span class="code-string">'exam_score'</span>])
+<span class="code-function">print</span>(f<span class="code-string">"\nr(study_hours, exam_score) = {r:.4f}"</span>)
+
+<span class="code-comment"># ── Using NumPy ──</span>
+cov_matrix = np.cov(df[<span class="code-string">'study_hours'</span>], df[<span class="code-string">'exam_score'</span>])
+corr_matrix = np.corrcoef(df[<span class="code-string">'study_hours'</span>], df[<span class="code-string">'exam_score'</span>])
+</code></pre>
+
+<h2>13.2 Scatter Plot with Regression Line</h2>
+<pre><code><span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt
+<span class="code-keyword">import</span> seaborn <span class="code-keyword">as</span> sns
+
+<span class="code-comment"># Basic scatter plot</span>
+plt.figure(figsize=(8, 5))
+sns.scatterplot(data=df, x=<span class="code-string">'study_hours'</span>, y=<span class="code-string">'exam_score'</span>,
+                s=100, color=<span class="code-string">'#3b82f6'</span>, edgecolor=<span class="code-string">'white'</span>)
+
+<span class="code-comment"># Add regression line</span>
+sns.regplot(data=df, x=<span class="code-string">'study_hours'</span>, y=<span class="code-string">'exam_score'</span>,
+            scatter=<span class="code-keyword">False</span>, color=<span class="code-string">'#ef4444'</span>, line_kws={<span class="code-string">'linewidth'</span>: 2})
+
+plt.title(<span class="code-string">'Study Hours vs Exam Score'</span>, fontsize=14, fontweight=<span class="code-string">'bold'</span>)
+plt.xlabel(<span class="code-string">'Study Hours'</span>)
+plt.ylabel(<span class="code-string">'Exam Score'</span>)
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h2>13.3 Side-by-Side Box Plot & Violin Plot</h2>
+<pre><code><span class="code-comment"># Using Titanic dataset</span>
+titanic = sns.load_dataset(<span class="code-string">'titanic'</span>)
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+<span class="code-comment"># Side-by-side Box Plot</span>
+sns.boxplot(data=titanic, x=<span class="code-string">'class'</span>, y=<span class="code-string">'age'</span>, palette=<span class="code-string">'viridis'</span>, ax=axes[0])
+axes[0].set_title(<span class="code-string">'Age Distribution by Passenger Class'</span>)
+
+<span class="code-comment"># Violin Plot</span>
+sns.violinplot(data=titanic, x=<span class="code-string">'class'</span>, y=<span class="code-string">'age'</span>, palette=<span class="code-string">'muted'</span>, ax=axes[1])
+axes[1].set_title(<span class="code-string">'Age Distribution (Violin) by Class'</span>)
+
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h2>13.4 Contingency Table & Grouped Bar Chart</h2>
+<pre><code><span class="code-comment"># Contingency Table (Crosstab)</span>
+ct = pd.crosstab(titanic[<span class="code-string">'sex'</span>], titanic[<span class="code-string">'survived'</span>], margins=<span class="code-keyword">True</span>)
+<span class="code-function">print</span>(ct)
+
+<span class="code-comment"># Grouped Bar Chart</span>
+ct_no_margins = pd.crosstab(titanic[<span class="code-string">'sex'</span>], titanic[<span class="code-string">'survived'</span>])
+ct_no_margins.plot(kind=<span class="code-string">'bar'</span>, figsize=(8, 5), color=[<span class="code-string">'#ef4444'</span>, <span class="code-string">'#22c55e'</span>])
+plt.title(<span class="code-string">'Survival by Gender'</span>)
+plt.xlabel(<span class="code-string">'Gender'</span>)
+plt.ylabel(<span class="code-string">'Count'</span>)
+plt.xticks(rotation=0)
+plt.legend([<span class="code-string">'Did Not Survive'</span>, <span class="code-string">'Survived'</span>])
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h2>13.5 Pair Plot & Correlation Heatmap</h2>
+<pre><code><span class="code-comment"># ── Pair Plot ──</span>
+iris = sns.load_dataset(<span class="code-string">'iris'</span>)
+sns.pairplot(iris, hue=<span class="code-string">'species'</span>, diag_kind=<span class="code-string">'kde'</span>, palette=<span class="code-string">'Set2'</span>)
+plt.suptitle(<span class="code-string">'Iris Dataset — Pair Plot'</span>, y=1.02, fontsize=14)
+plt.show()
+
+<span class="code-comment"># ── Correlation Heatmap ──</span>
+plt.figure(figsize=(8, 6))
+corr = iris.drop(<span class="code-string">'species'</span>, axis=1).corr()
+sns.heatmap(corr, annot=<span class="code-keyword">True</span>, cmap=<span class="code-string">'coolwarm'</span>, center=0,
+            fmt=<span class="code-string">'.2f'</span>, square=<span class="code-keyword">True</span>, linewidths=1,
+            vmin=-1, vmax=1)
+plt.title(<span class="code-string">'Correlation Heatmap — Iris Features'</span>, fontsize=14, fontweight=<span class="code-string">'bold'</span>)
+plt.tight_layout()
+plt.show()
+</code></pre>
+</div>
+
+<!-- ════════════════════ SECTION 14 ════════════════════ -->
+<div class="section-wrapper">
+<h1>14 · Quick Reference Card</h1>
+
+<div class="quick-ref">
+    <h3>🚀 Descriptive Statistics Part 2 — Complete Cheat Sheet</h3>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Bivariate Analysis Summary</h4>
+    <ul>
+        <li><strong>Num × Num →</strong> Scatter plot, Covariance, Correlation</li>
+        <li><strong>Num × Cat →</strong> Side-by-side Box/Violin plot, Group statistics</li>
+        <li><strong>Cat × Cat →</strong> Contingency table (crosstab), Grouped bar chart, Heatmap</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Covariance & Correlation</h4>
+    <ul>
+        <li><strong>Cov(X,Y)</strong> = Σ(Xᵢ−X̄)(Yᵢ−Ȳ) / (n−1) → direction only, unbounded</li>
+        <li><strong>r = Cov(X,Y) / (σₓ·σᵧ)</strong> → direction + strength, bounded [−1, +1]</li>
+        <li><strong>Cov(X,X) = Var(X)</strong> — covariance of a variable with itself = its variance</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Correlation Strength Guide</h4>
+    <ul>
+        <li>|r| > 0.7 → <strong>Strong</strong></li>
+        <li>0.4 < |r| < 0.7 → <strong>Moderate</strong></li>
+        <li>|r| < 0.4 → <strong>Weak</strong></li>
+        <li>r = 0 → <strong>No linear relationship</strong> (may still be non-linear!)</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Critical Warnings</h4>
+    <ul>
+        <li>⚠️ <strong>Correlation ≠ Causation</strong> — always consider confounders</li>
+        <li>⚠️ <strong>Pearson r captures only LINEAR relationships</strong></li>
+        <li>⚠️ <strong>Simpson's Paradox</strong> — aggregate trends can reverse at subgroup level</li>
+        <li>⚠️ Always <strong>plot first, compute later</strong></li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Python Quick Reference</h4>
+    <ul>
+        <li><code>df.corr()</code> — Full correlation matrix</li>
+        <li><code>df.cov()</code> — Full covariance matrix</li>
+        <li><code>pd.crosstab(df['a'], df['b'])</code> — Contingency table</li>
+        <li><code>sns.pairplot(df, hue='col')</code> — Pair plot with categories</li>
+        <li><code>sns.heatmap(df.corr(), annot=True)</code> — Correlation heatmap</li>
+        <li><code>sns.boxplot(x='cat', y='num', data=df)</code> — Side-by-side box plot</li>
+        <li><code>sns.violinplot(x='cat', y='num', data=df)</code> — Violin plot</li>
+    </ul>
+</div>
+
+<div class="callout callout-note" style="margin-top: 20px;">
+    <div class="callout-title">📚 What's Next? → Probability Distribution Functions (Session 40)</div>
+    <p>Part 3 of the series moves into <strong>Probability Distribution Functions</strong> — covering PDFs, PMFs, CDFs, and the mathematical foundations of probability that underpin all of inferential statistics and machine learning.</p>
+</div>
+</div>
+
+</body>
+</html>

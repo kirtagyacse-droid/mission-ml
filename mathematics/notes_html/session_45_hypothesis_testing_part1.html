@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Session 45 — Hypothesis Testing Part 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;--secondary:#7c3aed;--secondary-light:#f5f3ff;--accent:#059669;--accent-light:#ecfdf5;--warning:#d97706;--warning-light:#fffbeb;--dark:#0f172a;--dark-card:#1e293b;--light:#f8fafc;--border:#e2e8f0;--text-main:#334155;--text-light:#64748b; }
+        @page { size:A4; margin:18mm 15mm 20mm 15mm; }
+        @page cover-page { size:A4; margin:0; }
+        * { box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:var(--text-main); background:white; margin:0; padding:0; line-height:1.7; font-size:10pt; }
+        .cover-page { page-break-after:always; page:cover-page; height:297mm; background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 45%,#312e81 100%); color:white; padding:50mm 30mm 40mm 30mm; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; }
+        .cover-page::before { content:""; position:absolute; top:-20%; right:-15%; width:80%; height:80%; background:radial-gradient(circle,rgba(59,130,246,0.15) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-page::after { content:""; position:absolute; bottom:-10%; left:-8%; width:45%; height:45%; background:radial-gradient(circle,rgba(139,92,246,0.08) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-header { z-index:2; }
+        .cover-badge { display:inline-block; background:linear-gradient(90deg,#3b82f6,#8b5cf6); color:white; font-family:'Outfit',sans-serif; font-size:9pt; font-weight:700; padding:6px 16px; border-radius:9999px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:15px; }
+        .cover-series { font-family:'Outfit',sans-serif; font-size:11pt; color:#94a3b8; font-weight:400; letter-spacing:0.5px; margin-bottom:10px; }
+        .cover-title h1 { font-family:'Outfit',sans-serif; font-size:32pt; line-height:1.15; font-weight:800; border:none; margin:0 0 20px 0; padding:0; background:linear-gradient(to right,#ffffff,#c7d2fe); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .cover-subtitle { font-size:14pt; color:#94a3b8; font-weight:400; margin-bottom:25px; font-family:'Outfit',sans-serif; line-height:1.5; }
+        .cover-topics { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; z-index:2; }
+        .cover-topic-tag { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; font-size:8pt; padding:4px 12px; border-radius:20px; font-family:'Outfit',sans-serif; }
+        .cover-footer { border-top:1px solid rgba(255,255,255,0.1); padding-top:25px; z-index:2; }
+        .cover-author { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:600; color:white; margin-bottom:5px; }
+        .cover-meta { font-size:9pt; color:#64748b; }
+        .toc-page { page-break-after:always; padding-top:10px; }
+        .toc-title { font-family:'Outfit',sans-serif; font-size:20pt; font-weight:800; color:var(--dark); margin-bottom:25px; border-bottom:3px solid var(--primary); padding-bottom:10px; }
+        .toc-section { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; border-bottom:1px dotted #cbd5e1; font-size:10.5pt; }
+        .toc-section-num { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary); min-width:30px; }
+        .toc-section-title { flex:1; font-weight:500; color:var(--dark); }
+        .section-wrapper { page-break-before:always; padding-top:5px; }
+        h1 { font-family:'Outfit',sans-serif; font-size:18pt; font-weight:800; color:var(--dark); margin-top:30px; margin-bottom:12px; border-bottom:2px solid var(--primary); padding-bottom:8px; page-break-after:avoid; }
+        h2 { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:700; color:var(--primary); margin-top:22px; margin-bottom:8px; page-break-after:avoid; }
+        h3 { font-family:'Outfit',sans-serif; font-size:11pt; font-weight:600; color:var(--secondary); margin-top:16px; margin-bottom:6px; page-break-after:avoid; }
+        h4 { font-family:'Outfit',sans-serif; font-size:10pt; font-weight:600; color:#475569; margin-top:12px; margin-bottom:5px; }
+        p { margin-top:0; margin-bottom:10px; text-align:justify; }
+        li { margin-bottom:5px; }
+        ul,ol { margin-top:4px; margin-bottom:12px; padding-left:22px; }
+        strong { color:#1e293b; }
+        .formula-box { background:linear-gradient(135deg,#eff6ff 0%,#f5f3ff 100%); border:1px solid #c7d2fe; border-left:4px solid var(--primary); border-radius:0 8px 8px 0; padding:14px 18px; margin:14px 0; page-break-inside:avoid; }
+        .formula-box .formula-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary-dark); font-size:9pt; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+        .formula-box .formula-content { font-family:'Fira Code',monospace; font-size:10pt; color:#1e293b; line-height:1.8; }
+        .callout { border-radius:0 8px 8px 0; padding:14px 16px; margin:14px 0; page-break-inside:avoid; }
+        .callout-title { font-family:'Outfit',sans-serif; font-weight:700; font-size:9.5pt; margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+        .callout-note { background-color:var(--primary-light); border-left:4px solid var(--primary); }
+        .callout-note .callout-title { color:var(--primary-dark); }
+        .callout-tip { background-color:var(--accent-light); border-left:4px solid var(--accent); }
+        .callout-tip .callout-title { color:#065f46; }
+        .callout-warning { background-color:var(--warning-light); border-left:4px solid var(--warning); }
+        .callout-warning .callout-title { color:#92400e; }
+        .callout-example { background-color:#fdf4ff; border-left:4px solid #a855f7; }
+        .callout-example .callout-title { color:#7e22ce; }
+        .table-wrapper { margin:14px 0; border:1px solid var(--border); border-radius:8px; overflow:hidden; page-break-inside:avoid; }
+        table { width:100%; border-collapse:collapse; font-size:8.5pt; }
+        th { background-color:var(--dark); color:white; font-family:'Outfit',sans-serif; font-weight:600; text-transform:uppercase; font-size:7.5pt; letter-spacing:0.5px; padding:10px 12px; border:none; }
+        td { padding:8px 12px; border:none; border-bottom:1px solid var(--border); vertical-align:top; }
+        tr:last-child td { border-bottom:none; }
+        tr:nth-child(even) { background-color:var(--light); }
+        .comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0; page-break-inside:avoid; }
+        .comparison-card { border:1px solid var(--border); border-radius:8px; padding:14px; background-color:var(--light); }
+        .comparison-card h4 { margin-top:0; color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:5px; }
+        .diagram-box { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:16px; margin:14px 0; text-align:center; font-family:'Fira Code',monospace; font-size:9pt; line-height:1.8; page-break-inside:avoid; }
+        .diagram-box .diagram-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--dark); font-size:10pt; margin-bottom:10px; text-align:left; }
+        pre { background-color:var(--dark-card); color:#f8fafc; padding:14px 16px; border-radius:8px; border:1px solid #334155; font-family:'Fira Code',monospace; font-size:8pt; line-height:1.5; margin:12px 0; overflow:hidden; white-space:pre-wrap; word-break:break-all; page-break-inside:avoid; }
+        code { font-family:'Fira Code',monospace; font-size:8.5pt; background-color:#f1f5f9; color:#0f172a; padding:2px 5px; border-radius:4px; }
+        pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:8pt; }
+        .code-comment { color:#6b7280; } .code-keyword { color:#c084fc; } .code-string { color:#34d399; } .code-function { color:#60a5fa; }
+        .quick-ref { background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); color:white; border-radius:10px; padding:20px; margin:16px 0; page-break-inside:avoid; }
+        .quick-ref h3 { color:#c7d2fe; margin-top:0; font-size:12pt; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; }
+        .quick-ref p,.quick-ref li { color:#e2e8f0; }
+        .quick-ref code { background:rgba(255,255,255,0.1); color:#a5b4fc; }
+    </style>
+</head>
+<body>
+
+<div class="cover-page">
+    <div class="cover-header">
+        <div class="cover-badge">📐 Mathematics for Machine Learning</div>
+        <div class="cover-series">CampusX · Data Science Mentorship Program 2023 · Video 9 of 23</div>
+    </div>
+    <div class="cover-title">
+        <h1>SESSION 45<br>Hypothesis Testing Part 1</h1>
+        <div class="cover-subtitle">Null & Alternative Hypotheses · Type I & II Errors · P-Values · Z-Tests</div>
+        <div class="cover-topics">
+            <span class="cover-topic-tag">Hypothesis Testing Framework</span>
+<span class="cover-topic-tag">Null vs Alternative Hypothesis</span>
+<span class="cover-topic-tag">Type I & Type II Errors</span>
+<span class="cover-topic-tag">Significance Level (Alpha)</span>
+<span class="cover-topic-tag">Decision Rules: Critical Value vs P-Value</span>
+<span class="cover-topic-tag">One-Tailed vs Two-Tailed Tests</span>
+<span class="cover-topic-tag">One-Sample Z-Test</span>
+<span class="cover-topic-tag">Two-Sample Z-Test (A/B Testing)</span>
+
+        </div>
+    </div>
+    <div class="cover-footer">
+        <div class="cover-author">Session Notes — Complete Reference</div>
+        <div class="cover-meta">Playlist: Maths for Machine Learning · Instructor: Nitish Singh (CampusX)</div>
+    </div>
+</div>
+
+<div class="toc-page">
+    <div class="toc-title">📑 Table of Contents</div>
+    
+        <div class="toc-section">
+            <span class="toc-section-num">01</span>
+            <span class="toc-section-title">Hypothesis Testing Framework</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">02</span>
+            <span class="toc-section-title">Null vs Alternative Hypothesis</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">03</span>
+            <span class="toc-section-title">Type I & Type II Errors</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">04</span>
+            <span class="toc-section-title">Significance Level (Alpha)</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">05</span>
+            <span class="toc-section-title">Decision Rules: Critical Value vs P-Value</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">06</span>
+            <span class="toc-section-title">One-Tailed vs Two-Tailed Tests</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">07</span>
+            <span class="toc-section-title">One-Sample Z-Test</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">08</span>
+            <span class="toc-section-title">Two-Sample Z-Test (A/B Testing)</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">09</span>
+            <span class="toc-section-title">Quick Reference Card</span>
+        </div>
+        
+</div>
+
+
+        <div class="section-wrapper">
+            <h1>01 · Hypothesis Testing Framework</h1>
+            <p><strong>Hypothesis Testing</strong> is a formal statistical method used to make decisions about a population based on sample data. It is widely used in machine learning for feature selection, model evaluation, and A/B testing.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>02 · Null vs Alternative Hypothesis</h1>
+            <p>Every hypothesis test involves two competing statements:</p>
+                <ul>
+                    <li><strong>Null Hypothesis ($H_0$):</strong> The status quo, assuming no effect, no change, or no difference. We assume $H_0$ is true unless proven otherwise.</li>
+                    <li><strong>Alternative Hypothesis ($H_a$ or $H_1$):</strong> The claim we want to support, suggesting there is a significant effect or difference.</li>
+                </ul>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>03 · Type I & Type II Errors</h1>
+            <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Decision / Reality</th><th>H₀ is True</th><th>H₀ is False</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Reject H₀</strong></td><td>Type I Error (α)<br>(False Positive)</td><td>Correct Decision (1-β)<br>(Power of the Test)</td></tr>
+                            <tr><td><strong>Fail to Reject H₀</strong></td><td>Correct Decision<br>(No Error)</td><td>Type II Error (β)<br>(False Negative)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>04 · Significance Level (Alpha)</h1>
+            <p>The <strong>significance level ($lpha$)</strong> is the maximum probability of committing a Type I error. It is set by the researcher before the test begins (usually $lpha = 0.05$ or $0.01$).</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>05 · Decision Rules: Critical Value vs P-Value</h1>
+            <p>We make decisions using one of two equivalent approaches:</p>
+                <ul>
+                    <li><strong>Critical Value Approach:</strong> Reject $H_0$ if the computed test statistic is in the critical region.</li>
+                    <li><strong>P-value Approach:</strong> Reject $H_0$ if the **p-value $\le lpha$**. The p-value is the probability of obtaining a test statistic at least as extreme as the observed value, assuming $H_0$ is true.</li>
+                </ul>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>06 · One-Tailed vs Two-Tailed Tests</h1>
+            <ul>
+                    <li><strong>One-Tailed:</strong> $H_a$ specifies a direction (e.g., $\mu > \mu_0$ or $\mu < \mu_0$). All critical area is on one side of the distribution.</li>
+                    <li><strong>Two-Tailed:</strong> $H_a$ does not specify a direction ($\mu 
+eq \mu_0$). The critical area is split equally between both tails.</li>
+                </ul>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>07 · One-Sample Z-Test</h1>
+            <p>Used to compare a sample mean to a known population mean when population variance $\sigma^2$ is known.</p>
+                <div class="formula-box">
+                    <div class="formula-title">Z-Statistic Formula</div>
+                    <div class="formula-content">
+                        Z = (X̄ − μ₀) / (σ / √n)
+                    </div>
+                </div>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>08 · Two-Sample Z-Test (A/B Testing)</h1>
+            <p>Used in A/B testing to compare the conversion rates or means of two independent groups (control and treatment):</p>
+                <div class="formula-box">
+                    <div class="formula-title">Two-Sample Z-Statistic</div>
+                    <div class="formula-content">
+                        Z = (p̂₁ − p̂₂) / √[p_pool(1 − p_pool)(1/n₁ + 1/n₂)]
+                    </div>
+                </div>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>09 · Quick Reference Card</h1>
+            <div class="quick-ref">
+                    <h3>🚀 Hypothesis Testing part 1 Cheat Sheet</h3>
+                    <ul>
+                        <li><strong>Type I Error (α):</strong> Rejecting $H_0$ when it is actually true (False Positive).</li>
+                        <li><strong>Type II Error (β):</strong> Failing to reject $H_0$ when it is false (False Negative).</li>
+                        <li><strong>Rule:</strong> If **p-value $\le lpha$**, reject $H_0$ (statistically significant).</li>
+                        <li><strong>One-Sample Z-Test:</strong> Used only when population standard deviation is known.</li>
+                    </ul>
+                </div>
+        </div>
+        
+
+</body>
+</html>

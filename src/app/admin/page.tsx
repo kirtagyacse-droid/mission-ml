@@ -166,17 +166,24 @@ export default function AdminPage() {
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-[--color-accent-pink] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (status === "unauthenticated") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="glass-card p-8 text-center">
+      <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+        {/* 3D background elements */}
+        <div className="bg-3d-container">
+          <div className="cyber-grid"></div>
+          <div className="cube-3d" style={{ top: '25%', left: '15%' }}>
+            <div className="face front"></div><div className="face back"></div><div className="face left"></div><div className="face right"></div><div className="face top"></div><div className="face bottom"></div>
+          </div>
+        </div>
+        <div className="glass-card p-8 text-center relative z-10 border border-[--color-border-glass]">
           <p className="text-[--color-text-secondary] mb-4">Sign in to access admin</p>
-          <Link href="/auth/signin" className="btn-gradient px-6 py-2 rounded-xl text-white">
+          <Link href="/auth/signin" className="btn-gradient inline-block px-6 py-2.5 rounded-xl text-[#05020a] font-bold">
             Sign In
           </Link>
         </div>
@@ -185,44 +192,56 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      {/* 3D background elements */}
+      <div className="bg-3d-container">
+        <div className="cyber-grid"></div>
+        <div className="cube-3d" style={{ top: '15%', left: '10%' }}>
+          <div className="face front"></div><div className="face back"></div><div className="face left"></div><div className="face right"></div><div className="face top"></div><div className="face bottom"></div>
+        </div>
+        <div className="cube-3d large" style={{ top: '55%', right: '8%' }}>
+          <div className="face front"></div><div className="face back"></div><div className="face left"></div><div className="face right"></div><div className="face top"></div><div className="face bottom"></div>
+        </div>
+      </div>
+
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[--color-bg-primary]/80 border-b border-white/5">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#05020a]/85 border-b border-[--color-border-glass]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-[--color-text-muted] hover:text-[--color-accent-cyan] transition-colors">
+            <Link href="/" className="text-xs font-bold text-[--color-text-muted] hover:text-[--color-accent-chartreuse] transition-colors">
               ← Dashboard
             </Link>
-            <span className="text-[--color-text-muted]">/</span>
-            <h1 className="font-semibold text-[--color-text-primary]">Admin</h1>
+            <span className="text-[--color-text-muted] text-xs">/</span>
+            <h1 className="font-bold text-sm text-[--color-text-primary] tracking-tight">Admin Control Panel</h1>
           </div>
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8 relative z-10">
         {/* Add Topic */}
-        <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold mb-4 gradient-text">Add Topic</h2>
+        <div className="glass-card p-6 border border-[--color-border-glass]">
+          <h2 className="text-lg font-bold mb-4 gradient-text tracking-tight">Add New Topic</h2>
           <form onSubmit={handleAddTopic} className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               placeholder="Topic title"
               value={newTopicTitle}
               onChange={(e) => setNewTopicTitle(e.target.value)}
-              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] placeholder:text-[--color-text-muted] focus:outline-none focus:border-[--color-accent-cyan]/50"
+              className="flex-1 bg-[#0d0417]/50 border border-[--color-border-glass] rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] placeholder:text-[--color-text-muted] focus:outline-none focus:border-[--color-accent-chartreuse]/40"
             />
             <select
               value={newTopicKind}
               onChange={(e) => setNewTopicKind(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-cyan]/50"
+              className="bg-[#0d0417]/50 border border-[--color-border-glass] rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-chartreuse]/40"
             >
               <option value="COURSE_MANUAL">Course (Manual)</option>
               <option value="SINGLE_VIDEO">Single Videos</option>
               <option value="PLAYLIST">Playlist</option>
+              <option value="BOOK">Book</option>
             </select>
             <button
               type="submit"
-              className="btn-gradient px-6 py-2.5 rounded-lg text-white text-sm font-medium"
+              className="btn-gradient px-6 py-2.5 rounded-lg text-[#05020a] text-sm font-bold cursor-pointer"
             >
               Add Topic
             </button>
@@ -230,14 +249,14 @@ export default function AdminPage() {
         </div>
 
         {/* Add Item */}
-        <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold mb-4 gradient-text">Add Item</h2>
+        <div className="glass-card p-6 border border-[--color-border-glass]">
+          <h2 className="text-lg font-bold mb-4 gradient-text tracking-tight">Add New Item</h2>
           <form onSubmit={handleAddItem} className="space-y-3">
             <div className="flex flex-col sm:flex-row gap-3">
               <select
                 value={newItemTopicId}
                 onChange={(e) => setNewItemTopicId(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-cyan]/50"
+                className="bg-[#0d0417]/50 border border-[--color-border-glass] rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-chartreuse]/40"
               >
                 <option value="">Select topic...</option>
                 {topics.map((t) => (
@@ -249,7 +268,7 @@ export default function AdminPage() {
               <select
                 value={newItemType}
                 onChange={(e) => setNewItemType(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-cyan]/50"
+                className="bg-[#0d0417]/50 border border-[--color-border-glass] rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-chartreuse]/40"
               >
                 <option value="MANUAL_MILESTONE">Manual Milestone</option>
                 <option value="YOUTUBE_VIDEO">YouTube Video</option>
@@ -261,18 +280,18 @@ export default function AdminPage() {
                 placeholder="Item title"
                 value={newItemTitle}
                 onChange={(e) => setNewItemTitle(e.target.value)}
-                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] placeholder:text-[--color-text-muted] focus:outline-none focus:border-[--color-accent-cyan]/50"
+                className="flex-1 bg-[#0d0417]/50 border border-[--color-border-glass] rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] placeholder:text-[--color-text-muted] focus:outline-none focus:border-[--color-accent-chartreuse]/40"
               />
               <input
                 type="text"
                 placeholder="YouTube Video ID (optional)"
                 value={newItemVideoId}
                 onChange={(e) => setNewItemVideoId(e.target.value)}
-                className="sm:w-64 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] placeholder:text-[--color-text-muted] focus:outline-none focus:border-[--color-accent-cyan]/50"
+                className="sm:w-64 bg-[#0d0417]/50 border border-[--color-border-glass] rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] placeholder:text-[--color-text-muted] focus:outline-none focus:border-[--color-accent-chartreuse]/40"
               />
               <button
                 type="submit"
-                className="btn-gradient px-6 py-2.5 rounded-lg text-white text-sm font-medium"
+                className="btn-gradient px-6 py-2.5 rounded-lg text-[#05020a] text-sm font-bold cursor-pointer"
               >
                 Add Item
               </button>
@@ -281,13 +300,13 @@ export default function AdminPage() {
         </div>
 
         {/* Import Playlist */}
-        <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold mb-4 gradient-text">Import Playlist</h2>
+        <div className="glass-card p-6 border border-[--color-border-glass]">
+          <h2 className="text-lg font-bold mb-4 gradient-text tracking-tight">Import YouTube Playlist</h2>
           <form onSubmit={handleImportPlaylist} className="flex flex-col sm:flex-row gap-3">
             <select
               value={importTopicId}
               onChange={(e) => setImportTopicId(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-cyan]/50"
+              className="bg-[#0d0417]/50 border border-[--color-border-glass] rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-chartreuse]/40"
             >
               <option value="">Select topic...</option>
               {topics.map((t) => (
@@ -301,31 +320,31 @@ export default function AdminPage() {
               placeholder="Playlist URL or ID"
               value={importPlaylistId}
               onChange={(e) => setImportPlaylistId(e.target.value)}
-              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] placeholder:text-[--color-text-muted] focus:outline-none focus:border-[--color-accent-cyan]/50"
+              className="flex-1 bg-[#0d0417]/50 border border-[--color-border-glass] rounded-lg px-4 py-2.5 text-sm text-[--color-text-primary] placeholder:text-[--color-text-muted] focus:outline-none focus:border-[--color-accent-chartreuse]/40"
             />
             <button
               type="submit"
               disabled={importing}
-              className="btn-gradient px-6 py-2.5 rounded-lg text-white text-sm font-medium disabled:opacity-50"
+              className="btn-gradient px-6 py-2.5 rounded-lg text-[#05020a] text-sm font-bold disabled:opacity-50 cursor-pointer"
             >
               {importing ? "Importing..." : "Import"}
             </button>
           </form>
           {importResult && (
-            <p className="mt-3 text-sm text-[--color-text-secondary]">{importResult}</p>
+            <p className="mt-3 text-sm text-[--color-text-secondary] font-semibold">{importResult}</p>
           )}
         </div>
 
         {/* Topics & Items List */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold gradient-text">All Topics & Items</h2>
+        <div className="space-y-6">
+          <h2 className="text-lg font-bold gradient-text tracking-tight">All Topics & Items</h2>
           {topics.map((topic) => (
-            <div key={topic.id} className="glass-card overflow-hidden">
-              <div className="p-4 flex items-center justify-between border-b border-white/5">
+            <div key={topic.id} className="glass-card overflow-hidden border border-[--color-border-glass]">
+              <div className="p-4 flex items-center justify-between border-b border-white/5 bg-[#0d0417]/30">
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-mono text-[--color-text-muted]">#{topic.order + 1}</span>
-                  <h3 className="font-semibold text-[--color-text-primary]">{topic.title}</h3>
-                  <span className="text-[10px] uppercase tracking-wider text-[--color-text-muted] bg-white/5 px-2 py-0.5 rounded-full">
+                  <h3 className="font-bold text-[--color-text-primary] text-base">{topic.title}</h3>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-[--color-accent-carnation] bg-[--color-accent-pink]/10 border border-[--color-accent-pink]/25 px-2 py-0.5 rounded-full">
                     {topic.kind}
                   </span>
                   <span className="text-xs text-[--color-text-muted]">
@@ -334,16 +353,16 @@ export default function AdminPage() {
                 </div>
                 <button
                   onClick={() => handleDeleteTopic(topic.id)}
-                  className="text-xs text-[--color-accent-red]/60 hover:text-[--color-accent-red] transition-colors"
+                  className="text-xs font-bold text-[--color-accent-pink] hover:text-[--color-accent-chartreuse] transition-colors cursor-pointer"
                 >
-                  Delete
+                  Delete Topic
                 </button>
               </div>
               <div className="p-3 space-y-1">
                 {topic.items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 group"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[--color-accent-pink]/5 group"
                   >
                     {editingItem === item.id ? (
                       <>
@@ -351,24 +370,24 @@ export default function AdminPage() {
                           type="text"
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
-                          className="flex-1 bg-white/5 border border-white/10 rounded px-3 py-1.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-cyan]/50"
+                          className="flex-1 bg-[#0d0417]/70 border border-[--color-accent-pink]/40 rounded px-3 py-1.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-chartreuse]/40"
                         />
                         <input
                           type="text"
                           placeholder="Video ID"
                           value={editVideoId}
                           onChange={(e) => setEditVideoId(e.target.value)}
-                          className="w-40 bg-white/5 border border-white/10 rounded px-3 py-1.5 text-sm text-[--color-text-primary] focus:outline-none"
+                          className="w-40 bg-[#0d0417]/70 border border-[--color-accent-pink]/40 rounded px-3 py-1.5 text-sm text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-chartreuse]/40"
                         />
                         <button
                           onClick={() => handleEditItem(item.id)}
-                          className="text-xs text-[--color-accent-green] hover:underline"
+                          className="text-xs font-bold text-[--color-accent-chartreuse] hover:underline cursor-pointer"
                         >
                           Save
                         </button>
                         <button
                           onClick={() => setEditingItem(null)}
-                          className="text-xs text-[--color-text-muted] hover:underline"
+                          className="text-xs font-bold text-[--color-text-muted] hover:underline cursor-pointer"
                         >
                           Cancel
                         </button>
@@ -382,7 +401,7 @@ export default function AdminPage() {
                           {item.title}
                         </span>
                         {item.youtubeVideoId && (
-                          <span className="text-[10px] font-mono text-[--color-accent-cyan] bg-cyan-500/10 px-1.5 py-0.5 rounded">
+                          <span className="text-[10px] font-mono text-[--color-accent-chartreuse] bg-[--color-accent-chartreuse]/10 border border-[--color-accent-chartreuse]/20 px-2 py-0.5 rounded">
                             {item.youtubeVideoId}
                           </span>
                         )}
@@ -396,13 +415,13 @@ export default function AdminPage() {
                             setEditVideoId(item.youtubeVideoId ?? "");
                             setEditType(item.type);
                           }}
-                          className="text-xs text-[--color-text-muted] opacity-0 group-hover:opacity-100 hover:text-[--color-accent-cyan] transition-all"
+                          className="text-xs font-bold text-[--color-text-muted] opacity-0 group-hover:opacity-100 hover:text-[--color-accent-chartreuse] transition-all cursor-pointer"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDeleteItem(item.id)}
-                          className="text-xs text-[--color-text-muted] opacity-0 group-hover:opacity-100 hover:text-[--color-accent-red] transition-all"
+                          className="text-xs font-bold text-[--color-text-muted] opacity-0 group-hover:opacity-100 hover:text-[--color-accent-pink] transition-all cursor-pointer"
                         >
                           Delete
                         </button>
@@ -418,8 +437,8 @@ export default function AdminPage() {
               </div>
             </div>
           ))}
-        </div>
       </div>
     </div>
+  </div>
   );
 }

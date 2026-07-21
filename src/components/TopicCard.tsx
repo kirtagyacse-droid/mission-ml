@@ -40,16 +40,18 @@ const kindIcons: Record<string, string> = {
   COURSE_MANUAL: "📚",
   SINGLE_VIDEO: "🎬",
   PLAYLIST: "📋",
+  BOOK: "📖",
 };
 
 const kindLabels: Record<string, string> = {
   COURSE_MANUAL: "Course",
   SINGLE_VIDEO: "Videos",
   PLAYLIST: "Playlist",
+  BOOK: "Book",
 };
 
 export default function TopicCard({ topic, onProgressChange }: Props) {
-  const [expanded, setExpanded] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const totalItems = topic.items.length;
   const completedItems = topic.items.filter((item) =>
@@ -59,77 +61,128 @@ export default function TopicCard({ topic, onProgressChange }: Props) {
     totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
 
   return (
-    <div className="glass-card overflow-hidden">
-      {/* Header — clickable to expand */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full p-5 sm:p-6 flex items-center gap-4 text-left group"
+    <>
+      {/* Small vertical card */}
+      <div
+        onClick={() => setShowModal(true)}
+        className="flex-shrink-0 w-72 h-64 p-6 glass-card border border-[--color-border-glass] rounded-2xl flex flex-col justify-between cursor-pointer group hover:-translate-y-2 hover:border-[--color-accent-chartreuse]/40 hover:shadow-[0_0_35px_rgba(206,255,50,0.1)] transition-all duration-300 relative overflow-hidden select-none"
       >
-        {/* Icon */}
-        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xl">
-          {kindIcons[topic.kind] ?? "📌"}
-        </div>
+        {/* Animated accent shine */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-        {/* Title & meta */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-semibold text-[--color-text-primary] truncate text-base sm:text-lg">
-              {topic.title}
-            </h2>
-            <span className="flex-shrink-0 text-[10px] uppercase tracking-wider text-[--color-text-muted] bg-white/5 px-2 py-0.5 rounded-full">
+        {/* Top Info */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="w-12 h-12 rounded-2xl bg-[--color-accent-pink]/10 border border-[--color-accent-pink]/20 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(236,43,122,0.15)] group-hover:scale-110 transition-transform duration-300">
+              {kindIcons[topic.kind] ?? "📌"}
+            </div>
+            <span className="text-[9px] uppercase tracking-widest font-black text-[--color-accent-carnation] bg-[--color-accent-pink]/10 border border-[--color-accent-pink]/25 px-3 py-1 rounded-full">
               {kindLabels[topic.kind] ?? topic.kind}
             </span>
           </div>
 
-          {/* Progress bar */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
-              <div
-                className="progress-fill h-full"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <span className="flex-shrink-0 text-xs font-mono text-[--color-text-secondary]">
-              <span
-                className={
-                  completedItems === totalItems && totalItems > 0
-                    ? "text-[--color-accent-green]"
-                    : "text-[--color-accent-cyan]"
-                }
-              >
+          <h3 className="font-bold text-[--color-text-primary] text-lg leading-snug group-hover:text-[--color-accent-chartreuse] transition-colors duration-300 line-clamp-3">
+            {topic.title}
+          </h3>
+        </div>
+
+        {/* Bottom Progress */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-xs font-mono">
+            <span className="text-[--color-text-muted] font-medium">Progress</span>
+            <span className="text-[--color-text-secondary] font-bold">
+              <span className={completedItems === totalItems && totalItems > 0 ? "text-[--color-accent-chartreuse]" : "text-[--color-accent-pink]"}>
                 {completedItems}
               </span>
-              /{totalItems}
+              <span className="text-[--color-text-muted] font-normal">/</span>
+              {totalItems}
             </span>
           </div>
-        </div>
 
-        {/* Expand arrow */}
-        <div
-          className={`flex-shrink-0 w-6 h-6 flex items-center justify-center text-[--color-text-muted] transition-transform duration-300 ${
-            expanded ? "rotate-180" : ""
-          }`}
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <div className="relative h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+            <div
+              className="progress-fill h-full"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
         </div>
-      </button>
+      </div>
 
-      {/* Items list — expandable */}
-      {expanded && (
-        <div className="expand-enter border-t border-white/5">
-          <div className="p-3 sm:p-4 space-y-1">
-            {topic.items.map((item) => (
-              <ItemRow
-                key={item.id}
-                item={item}
-                onProgressChange={onProgressChange}
-              />
-            ))}
+      {/* Checklist Pop-up Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            onClick={() => setShowModal(false)}
+            className="absolute inset-0 bg-[#04010a]/90 backdrop-blur-md transition-all duration-300"
+          />
+
+          {/* Modal Container */}
+          <div className="relative w-full max-w-2xl max-h-[80vh] bg-[#0c0418]/95 border border-[--color-accent-pink]/25 rounded-3xl p-6 sm:p-8 flex flex-col gap-6 shadow-[0_0_60px_rgba(236,43,122,0.2)] overflow-hidden scale-in">
+            {/* Holographic scanner effect line */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[--color-accent-pink] to-transparent animate-pulse" />
+
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{kindIcons[topic.kind] ?? "📌"}</span>
+                  <span className="text-[9px] uppercase tracking-widest font-black text-[--color-accent-chartreuse] bg-[--color-accent-chartreuse]/10 border border-[--color-accent-chartreuse]/20 px-3 py-1 rounded-full">
+                    {kindLabels[topic.kind] ?? topic.kind}
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-[--color-text-primary] mt-2 leading-tight">
+                  {topic.title}
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowModal(false)}
+                className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[--color-text-secondary] hover:text-[--color-accent-pink] hover:border-[--color-accent-pink]/30 hover:scale-105 transition-all duration-200 cursor-pointer"
+                title="Close"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Overall Progress Indicator */}
+            <div className="p-4 bg-[#120724]/40 border border-white/5 rounded-2xl flex items-center justify-between gap-6">
+              <div className="flex-1 space-y-2">
+                <div className="flex justify-between text-xs font-mono">
+                  <span className="text-[--color-text-secondary]">Completion Progress</span>
+                  <span className="font-bold text-[--color-accent-chartreuse]">{Math.round(progressPercent)}%</span>
+                </div>
+                <div className="h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                  <div
+                    className="progress-fill h-full"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              </div>
+              <div className="text-center font-mono">
+                <div className="text-2xl font-black text-[--color-text-primary]">
+                  {completedItems}
+                </div>
+                <div className="text-[8px] uppercase tracking-wider text-[--color-text-muted] font-bold">
+                  of {totalItems} items
+                </div>
+              </div>
+            </div>
+
+            {/* Scrollable Checklist Items */}
+            <div className="flex-1 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
+              {topic.items.map((item) => (
+                <ItemRow
+                  key={item.id}
+                  item={item}
+                  onProgressChange={onProgressChange}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

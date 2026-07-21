@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Session 41 — Normal Distribution</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;--secondary:#7c3aed;--secondary-light:#f5f3ff;--accent:#059669;--accent-light:#ecfdf5;--warning:#d97706;--warning-light:#fffbeb;--dark:#0f172a;--dark-card:#1e293b;--light:#f8fafc;--border:#e2e8f0;--text-main:#334155;--text-light:#64748b; }
+        @page { size:A4; margin:18mm 15mm 20mm 15mm; }
+        @page cover-page { size:A4; margin:0; }
+        * { box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:var(--text-main); background:white; margin:0; padding:0; line-height:1.7; font-size:10pt; }
+        .cover-page { page-break-after:always; page:cover-page; height:297mm; background:linear-gradient(135deg,#0f172a 0%,#172554 45%,#1e3a5f 100%); color:white; padding:50mm 30mm 40mm 30mm; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; }
+        .cover-page::before { content:""; position:absolute; top:-20%; right:-15%; width:80%; height:80%; background:radial-gradient(circle,rgba(59,130,246,0.15) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-page::after { content:""; position:absolute; bottom:-10%; left:-8%; width:45%; height:45%; background:radial-gradient(circle,rgba(168,85,247,0.08) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-header { z-index:2; }
+        .cover-badge { display:inline-block; background:linear-gradient(90deg,#3b82f6,#a855f7); color:white; font-family:'Outfit',sans-serif; font-size:9pt; font-weight:700; padding:6px 16px; border-radius:9999px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:15px; }
+        .cover-series { font-family:'Outfit',sans-serif; font-size:11pt; color:#94a3b8; font-weight:400; letter-spacing:0.5px; margin-bottom:10px; }
+        .cover-title h1 { font-family:'Outfit',sans-serif; font-size:38pt; line-height:1.15; font-weight:800; border:none; margin:0 0 20px 0; padding:0; background:linear-gradient(to right,#ffffff,#93c5fd); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .cover-subtitle { font-size:14pt; color:#94a3b8; font-weight:400; margin-bottom:25px; font-family:'Outfit',sans-serif; line-height:1.5; }
+        .cover-topics { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; z-index:2; }
+        .cover-topic-tag { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; font-size:8pt; padding:4px 12px; border-radius:20px; font-family:'Outfit',sans-serif; }
+        .cover-footer { border-top:1px solid rgba(255,255,255,0.1); padding-top:25px; z-index:2; }
+        .cover-author { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:600; color:white; margin-bottom:5px; }
+        .cover-meta { font-size:9pt; color:#64748b; }
+        .toc-page { page-break-after:always; padding-top:10px; }
+        .toc-title { font-family:'Outfit',sans-serif; font-size:20pt; font-weight:800; color:var(--dark); margin-bottom:25px; border-bottom:3px solid var(--primary); padding-bottom:10px; }
+        .toc-section { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; border-bottom:1px dotted #cbd5e1; font-size:10.5pt; }
+        .toc-section-num { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary); min-width:30px; }
+        .toc-section-title { flex:1; font-weight:500; color:var(--dark); }
+        .section-wrapper { page-break-before:always; padding-top:5px; }
+        h1 { font-family:'Outfit',sans-serif; font-size:18pt; font-weight:800; color:var(--dark); margin-top:30px; margin-bottom:12px; border-bottom:2px solid var(--primary); padding-bottom:8px; page-break-after:avoid; }
+        h2 { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:700; color:var(--primary); margin-top:22px; margin-bottom:8px; page-break-after:avoid; }
+        h3 { font-family:'Outfit',sans-serif; font-size:11pt; font-weight:600; color:var(--secondary); margin-top:16px; margin-bottom:6px; page-break-after:avoid; }
+        h4 { font-family:'Outfit',sans-serif; font-size:10pt; font-weight:600; color:#475569; margin-top:12px; margin-bottom:5px; }
+        p { margin-top:0; margin-bottom:10px; text-align:justify; }
+        li { margin-bottom:5px; }
+        ul,ol { margin-top:4px; margin-bottom:12px; padding-left:22px; }
+        strong { color:#1e293b; }
+        .formula-box { background:linear-gradient(135deg,#eff6ff 0%,#f5f3ff 100%); border:1px solid #c7d2fe; border-left:4px solid var(--primary); border-radius:0 8px 8px 0; padding:14px 18px; margin:14px 0; page-break-inside:avoid; }
+        .formula-box .formula-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary-dark); font-size:9pt; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+        .formula-box .formula-content { font-family:'Fira Code',monospace; font-size:10pt; color:#1e293b; line-height:1.8; }
+        .callout { border-radius:0 8px 8px 0; padding:14px 16px; margin:14px 0; page-break-inside:avoid; }
+        .callout-title { font-family:'Outfit',sans-serif; font-weight:700; font-size:9.5pt; margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+        .callout-note { background-color:var(--primary-light); border-left:4px solid var(--primary); }
+        .callout-note .callout-title { color:var(--primary-dark); }
+        .callout-tip { background-color:var(--accent-light); border-left:4px solid var(--accent); }
+        .callout-tip .callout-title { color:#065f46; }
+        .callout-warning { background-color:var(--warning-light); border-left:4px solid var(--warning); }
+        .callout-warning .callout-title { color:#92400e; }
+        .callout-example { background-color:#fdf4ff; border-left:4px solid #a855f7; }
+        .callout-example .callout-title { color:#7e22ce; }
+        .table-wrapper { margin:14px 0; border:1px solid var(--border); border-radius:8px; overflow:hidden; page-break-inside:avoid; }
+        table { width:100%; border-collapse:collapse; font-size:8.5pt; }
+        th { background-color:var(--dark); color:white; font-family:'Outfit',sans-serif; font-weight:600; text-transform:uppercase; font-size:7.5pt; letter-spacing:0.5px; padding:10px 12px; border:none; }
+        td { padding:8px 12px; border:none; border-bottom:1px solid var(--border); vertical-align:top; }
+        tr:last-child td { border-bottom:none; }
+        tr:nth-child(even) { background-color:var(--light); }
+        .comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0; page-break-inside:avoid; }
+        .comparison-card { border:1px solid var(--border); border-radius:8px; padding:14px; background-color:var(--light); }
+        .comparison-card h4 { margin-top:0; color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:5px; }
+        .diagram-box { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:16px; margin:14px 0; text-align:center; font-family:'Fira Code',monospace; font-size:9pt; line-height:1.8; page-break-inside:avoid; }
+        .diagram-box .diagram-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--dark); font-size:10pt; margin-bottom:10px; text-align:left; }
+        pre { background-color:var(--dark-card); color:#f8fafc; padding:14px 16px; border-radius:8px; border:1px solid #334155; font-family:'Fira Code',monospace; font-size:8pt; line-height:1.5; margin:12px 0; overflow:hidden; white-space:pre-wrap; word-break:break-all; page-break-inside:avoid; }
+        code { font-family:'Fira Code',monospace; font-size:8.5pt; background-color:#f1f5f9; color:#0f172a; padding:2px 5px; border-radius:4px; }
+        pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:8pt; }
+        .code-comment { color:#6b7280; } .code-keyword { color:#c084fc; } .code-string { color:#34d399; } .code-function { color:#60a5fa; }
+        .quick-ref { background:linear-gradient(135deg,#0f172a 0%,#172554 100%); color:white; border-radius:10px; padding:20px; margin:16px 0; page-break-inside:avoid; }
+        .quick-ref h3 { color:#93c5fd; margin-top:0; font-size:12pt; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; }
+        .quick-ref p,.quick-ref li { color:#e2e8f0; }
+        .quick-ref code { background:rgba(255,255,255,0.1); color:#a5b4fc; }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════ COVER ════════════════════ -->
+<div class="cover-page">
+    <div class="cover-header">
+        <div class="cover-badge">📐 Mathematics for Machine Learning</div>
+        <div class="cover-series">CampusX · Data Science Mentorship Program 2023 · Video 5 of 23</div>
+    </div>
+    <div class="cover-title">
+        <h1>NORMAL<br>DISTRIBUTION</h1>
+        <div class="cover-subtitle">Session 41 — The Gaussian Bell Curve · Z-Scores · Empirical Rule · QQ Plots</div>
+        <div class="cover-topics">
+            <span class="cover-topic-tag">Bell Curve Equation</span>
+            <span class="cover-topic-tag">μ and σ Parameters</span>
+            <span class="cover-topic-tag">68-95-99.7 Rule</span>
+            <span class="cover-topic-tag">Standard Normal</span>
+            <span class="cover-topic-tag">Z-Score & Z-Table</span>
+            <span class="cover-topic-tag">QQ Plot</span>
+            <span class="cover-topic-tag">Normality Tests</span>
+            <span class="cover-topic-tag">Log-Normal</span>
+        </div>
+    </div>
+    <div class="cover-footer">
+        <div class="cover-author">Session Notes — Complete Reference</div>
+        <div class="cover-meta">Playlist: Maths for Machine Learning · Instructor: Nitish Singh (CampusX)</div>
+    </div>
+</div>
+
+<!-- ════════════════════ TOC ════════════════════ -->
+<div class="toc-page">
+    <div class="toc-title">📑 Table of Contents</div>
+    <div class="toc-section"><span class="toc-section-num">01</span><span class="toc-section-title">Why Normal Distribution Matters</span></div>
+    <div class="toc-section"><span class="toc-section-num">02</span><span class="toc-section-title">The Bell Curve — Equation & Parameters</span></div>
+    <div class="toc-section"><span class="toc-section-num">03</span><span class="toc-section-title">Properties of the Normal Distribution</span></div>
+    <div class="toc-section"><span class="toc-section-num">04</span><span class="toc-section-title">Empirical Rule (68-95-99.7)</span></div>
+    <div class="toc-section"><span class="toc-section-num">05</span><span class="toc-section-title">Standard Normal Distribution & Z-Score</span></div>
+    <div class="toc-section"><span class="toc-section-num">06</span><span class="toc-section-title">Using Z-Tables</span></div>
+    <div class="toc-section"><span class="toc-section-num">07</span><span class="toc-section-title">CDF of the Normal Distribution</span></div>
+    <div class="toc-section"><span class="toc-section-num">08</span><span class="toc-section-title">Effect of μ and σ on the Curve</span></div>
+    <div class="toc-section"><span class="toc-section-num">09</span><span class="toc-section-title">Checking Normality — QQ Plot & Statistical Tests</span></div>
+    <div class="toc-section"><span class="toc-section-num">10</span><span class="toc-section-title">Skewness & Kurtosis Revisited</span></div>
+    <div class="toc-section"><span class="toc-section-num">11</span><span class="toc-section-title">Log-Normal Distribution & Data Transformations</span></div>
+    <div class="toc-section"><span class="toc-section-num">12</span><span class="toc-section-title">Applications in Machine Learning</span></div>
+    <div class="toc-section"><span class="toc-section-num">13</span><span class="toc-section-title">Python Implementation — Complete Code</span></div>
+    <div class="toc-section"><span class="toc-section-num">14</span><span class="toc-section-title">Quick Reference Card</span></div>
+</div>
+
+<!-- ═══════ SECTION 1 ═══════ -->
+<div class="section-wrapper">
+<h1>1 · Why Normal Distribution Matters</h1>
+<p>The <strong>Normal Distribution</strong> (Gaussian Distribution) is arguably the most important probability distribution in all of statistics, data science, and machine learning. Understanding it deeply is non-negotiable.</p>
+
+<h2>1.1 Why Is It Everywhere?</h2>
+<ul>
+    <li><strong>Nature follows it:</strong> Heights, weights, blood pressure, IQ scores, measurement errors — all tend to be normally distributed</li>
+    <li><strong>Central Limit Theorem:</strong> The mean of any sufficiently large random sample will be approximately normally distributed, regardless of the underlying distribution</li>
+    <li><strong>Mathematical convenience:</strong> Many statistical methods are derived under the assumption of normality</li>
+    <li><strong>ML algorithms depend on it:</strong> Linear Regression (residuals), Logistic Regression, LDA, Gaussian Naive Bayes, Gaussian Mixture Models all assume normality</li>
+</ul>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 The "Normal" Name</div>
+    <p>It's called "normal" not because other distributions are "abnormal," but because it was historically considered the norm for describing natural variation. It is also called the <strong>Gaussian Distribution</strong> after Carl Friedrich Gauss, who used it to model astronomical errors.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 2 ═══════ -->
+<div class="section-wrapper">
+<h1>2 · The Bell Curve — Equation & Parameters</h1>
+
+<h2>2.1 The PDF Formula</h2>
+<div class="formula-box">
+    <div class="formula-title">Normal Distribution PDF</div>
+    <div class="formula-content">
+        f(x) = (1 / σ√(2π)) · e^[−(x − μ)² / (2σ²)]
+
+        where:
+        μ  = mean (centre of the bell curve)
+        σ  = standard deviation (width/spread)
+        σ² = variance
+        e  = Euler's number ≈ 2.71828
+        π  ≈ 3.14159
+    </div>
+</div>
+
+<h2>2.2 Breaking Down the Formula</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Component</th><th>Purpose</th><th>Effect</th></tr></thead>
+    <tbody>
+        <tr><td><strong>1 / σ√(2π)</strong></td><td>Normalisation constant</td><td>Ensures total area under curve = 1</td></tr>
+        <tr><td><strong>(x − μ)²</strong></td><td>Squared distance from mean</td><td>Makes the curve symmetric about μ</td></tr>
+        <tr><td><strong>−(x − μ)² / (2σ²)</strong></td><td>Negative exponent</td><td>Values far from μ get exponentially smaller density</td></tr>
+        <tr><td><strong>e^[…]</strong></td><td>Exponential function</td><td>Creates the smooth bell shape</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>2.3 Notation</h2>
+<div class="formula-box">
+    <div class="formula-title">Standard Notation</div>
+    <div class="formula-content">
+        X ~ N(μ, σ²)     "X follows a Normal distribution with mean μ and variance σ²"
+
+        Examples:
+        X ~ N(0, 1)       Standard Normal Distribution
+        X ~ N(100, 225)   IQ scores (μ=100, σ=15, σ²=225)
+    </div>
+</div>
+</div>
+
+<!-- ═══════ SECTION 3 ═══════ -->
+<div class="section-wrapper">
+<h1>3 · Properties of the Normal Distribution</h1>
+
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>#</th><th>Property</th><th>Details</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td><strong>Bell-shaped & Symmetric</strong></td><td>Perfectly symmetric about the mean μ</td></tr>
+        <tr><td>2</td><td><strong>Mean = Median = Mode</strong></td><td>All three measures of central tendency are identical</td></tr>
+        <tr><td>3</td><td><strong>Unimodal</strong></td><td>Exactly one peak (the mode) at x = μ</td></tr>
+        <tr><td>4</td><td><strong>Asymptotic</strong></td><td>Tails approach zero but never touch the x-axis (extends to ±∞)</td></tr>
+        <tr><td>5</td><td><strong>Total area = 1</strong></td><td>∫₋∞⁺∞ f(x) dx = 1</td></tr>
+        <tr><td>6</td><td><strong>Defined by two parameters</strong></td><td>μ (location) and σ (scale) completely specify the distribution</td></tr>
+        <tr><td>7</td><td><strong>Skewness = 0</strong></td><td>No skew — perfectly balanced left and right</td></tr>
+        <tr><td>8</td><td><strong>Kurtosis = 3 (excess = 0)</strong></td><td>The baseline "mesokurtic" distribution</td></tr>
+        <tr><td>9</td><td><strong>Inflection points</strong></td><td>At x = μ ± σ (where the curve changes from concave to convex)</td></tr>
+        <tr><td>10</td><td><strong>Additive property</strong></td><td>Sum of independent normals is also normal: X + Y ~ N(μₓ+μᵧ, σₓ²+σᵧ²)</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="diagram-box">
+    <div class="diagram-title">📊 Anatomy of the Bell Curve</div>
+    <pre style="background:transparent;color:#334155;border:none;text-align:left;padding:0;font-size:9pt;">
+                           Peak = f(μ) = 1/(σ√2π)
+                              ▼
+                           ┌──*──┐
+                          ╱  │    ╲          ← Inflection points at μ±σ
+                        ╱    │      ╲
+                      ╱      │        ╲
+                   ╱─────────│───────────╲
+                ╱            │              ╲
+         ──╱─────────────────│───────────────────╲──── x-axis
+           │    │    │       μ       │    │    │
+          μ-3σ μ-2σ μ-σ            μ+σ  μ+2σ μ+3σ
+
+           ←── 68.27% ──→           (1σ)
+           ←────── 95.45% ──────→   (2σ)
+           ←─────────── 99.73% ─────────────→  (3σ)
+    </pre>
+</div>
+</div>
+
+<!-- ═══════ SECTION 4 ═══════ -->
+<div class="section-wrapper">
+<h1>4 · Empirical Rule (68-95-99.7)</h1>
+
+<p>The <strong>Empirical Rule</strong> (also called the 3-sigma rule) is the most practically useful property of the normal distribution. It tells you exactly how much data falls within 1, 2, or 3 standard deviations of the mean.</p>
+
+<div class="formula-box">
+    <div class="formula-title">The 68-95-99.7 Rule</div>
+    <div class="formula-content">
+        P(μ − 1σ ≤ X ≤ μ + 1σ) = 68.27%    ← About 2/3 of data
+        P(μ − 2σ ≤ X ≤ μ + 2σ) = 95.45%    ← Almost all data
+        P(μ − 3σ ≤ X ≤ μ + 3σ) = 99.73%    ← Virtually all data
+    </div>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — IQ Scores (μ = 100, σ = 15)</div>
+    <p>
+    • <strong>68%</strong> of people have IQ between <strong>85 and 115</strong> (100 ± 15)<br>
+    • <strong>95%</strong> of people have IQ between <strong>70 and 130</strong> (100 ± 30)<br>
+    • <strong>99.7%</strong> of people have IQ between <strong>55 and 145</strong> (100 ± 45)<br><br>
+    An IQ above 145 is in the top 0.15% of the population!
+    </p>
+</div>
+
+<h2>4.1 Practical Uses of the Empirical Rule</h2>
+<ul>
+    <li><strong>Outlier detection:</strong> Data beyond 3σ from the mean is almost certainly an outlier (~0.27% chance)</li>
+    <li><strong>Quality control:</strong> Six Sigma methodology (3σ on each side = 99.99966%)</li>
+    <li><strong>Quick estimation:</strong> Rapidly estimate probabilities without needing a Z-table</li>
+    <li><strong>Data validation:</strong> If data doesn't follow 68-95-99.7, it may not be normally distributed</li>
+</ul>
+</div>
+
+<!-- ═══════ SECTION 5 ═══════ -->
+<div class="section-wrapper">
+<h1>5 · Standard Normal Distribution & Z-Score</h1>
+
+<h2>5.1 The Standard Normal Distribution</h2>
+<p>The <strong>Standard Normal Distribution</strong> is a special normal distribution with <strong>μ = 0</strong> and <strong>σ = 1</strong>. It is denoted as <strong>Z ~ N(0, 1)</strong>.</p>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 Why Standardize?</div>
+    <p>Every normal distribution has a different μ and σ. To compare values across different distributions (e.g., comparing a score on one exam to a score on a different exam), we transform everything to the <strong>same standard scale</strong>. One Z-table works for ALL normal distributions.</p>
+</div>
+
+<h2>5.2 The Z-Score Formula</h2>
+<div class="formula-box">
+    <div class="formula-title">Z-Score (Standardization)</div>
+    <div class="formula-content">
+        Z = (X − μ) / σ
+
+        where:
+        X = raw value
+        μ = mean of the distribution
+        σ = standard deviation
+        Z = number of standard deviations from the mean
+    </div>
+</div>
+
+<h2>5.3 Interpreting the Z-Score</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Z-Score</th><th>Meaning</th><th>Percentile (approx)</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Z = 0</strong></td><td>Exactly at the mean</td><td>50th</td></tr>
+        <tr><td><strong>Z = +1</strong></td><td>1 SD above the mean</td><td>84.13th</td></tr>
+        <tr><td><strong>Z = +2</strong></td><td>2 SD above the mean</td><td>97.72nd</td></tr>
+        <tr><td><strong>Z = +3</strong></td><td>3 SD above the mean</td><td>99.87th</td></tr>
+        <tr><td><strong>Z = −1</strong></td><td>1 SD below the mean</td><td>15.87th</td></tr>
+        <tr><td><strong>Z = −2</strong></td><td>2 SD below the mean</td><td>2.28th</td></tr>
+        <tr><td><strong>Z = −3</strong></td><td>3 SD below the mean</td><td>0.13th</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — Comparing Exam Scores</div>
+    <p><strong>Exam A:</strong> Score = 85, μ = 70, σ = 10 → Z = (85−70)/10 = <strong>+1.50</strong><br>
+    <strong>Exam B:</strong> Score = 92, μ = 80, σ = 5 → Z = (92−80)/5 = <strong>+2.40</strong><br><br>
+    Although 92 > 85, the Z-scores reveal that the Exam B score is <strong>more exceptional</strong> (2.4 SD above mean vs 1.5 SD). The student performed relatively better on Exam B.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 6 ═══════ -->
+<div class="section-wrapper">
+<h1>6 · Using Z-Tables</h1>
+
+<p>A <strong>Z-table</strong> maps Z-scores to cumulative probabilities (area under the standard normal curve to the left of Z).</p>
+
+<h2>6.1 How to Read a Z-Table</h2>
+<ol>
+    <li>Compute the Z-score: Z = (X − μ) / σ</li>
+    <li>Find the row matching the integer + first decimal (e.g., 1.5 for Z = 1.53)</li>
+    <li>Find the column matching the second decimal (e.g., 0.03)</li>
+    <li>The intersection gives P(Z ≤ 1.53)</li>
+</ol>
+
+<h2>6.2 Common Probability Calculations</h2>
+<div class="formula-box">
+    <div class="formula-title">Z-Table Probability Formulas</div>
+    <div class="formula-content">
+        P(Z ≤ z)     = Read directly from Z-table = Φ(z)
+        P(Z > z)     = 1 − Φ(z)
+        P(Z ≤ −z)    = 1 − Φ(z)     (by symmetry)
+        P(a ≤ Z ≤ b) = Φ(b) − Φ(a)
+    </div>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — Finding Probabilities</div>
+    <p><strong>Problem:</strong> Heights are N(170, 25) — μ=170 cm, σ=5 cm. Find P(height > 180 cm).<br><br>
+    <strong>Step 1:</strong> Z = (180 − 170) / 5 = +2.0<br>
+    <strong>Step 2:</strong> From Z-table, Φ(2.0) = 0.9772<br>
+    <strong>Step 3:</strong> P(X > 180) = 1 − 0.9772 = <strong>0.0228 = 2.28%</strong><br><br>
+    Only about 2.3% of people are taller than 180 cm in this population.</p>
+</div>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 In Python — No Z-Table Needed!</div>
+    <p>Use <code>scipy.stats.norm.cdf(x, μ, σ)</code> directly. It computes the exact probability without looking up tables. The Z-table is for conceptual understanding and exams.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 7 ═══════ -->
+<div class="section-wrapper">
+<h1>7 · CDF of the Normal Distribution</h1>
+
+<p>The CDF of the normal distribution, denoted Φ(x), gives the probability that a normal random variable is less than or equal to x.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Normal CDF</div>
+    <div class="formula-content">
+        Φ(x) = P(X ≤ x) = ∫₋∞ˣ f(t) dt
+
+        No closed-form solution! Must be computed numerically.
+        That's why Z-tables and computer functions exist.
+    </div>
+</div>
+
+<h2>7.1 Key CDF Values to Remember</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>x (in Z-scores)</th><th>Φ(x) = P(Z ≤ x)</th><th>P(Z > x)</th></tr></thead>
+    <tbody>
+        <tr><td>−3.0</td><td>0.0013</td><td>0.9987</td></tr>
+        <tr><td>−2.0</td><td>0.0228</td><td>0.9772</td></tr>
+        <tr><td>−1.0</td><td>0.1587</td><td>0.8413</td></tr>
+        <tr><td><strong>0</strong></td><td><strong>0.5000</strong></td><td><strong>0.5000</strong></td></tr>
+        <tr><td>+1.0</td><td>0.8413</td><td>0.1587</td></tr>
+        <tr><td>+1.645</td><td>0.9500</td><td>0.0500 (← 5% significance!)</td></tr>
+        <tr><td>+1.96</td><td>0.9750</td><td>0.0250 (← 2.5% two-tailed)</td></tr>
+        <tr><td>+2.0</td><td>0.9772</td><td>0.0228</td></tr>
+        <tr><td>+2.576</td><td>0.9950</td><td>0.0050 (← 1% significance)</td></tr>
+        <tr><td>+3.0</td><td>0.9987</td><td>0.0013</td></tr>
+    </tbody>
+</table>
+</div>
+</div>
+
+<!-- ═══════ SECTION 8 ═══════ -->
+<div class="section-wrapper">
+<h1>8 · Effect of μ and σ on the Curve</h1>
+
+<h2>8.1 Changing μ (Mean) — Shifts the Curve</h2>
+<ul>
+    <li>Increasing μ → Curve shifts <strong>right</strong></li>
+    <li>Decreasing μ → Curve shifts <strong>left</strong></li>
+    <li>Shape and spread remain unchanged</li>
+</ul>
+
+<h2>8.2 Changing σ (Standard Deviation) — Changes Width</h2>
+<ul>
+    <li>Small σ → <strong>Tall and narrow</strong> curve (data concentrated near mean)</li>
+    <li>Large σ → <strong>Short and wide</strong> curve (data spread out)</li>
+    <li>Peak height = 1/(σ√2π) — smaller σ means taller peak</li>
+    <li>Total area always remains 1</li>
+</ul>
+
+<div class="comparison-grid">
+    <div class="comparison-card">
+        <h4>📊 N(0, 1) vs N(5, 1)</h4>
+        <p>Same shape, different centre. Changing μ only <strong>slides</strong> the curve along x-axis without changing its shape.</p>
+    </div>
+    <div class="comparison-card">
+        <h4>📊 N(0, 1) vs N(0, 4)</h4>
+        <p>Same centre, different spread. σ=2 is twice as wide as σ=1. The wider curve is shorter because total area must stay = 1.</p>
+    </div>
+</div>
+</div>
+
+<!-- ═══════ SECTION 9 ═══════ -->
+<div class="section-wrapper">
+<h1>9 · Checking Normality — QQ Plot & Statistical Tests</h1>
+
+<p>Before applying methods that assume normality, you must <strong>verify</strong> that your data is approximately normally distributed.</p>
+
+<h2>9.1 QQ Plot (Quantile-Quantile Plot)</h2>
+<p>The <strong>QQ plot</strong> is the most popular graphical method for assessing normality. It plots the quantiles of your data against the quantiles of a theoretical normal distribution.</p>
+
+<h3>How to Read a QQ Plot</h3>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Pattern</th><th>Interpretation</th></tr></thead>
+    <tbody>
+        <tr><td>Points lie on the <strong>45° diagonal line</strong></td><td>Data is <strong>normally distributed</strong> ✅</td></tr>
+        <tr><td>Points curve <strong>upward at both ends</strong> (S-shape)</td><td><strong>Heavy tails</strong> (leptokurtic) — more extreme values than expected</td></tr>
+        <tr><td>Points curve <strong>downward at both ends</strong></td><td><strong>Light tails</strong> (platykurtic) — fewer extreme values</td></tr>
+        <tr><td>Points curve <strong>upward at right end</strong></td><td><strong>Right-skewed</strong> (positive skew)</td></tr>
+        <tr><td>Points curve <strong>upward at left end</strong></td><td><strong>Left-skewed</strong> (negative skew)</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>9.2 Statistical Tests for Normality</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Test</th><th>Best For</th><th>H₀</th><th>Python</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Shapiro-Wilk</strong></td><td>Small to medium samples (n < 5000)</td><td>Data is normal</td><td><code>stats.shapiro(data)</code></td></tr>
+        <tr><td><strong>D'Agostino-Pearson</strong></td><td>Medium to large samples</td><td>Data is normal</td><td><code>stats.normaltest(data)</code></td></tr>
+        <tr><td><strong>Kolmogorov-Smirnov</strong></td><td>Comparing to any distribution</td><td>Data follows specified dist</td><td><code>stats.kstest(data, 'norm')</code></td></tr>
+        <tr><td><strong>Anderson-Darling</strong></td><td>Emphasis on tail behaviour</td><td>Data is normal</td><td><code>stats.anderson(data)</code></td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-warning">
+    <div class="callout-title">⚠️ p-value Interpretation</div>
+    <p>• p-value > 0.05 → <strong>Fail to reject H₀</strong> → Data is consistent with normality<br>
+    • p-value ≤ 0.05 → <strong>Reject H₀</strong> → Data is significantly non-normal<br><br>
+    <strong>Caution:</strong> With very large samples, even tiny deviations from normality become statistically significant. Always use both <strong>visual (QQ plot)</strong> and <strong>statistical tests</strong> together.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 10 ═══════ -->
+<div class="section-wrapper">
+<h1>10 · Skewness & Kurtosis Revisited</h1>
+
+<p>The normal distribution serves as the baseline reference for measuring skewness and kurtosis.</p>
+
+<h2>10.1 Skewness</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Type</th><th>Skewness Value</th><th>Shape</th><th>Mean vs Median</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Symmetric (Normal)</strong></td><td>= 0</td><td>Perfectly balanced</td><td>Mean = Median = Mode</td></tr>
+        <tr><td><strong>Right-skewed (Positive)</strong></td><td>> 0</td><td>Long tail to the right</td><td>Mean > Median > Mode</td></tr>
+        <tr><td><strong>Left-skewed (Negative)</strong></td><td>< 0</td><td>Long tail to the left</td><td>Mean < Median < Mode</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>10.2 Kurtosis</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Type</th><th>Excess Kurtosis</th><th>Tail Behaviour</th><th>Peak</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Mesokurtic (Normal)</strong></td><td>= 0 (kurtosis = 3)</td><td>Normal tails — baseline</td><td>Moderate peak</td></tr>
+        <tr><td><strong>Leptokurtic</strong></td><td>> 0</td><td>Heavier/fatter tails, more outliers</td><td>Sharper peak</td></tr>
+        <tr><td><strong>Platykurtic</strong></td><td>< 0</td><td>Lighter/thinner tails, fewer outliers</td><td>Flatter peak</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 Rule of Thumb</div>
+    <p>For data to be considered "approximately normal":<br>
+    • |Skewness| < <strong>0.5</strong> → acceptable<br>
+    • |Skewness| between 0.5 and 1 → moderately skewed<br>
+    • |Skewness| > 1 → highly skewed, consider transformation</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 11 ═══════ -->
+<div class="section-wrapper">
+<h1>11 · Log-Normal Distribution & Data Transformations</h1>
+
+<h2>11.1 Log-Normal Distribution</h2>
+<p>A variable X follows a <strong>log-normal distribution</strong> if <strong>ln(X)</strong> is normally distributed. It's extremely common in real-world data.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Log-Normal Relationship</div>
+    <div class="formula-content">
+        If X ~ LogNormal  →  ln(X) ~ Normal
+        If Y ~ Normal      →  e^Y ~ LogNormal
+    </div>
+</div>
+
+<h3>Real-World Examples of Log-Normal Data</h3>
+<ul>
+    <li><strong>Income/salary</strong> distributions</li>
+    <li><strong>Stock prices</strong> and returns</li>
+    <li><strong>City populations</strong></li>
+    <li><strong>File sizes</strong> on a computer</li>
+    <li><strong>Duration</strong> of events (hospital stays, phone calls)</li>
+</ul>
+
+<h2>11.2 Common Transformations</h2>
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Transformation</th><th>Formula</th><th>Best For</th><th>Python</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Log Transform</strong></td><td>X' = log(X)</td><td>Right-skewed data, log-normal data</td><td><code>np.log(data)</code></td></tr>
+        <tr><td><strong>Square Root</strong></td><td>X' = √X</td><td>Count data, moderate skew</td><td><code>np.sqrt(data)</code></td></tr>
+        <tr><td><strong>Box-Cox</strong></td><td>X' = (X^λ − 1)/λ</td><td>Finds optimal λ automatically</td><td><code>stats.boxcox(data)</code></td></tr>
+        <tr><td><strong>Yeo-Johnson</strong></td><td>Modified Box-Cox</td><td>Handles negative values too</td><td><code>PowerTransformer()</code></td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-warning">
+    <div class="callout-title">⚠️ When to Transform</div>
+    <p>Transform your data if the ML algorithm <strong>assumes normality</strong> (e.g., Linear Regression residuals). Tree-based models (Random Forest, XGBoost) do NOT need normal data — transformations won't help and may hurt interpretability.</p>
+</div>
+</div>
+
+<!-- ═══════ SECTION 12 ═══════ -->
+<div class="section-wrapper">
+<h1>12 · Applications in Machine Learning</h1>
+
+<div class="table-wrapper">
+<table>
+    <thead><tr><th>Application</th><th>How Normal Distribution Is Used</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Feature Scaling</strong></td><td>StandardScaler transforms features to Z-scores: Z = (X−μ)/σ</td></tr>
+        <tr><td><strong>Outlier Detection</strong></td><td>Points beyond μ ± 3σ flagged as outliers</td></tr>
+        <tr><td><strong>Gaussian Naive Bayes</strong></td><td>Assumes features are normally distributed within each class</td></tr>
+        <tr><td><strong>Linear Regression</strong></td><td>Assumes residuals (errors) are normally distributed</td></tr>
+        <tr><td><strong>Hypothesis Testing</strong></td><td>Z-tests and t-tests are built on normal distribution</td></tr>
+        <tr><td><strong>Confidence Intervals</strong></td><td>CI = X̄ ± Z*(σ/√n) — relies on normal sampling distribution</td></tr>
+        <tr><td><strong>Gaussian Mixture Models</strong></td><td>Models data as mixture of multiple normal distributions</td></tr>
+        <tr><td><strong>Weight Initialization</strong></td><td>Neural network weights often initialized from N(0, σ²)</td></tr>
+        <tr><td><strong>Batch Normalization</strong></td><td>Normalizes layer inputs to N(0, 1) during training</td></tr>
+        <tr><td><strong>Generative Models</strong></td><td>VAEs sample from N(0, 1) latent space</td></tr>
+    </tbody>
+</table>
+</div>
+</div>
+
+<!-- ═══════ SECTION 13 ═══════ -->
+<div class="section-wrapper">
+<h1>13 · Python Implementation — Complete Code</h1>
+
+<h2>13.1 Visualizing the Bell Curve</h2>
+<pre><code><span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np
+<span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt
+<span class="code-keyword">from</span> scipy <span class="code-keyword">import</span> stats
+
+<span class="code-comment"># ── Plot multiple normal distributions ──</span>
+x = np.linspace(-10, 15, 1000)
+params = [(0, 1, <span class="code-string">'N(0,1)'</span>), (0, 2, <span class="code-string">'N(0,4)'</span>), (3, 1, <span class="code-string">'N(3,1)'</span>), (5, 3, <span class="code-string">'N(5,9)'</span>)]
+colors = [<span class="code-string">'#3b82f6'</span>, <span class="code-string">'#ef4444'</span>, <span class="code-string">'#10b981'</span>, <span class="code-string">'#f59e0b'</span>]
+
+plt.figure(figsize=(10, 5))
+<span class="code-keyword">for</span> (mu, sigma, label), color <span class="code-keyword">in</span> zip(params, colors):
+    plt.plot(x, stats.norm.pdf(x, mu, sigma), label=label, color=color, lw=2)
+plt.title(<span class="code-string">'Effect of μ and σ on Normal Distribution'</span>, fontsize=14, fontweight=<span class="code-string">'bold'</span>)
+plt.xlabel(<span class="code-string">'x'</span>); plt.ylabel(<span class="code-string">'f(x)'</span>)
+plt.legend(); plt.grid(alpha=0.3); plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h2>13.2 Empirical Rule Visualization</h2>
+<pre><code>mu, sigma = 0, 1
+x = np.linspace(-4, 4, 1000)
+y = stats.norm.pdf(x, mu, sigma)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(x, y, <span class="code-string">'k'</span>, lw=2)
+
+<span class="code-comment"># Fill 1σ, 2σ, 3σ regions</span>
+<span class="code-keyword">for</span> n_sigma, color, alpha <span class="code-keyword">in</span> [(3, <span class="code-string">'#dbeafe'</span>, 1), (2, <span class="code-string">'#93c5fd'</span>, 1), (1, <span class="code-string">'#3b82f6'</span>, 0.5)]:
+    x_fill = np.linspace(-n_sigma, n_sigma, 500)
+    ax.fill_between(x_fill, stats.norm.pdf(x_fill, mu, sigma), color=color, alpha=alpha)
+
+ax.set_title(<span class="code-string">'Empirical Rule: 68-95-99.7'</span>, fontsize=14, fontweight=<span class="code-string">'bold'</span>)
+ax.set_xlabel(<span class="code-string">'Standard Deviations from Mean'</span>); ax.set_ylabel(<span class="code-string">'Density'</span>)
+ax.annotate(<span class="code-string">'68.27%'</span>, xy=(0, 0.15), fontsize=14, ha=<span class="code-string">'center'</span>, fontweight=<span class="code-string">'bold'</span>, color=<span class="code-string">'white'</span>)
+plt.tight_layout(); plt.show()
+</code></pre>
+
+<h2>13.3 Z-Score & Probability Calculation</h2>
+<pre><code><span class="code-comment"># ── Z-Score Calculation ──</span>
+x_val, mu, sigma = 85, 70, 10
+z_score = (x_val - mu) / sigma
+<span class="code-function">print</span>(f<span class="code-string">"Z-score for X={x_val}: {z_score:.2f}"</span>)
+
+<span class="code-comment"># ── Probability using CDF ──</span>
+p_below = stats.norm.cdf(x_val, mu, sigma)
+p_above = 1 - p_below  <span class="code-comment"># or stats.norm.sf(x_val, mu, sigma)</span>
+p_between = stats.norm.cdf(80, mu, sigma) - stats.norm.cdf(60, mu, sigma)
+
+<span class="code-function">print</span>(f<span class="code-string">"P(X ≤ {x_val}) = {p_below:.4f}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"P(X > {x_val}) = {p_above:.4f}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"P(60 ≤ X ≤ 80) = {p_between:.4f}"</span>)
+
+<span class="code-comment"># ── Inverse CDF (find X for a given percentile) ──</span>
+x_90th = stats.norm.ppf(0.90, mu, sigma)
+<span class="code-function">print</span>(f<span class="code-string">"90th percentile = {x_90th:.2f}"</span>)
+</code></pre>
+
+<h2>13.4 QQ Plot & Normality Test</h2>
+<pre><code><span class="code-keyword">from</span> scipy.stats <span class="code-keyword">import</span> probplot, shapiro
+<span class="code-keyword">import</span> seaborn <span class="code-keyword">as</span> sns
+
+<span class="code-comment"># Generate data</span>
+np.random.seed(42)
+normal_data = np.random.normal(50, 10, 500)
+skewed_data = np.random.exponential(10, 500)
+
+fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+<span class="code-comment"># QQ Plots</span>
+probplot(normal_data, dist=<span class="code-string">"norm"</span>, plot=axes[0, 0])
+axes[0, 0].set_title(<span class="code-string">'QQ Plot — Normal Data'</span>, fontweight=<span class="code-string">'bold'</span>)
+axes[0, 0].get_lines()[0].set_color(<span class="code-string">'#3b82f6'</span>)
+
+probplot(skewed_data, dist=<span class="code-string">"norm"</span>, plot=axes[0, 1])
+axes[0, 1].set_title(<span class="code-string">'QQ Plot — Skewed Data'</span>, fontweight=<span class="code-string">'bold'</span>)
+axes[0, 1].get_lines()[0].set_color(<span class="code-string">'#ef4444'</span>)
+
+<span class="code-comment"># Histograms with KDE</span>
+sns.histplot(normal_data, kde=<span class="code-keyword">True</span>, ax=axes[1, 0], color=<span class="code-string">'#3b82f6'</span>)
+axes[1, 0].set_title(<span class="code-string">'Distribution — Normal Data'</span>)
+sns.histplot(skewed_data, kde=<span class="code-keyword">True</span>, ax=axes[1, 1], color=<span class="code-string">'#ef4444'</span>)
+axes[1, 1].set_title(<span class="code-string">'Distribution — Skewed Data'</span>)
+
+plt.tight_layout(); plt.show()
+
+<span class="code-comment"># ── Shapiro-Wilk Test ──</span>
+stat, p_val = shapiro(normal_data)
+<span class="code-function">print</span>(f<span class="code-string">"Normal data  → Shapiro p={p_val:.4f} {'✅ Normal' if p_val > 0.05 else '❌ Not Normal'}"</span>)
+
+stat, p_val = shapiro(skewed_data)
+<span class="code-function">print</span>(f<span class="code-string">"Skewed data  → Shapiro p={p_val:.4f} {'✅ Normal' if p_val > 0.05 else '❌ Not Normal'}"</span>)
+</code></pre>
+
+<h2>13.5 Log Transform for Non-Normal Data</h2>
+<pre><code><span class="code-comment"># ── Transform skewed data ──</span>
+log_data = np.log(skewed_data)
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+<span class="code-comment"># Original</span>
+sns.histplot(skewed_data, kde=<span class="code-keyword">True</span>, ax=axes[0], color=<span class="code-string">'#ef4444'</span>)
+axes[0].set_title(f<span class="code-string">'Original (skew={stats.skew(skewed_data):.2f})'</span>)
+
+<span class="code-comment"># Log-transformed</span>
+sns.histplot(log_data, kde=<span class="code-keyword">True</span>, ax=axes[1], color=<span class="code-string">'#10b981'</span>)
+axes[1].set_title(f<span class="code-string">'Log Transform (skew={stats.skew(log_data):.2f})'</span>)
+
+<span class="code-comment"># QQ Plot of transformed</span>
+probplot(log_data, dist=<span class="code-string">"norm"</span>, plot=axes[2])
+axes[2].set_title(<span class="code-string">'QQ Plot — After Log Transform'</span>)
+
+plt.suptitle(<span class="code-string">'Transforming Skewed Data to Normal'</span>, fontsize=14, fontweight=<span class="code-string">'bold'</span>)
+plt.tight_layout(); plt.show()
+
+<span class="code-comment"># ── Box-Cox Transform (automatic) ──</span>
+<span class="code-keyword">from</span> scipy.stats <span class="code-keyword">import</span> boxcox
+transformed, best_lambda = boxcox(skewed_data)
+<span class="code-function">print</span>(f<span class="code-string">"Optimal λ = {best_lambda:.4f}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"Skewness after Box-Cox: {stats.skew(transformed):.4f}"</span>)
+</code></pre>
+</div>
+
+<!-- ═══════ SECTION 14 ═══════ -->
+<div class="section-wrapper">
+<h1>14 · Quick Reference Card</h1>
+
+<div class="quick-ref">
+    <h3>🚀 Session 41 — Normal Distribution Cheat Sheet</h3>
+
+    <h4 style="color:#93c5fd; margin-top:14px;">The Bell Curve</h4>
+    <ul>
+        <li>f(x) = (1/σ√2π) · e^[−(x−μ)²/(2σ²)]</li>
+        <li>Notation: X ~ N(μ, σ²)</li>
+        <li>Mean = Median = Mode = μ, Skewness = 0, Kurtosis = 3</li>
+    </ul>
+
+    <h4 style="color:#93c5fd; margin-top:14px;">Empirical Rule</h4>
+    <ul>
+        <li><strong>68.27%</strong> within μ ± 1σ</li>
+        <li><strong>95.45%</strong> within μ ± 2σ</li>
+        <li><strong>99.73%</strong> within μ ± 3σ</li>
+    </ul>
+
+    <h4 style="color:#93c5fd; margin-top:14px;">Z-Score</h4>
+    <ul>
+        <li>Z = (X − μ) / σ → converts any normal to N(0,1)</li>
+        <li>Z = 0 → 50th percentile, Z = ±1.96 → 95% CI bounds</li>
+    </ul>
+
+    <h4 style="color:#93c5fd; margin-top:14px;">Normality Checks</h4>
+    <ul>
+        <li><strong>QQ Plot:</strong> Points on diagonal = normal</li>
+        <li><strong>Shapiro-Wilk:</strong> <code>stats.shapiro(data)</code> → p > 0.05 = normal</li>
+        <li><strong>Skewness:</strong> |skew| < 0.5 → approximately normal</li>
+    </ul>
+
+    <h4 style="color:#93c5fd; margin-top:14px;">Python Quick Reference</h4>
+    <ul>
+        <li><code>stats.norm.pdf(x, μ, σ)</code> — density at x</li>
+        <li><code>stats.norm.cdf(x, μ, σ)</code> — P(X ≤ x)</li>
+        <li><code>stats.norm.ppf(q, μ, σ)</code> — inverse CDF (quantile → value)</li>
+        <li><code>stats.norm.sf(x, μ, σ)</code> — P(X > x)</li>
+        <li><code>probplot(data, dist='norm', plot=ax)</code> — QQ plot</li>
+        <li><code>stats.shapiro(data)</code> — Shapiro-Wilk test</li>
+        <li><code>stats.boxcox(data)</code> — optimal power transform</li>
+    </ul>
+</div>
+
+<div class="callout callout-note" style="margin-top:20px;">
+    <div class="callout-title">📚 What's Next? → Other Distributions (Session 42)</div>
+    <p>The next session covers other important probability distributions: <strong>Bernoulli, Binomial, Poisson, Uniform, Exponential</strong> and more — each with unique properties and ML applications.</p>
+</div>
+</div>
+
+</body>
+</html>

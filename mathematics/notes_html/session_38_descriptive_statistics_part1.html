@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Session 38 — Descriptive Statistics Part 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&family=Noto+Sans+Math&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --secondary: #7c3aed;
+            --secondary-light: #f5f3ff;
+            --accent: #059669;
+            --accent-light: #ecfdf5;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --dark: #0f172a;
+            --dark-card: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text-main: #334155;
+            --text-light: #64748b;
+        }
+
+        @page {
+            size: A4;
+            margin: 18mm 15mm 20mm 15mm;
+        }
+
+        @page cover-page {
+            size: A4;
+            margin: 0;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            line-height: 1.7;
+            font-size: 10pt;
+        }
+
+        /* ─── Cover Page ─── */
+        .cover-page {
+            page-break-after: always;
+            page: cover-page;
+            height: 297mm;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            color: white;
+            padding: 50mm 30mm 40mm 30mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-page::before {
+            content: "";
+            position: absolute;
+            top: -30%;
+            right: -25%;
+            width: 90%;
+            height: 90%;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(0,0,0,0) 70%);
+            z-index: 1;
+        }
+
+        .cover-page::after {
+            content: "";
+            position: absolute;
+            bottom: -20%;
+            left: -10%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, rgba(0,0,0,0) 70%);
+            z-index: 1;
+        }
+
+        .cover-header { z-index: 2; }
+
+        .cover-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 9pt;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+        }
+
+        .cover-series {
+            font-family: 'Outfit', sans-serif;
+            font-size: 11pt;
+            color: #94a3b8;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .cover-title h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36pt;
+            line-height: 1.15;
+            font-weight: 800;
+            color: white;
+            border: none;
+            margin: 0 0 20px 0;
+            padding: 0;
+            background: linear-gradient(to right, #ffffff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-subtitle {
+            font-size: 14pt;
+            color: #94a3b8;
+            font-weight: 400;
+            margin-bottom: 25px;
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.5;
+        }
+
+        .cover-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+            z-index: 2;
+        }
+
+        .cover-topic-tag {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #cbd5e1;
+            font-size: 8pt;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .cover-footer {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 25px;
+            z-index: 2;
+        }
+
+        .cover-author {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13pt;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .cover-meta {
+            font-size: 9pt;
+            color: #64748b;
+        }
+
+        /* ─── Table of Contents ─── */
+        .toc-page {
+            page-break-after: always;
+            padding-top: 10px;
+        }
+
+        .toc-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20pt;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .toc-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 8px 0;
+            border-bottom: 1px dotted #cbd5e1;
+            font-size: 10.5pt;
+        }
+
+        .toc-section-num {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--primary);
+            min-width: 30px;
+        }
+
+        .toc-section-title {
+            flex: 1;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .toc-section-page {
+            font-family: 'Fira Code', monospace;
+            font-size: 9pt;
+            color: var(--text-light);
+        }
+
+        /* ─── Content ─── */
+        .content-container { padding: 0; }
+
+        .section-wrapper {
+            page-break-before: always;
+            padding-top: 5px;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18pt;
+            font-weight: 800;
+            color: var(--dark);
+            margin-top: 30px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 8px;
+            page-break-after: avoid;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13pt;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 22px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 11pt;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-top: 16px;
+            margin-bottom: 6px;
+            page-break-after: avoid;
+        }
+
+        h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 10pt;
+            font-weight: 600;
+            color: #475569;
+            margin-top: 12px;
+            margin-bottom: 5px;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--text-main);
+            text-align: justify;
+        }
+
+        li {
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+
+        ul, ol {
+            margin-top: 4px;
+            margin-bottom: 12px;
+            padding-left: 22px;
+        }
+
+        strong { color: #1e293b; }
+
+        /* ─── Formula boxes ─── */
+        .formula-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+            border: 1px solid #c7d2fe;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin: 14px 0;
+            page-break-inside: avoid;
+            font-size: 10.5pt;
+        }
+
+        .formula-box .formula-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 9pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .formula-box .formula-content {
+            font-family: 'Fira Code', monospace;
+            font-size: 10pt;
+            color: #1e293b;
+            line-height: 1.8;
+        }
+
+        /* ─── Callout boxes ─── */
+        .callout {
+            border-radius: 0 8px 8px 0;
+            padding: 14px 16px;
+            margin: 14px 0;
+            page-break-inside: avoid;
+        }
+
+        .callout-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 9.5pt;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .callout-note {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+        }
+        .callout-note .callout-title { color: var(--primary-dark); }
+
+        .callout-tip {
+            background-color: var(--accent-light);
+            border-left: 4px solid var(--accent);
+        }
+        .callout-tip .callout-title { color: #065f46; }
+
+        .callout-warning {
+            background-color: var(--warning-light);
+            border-left: 4px solid var(--warning);
+        }
+        .callout-warning .callout-title { color: #92400e; }
+
+        .callout-example {
+            background-color: #fdf4ff;
+            border-left: 4px solid #a855f7;
+        }
+        .callout-example .callout-title { color: #7e22ce; }
+
+        /* ─── Tables ─── */
+        .table-wrapper {
+            margin: 14px 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+        }
+
+        th {
+            background-color: var(--dark);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 7.5pt;
+            letter-spacing: 0.5px;
+            padding: 10px 12px;
+            border: none;
+        }
+
+        td {
+            padding: 8px 12px;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            color: #334155;
+            vertical-align: top;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background-color: var(--light); }
+
+        /* ─── Comparison cards ─── */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 14px 0;
+            page-break-inside: avoid;
+        }
+
+        .comparison-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            background-color: var(--light);
+        }
+
+        .comparison-card h4 {
+            margin-top: 0;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        /* ─── Visual diagram boxes ─── */
+        .diagram-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 14px 0;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+            font-size: 9pt;
+            line-height: 1.8;
+            page-break-inside: avoid;
+        }
+
+        .diagram-box .diagram-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 10pt;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        /* ─── Code blocks ─── */
+        pre {
+            background-color: var(--dark-card);
+            color: #f8fafc;
+            padding: 14px 16px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            font-family: 'Fira Code', monospace;
+            font-size: 8pt;
+            line-height: 1.5;
+            margin: 12px 0;
+            overflow: hidden;
+            white-space: pre-wrap;
+            word-break: break-all;
+            page-break-inside: avoid;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            font-size: 8.5pt;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            border-radius: 0;
+            font-size: 8pt;
+        }
+
+        .code-comment { color: #6b7280; }
+        .code-keyword { color: #c084fc; }
+        .code-string { color: #34d399; }
+        .code-function { color: #60a5fa; }
+
+        /* ─── Quick Reference Card ─── */
+        .quick-ref {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 16px 0;
+            page-break-inside: avoid;
+        }
+
+        .quick-ref h3 {
+            color: #c7d2fe;
+            margin-top: 0;
+            font-size: 12pt;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        .quick-ref p, .quick-ref li {
+            color: #e2e8f0;
+        }
+
+        .quick-ref code {
+            background: rgba(255,255,255,0.1);
+            color: #a5b4fc;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════════ COVER PAGE ════════════════════════ -->
+<div class="cover-page">
+    <div class="cover-header">
+        <div class="cover-badge">📐 Mathematics for Machine Learning</div>
+        <div class="cover-series">CampusX · Data Science Mentorship Program 2023 · Video 2 of 23</div>
+    </div>
+    <div class="cover-title">
+        <h1>DESCRIPTIVE<br>STATISTICS<br>PART 1</h1>
+        <div class="cover-subtitle">Session 38 — A complete guide to summarizing, measuring, and visualizing data distributions</div>
+        <div class="cover-topics">
+            <span class="cover-topic-tag">Mean · Median · Mode</span>
+            <span class="cover-topic-tag">Variance · Std Dev</span>
+            <span class="cover-topic-tag">Percentiles · IQR</span>
+            <span class="cover-topic-tag">Box Plots · Histograms</span>
+            <span class="cover-topic-tag">Skewness · Kurtosis</span>
+            <span class="cover-topic-tag">Five-Number Summary</span>
+        </div>
+    </div>
+    <div class="cover-footer">
+        <div class="cover-author">Session Notes — Complete Reference</div>
+        <div class="cover-meta">Playlist: Maths for Machine Learning · Duration: 1h 52m · Instructor: Nitish Singh (CampusX)</div>
+    </div>
+</div>
+
+<!-- ════════════════════════ TABLE OF CONTENTS ════════════════════════ -->
+<div class="toc-page">
+    <div class="toc-title">📑 Table of Contents</div>
+
+    <div class="toc-section"><span class="toc-section-num">01</span> <span class="toc-section-title">What is Statistics? — The Big Picture</span></div>
+    <div class="toc-section"><span class="toc-section-num">02</span> <span class="toc-section-title">Population vs Sample</span></div>
+    <div class="toc-section"><span class="toc-section-num">03</span> <span class="toc-section-title">Parameter vs Statistic</span></div>
+    <div class="toc-section"><span class="toc-section-num">04</span> <span class="toc-section-title">Types of Data — Categorical & Numerical</span></div>
+    <div class="toc-section"><span class="toc-section-num">05</span> <span class="toc-section-title">Descriptive vs Inferential Statistics</span></div>
+    <div class="toc-section"><span class="toc-section-num">06</span> <span class="toc-section-title">Types of Analysis — Univariate, Bivariate, Multivariate</span></div>
+    <div class="toc-section"><span class="toc-section-num">07</span> <span class="toc-section-title">Measures of Central Tendency</span></div>
+    <div class="toc-section"><span class="toc-section-num">08</span> <span class="toc-section-title">Measures of Dispersion (Spread)</span></div>
+    <div class="toc-section"><span class="toc-section-num">09</span> <span class="toc-section-title">Percentiles, Quartiles & IQR</span></div>
+    <div class="toc-section"><span class="toc-section-num">10</span> <span class="toc-section-title">Five-Number Summary</span></div>
+    <div class="toc-section"><span class="toc-section-num">11</span> <span class="toc-section-title">Box Plot (Box-and-Whisker Plot)</span></div>
+    <div class="toc-section"><span class="toc-section-num">12</span> <span class="toc-section-title">Frequency Distribution & Histograms</span></div>
+    <div class="toc-section"><span class="toc-section-num">13</span> <span class="toc-section-title">Skewness — Measuring Asymmetry</span></div>
+    <div class="toc-section"><span class="toc-section-num">14</span> <span class="toc-section-title">Kurtosis — Measuring Tail Heaviness</span></div>
+    <div class="toc-section"><span class="toc-section-num">15</span> <span class="toc-section-title">Python Implementation</span></div>
+    <div class="toc-section"><span class="toc-section-num">16</span> <span class="toc-section-title">Quick Reference Card</span></div>
+</div>
+
+<!-- ════════════════════════ SECTION 1 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>1 · What is Statistics? — The Big Picture</h1>
+
+<p><strong>Statistics</strong> is the branch of mathematics that deals with the <strong>collection</strong>, <strong>organization</strong>, <strong>analysis</strong>, <strong>interpretation</strong>, and <strong>presentation</strong> of data. In the context of Machine Learning and Data Science, statistics provides the mathematical foundation for understanding data before building any model.</p>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 Why Statistics Matters for ML</div>
+    <p>Before you train any model, you <strong>must</strong> understand your data. Descriptive statistics helps you answer: What does my data look like? Where is the center? How spread out is it? Are there outliers? Is it symmetric? These answers drive critical decisions like feature selection, data cleaning, and model choice.</p>
+</div>
+
+<h2>The Two Pillars of Statistics</h2>
+
+<div class="comparison-grid">
+    <div class="comparison-card">
+        <h4>📊 Descriptive Statistics</h4>
+        <p>Methods that <strong>summarize and describe</strong> the main features of a dataset.</p>
+        <ul>
+            <li>Works with the <strong>data you have</strong></li>
+            <li>Uses tables, charts, measures of center and spread</li>
+            <li>No generalizations beyond the data</li>
+            <li><strong>Examples:</strong> Mean, Median, Histograms, Box Plots</li>
+        </ul>
+    </div>
+    <div class="comparison-card">
+        <h4>🔬 Inferential Statistics</h4>
+        <p>Methods that <strong>draw conclusions about a population</strong> from a sample.</p>
+        <ul>
+            <li>Makes <strong>predictions and generalizations</strong></li>
+            <li>Uses probability theory</li>
+            <li>Involves uncertainty and confidence levels</li>
+            <li><strong>Examples:</strong> Hypothesis Testing, Confidence Intervals, Regression</li>
+        </ul>
+    </div>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 2 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>2 · Population vs Sample</h1>
+
+<div class="comparison-grid">
+    <div class="comparison-card">
+        <h4>🌍 Population</h4>
+        <p>The <strong>entire group</strong> of individuals, objects, or data points that you are interested in studying.</p>
+        <ul>
+            <li>Usually very large or infinite</li>
+            <li>Often impractical or impossible to study completely</li>
+            <li>Denoted by <strong>N</strong> (size)</li>
+        </ul>
+        <p><strong>Example:</strong> All 1.4 billion citizens of India (for a health survey).</p>
+    </div>
+    <div class="comparison-card">
+        <h4>📋 Sample</h4>
+        <p>A <strong>representative subset</strong> of the population selected for analysis.</p>
+        <ul>
+            <li>Smaller, manageable size</li>
+            <li>Must be <strong>randomly selected</strong> to avoid bias</li>
+            <li>Denoted by <strong>n</strong> (size)</li>
+        </ul>
+        <p><strong>Example:</strong> Surveying 10,000 randomly chosen citizens from India.</p>
+    </div>
+</div>
+
+<div class="callout callout-warning">
+    <div class="callout-title">⚠️ Sampling Bias</div>
+    <p>If the sample is <strong>not representative</strong> of the population, the conclusions drawn will be misleading. A biased sample leads to biased statistics. Always aim for <strong>random sampling</strong> where every member of the population has an equal chance of being selected.</p>
+</div>
+
+<h2>Why Sample? Why Not Just Use the Entire Population?</h2>
+<ul>
+    <li><strong>Cost:</strong> Studying every member is prohibitively expensive</li>
+    <li><strong>Time:</strong> Data collection from billions of data points takes too long</li>
+    <li><strong>Practicality:</strong> Some populations are infinite (e.g., all possible coin flips)</li>
+    <li><strong>Destructive testing:</strong> Testing might destroy the unit (e.g., crash-testing every car)</li>
+</ul>
+</div>
+
+<!-- ════════════════════════ SECTION 3 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>3 · Parameter vs Statistic</h1>
+
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Aspect</th><th>Parameter</th><th>Statistic</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Describes</strong></td><td>Entire <strong>Population</strong></td><td>A <strong>Sample</strong></td></tr>
+        <tr><td><strong>Value</strong></td><td>Fixed (usually unknown)</td><td>Varies from sample to sample</td></tr>
+        <tr><td><strong>Notation (Mean)</strong></td><td>μ (mu)</td><td>x̄ (x-bar)</td></tr>
+        <tr><td><strong>Notation (Std Dev)</strong></td><td>σ (sigma)</td><td>s</td></tr>
+        <tr><td><strong>Notation (Proportion)</strong></td><td>p</td><td>p̂ (p-hat)</td></tr>
+        <tr><td><strong>Notation (Size)</strong></td><td>N</td><td>n</td></tr>
+        <tr><td><strong>Purpose</strong></td><td>True characteristic of population</td><td>Estimate of the parameter</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example</div>
+    <p>If the <strong>average height of ALL adults in India</strong> is 5'5" → this is a <strong>parameter</strong> (μ = 5'5").<br>
+    If you measure 500 randomly selected adults and find their average height is 5'4.8" → this is a <strong>statistic</strong> (x̄ = 5'4.8").</p>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 4 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>4 · Types of Data</h1>
+
+<div class="diagram-box">
+    <div class="diagram-title">📊 Data Classification Hierarchy</div>
+    <pre style="background: transparent; color: #334155; border: none; text-align: left; padding: 0; font-size: 9pt;">
+                               DATA
+                    ┌───────────┴───────────┐
+              CATEGORICAL              NUMERICAL
+           (Qualitative)            (Quantitative)
+          ┌──────┴──────┐          ┌──────┴──────┐
+       Nominal     Ordinal     Discrete    Continuous
+    </pre>
+</div>
+
+<h2>4.1 Categorical (Qualitative) Data</h2>
+<p>Represents <strong>characteristics, labels, or categories</strong> — cannot be measured numerically in a meaningful way.</p>
+
+<h3>Nominal Data</h3>
+<ul>
+    <li>Categories with <strong>no natural order</strong></li>
+    <li><strong>Examples:</strong> Gender (Male/Female), Blood Group (A/B/AB/O), City Names, Color</li>
+    <li>Mathematical operations have no meaning</li>
+</ul>
+
+<h3>Ordinal Data</h3>
+<ul>
+    <li>Categories with a <strong>natural ranking/order</strong></li>
+    <li>The <strong>differences between ranks are not equal</strong></li>
+    <li><strong>Examples:</strong> Education Level (High School < Bachelor's < Master's < PhD), Customer Rating (1-5 stars), T-Shirt Size (S < M < L < XL)</li>
+</ul>
+
+<h2>4.2 Numerical (Quantitative) Data</h2>
+<p>Represents <strong>measurable quantities</strong> — arithmetic operations are meaningful.</p>
+
+<h3>Discrete Data</h3>
+<ul>
+    <li><strong>Countable</strong>, finite values — usually integers</li>
+    <li>Cannot have fractional values between consecutive values</li>
+    <li><strong>Examples:</strong> Number of students (28), Number of cars sold (15), Dice rolls (1-6)</li>
+</ul>
+
+<h3>Continuous Data</h3>
+<ul>
+    <li>Can take <strong>any value within a range</strong> (infinitely many values)</li>
+    <li>Measured, not counted</li>
+    <li><strong>Examples:</strong> Height (5.742 ft), Weight (68.3 kg), Temperature (37.2°C), Time (3.567 seconds)</li>
+</ul>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 ML Relevance</div>
+    <p>Understanding data types is critical because it determines: which <strong>statistical measures</strong> to apply (you can't compute mean of nominal data), which <strong>visualizations</strong> to use (bar chart vs histogram), and which <strong>ML algorithms</strong> are appropriate (classification vs regression). Most ML algorithms require <strong>numerical input</strong>, so categorical data must be encoded (One-Hot, Label Encoding).</p>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 5 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>5 · Descriptive vs Inferential Statistics</h1>
+
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Feature</th><th>Descriptive Statistics</th><th>Inferential Statistics</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Goal</strong></td><td>Summarize and describe data</td><td>Make predictions/generalizations about a population</td></tr>
+        <tr><td><strong>Data Used</strong></td><td>Entire dataset at hand</td><td>Sample data to infer about population</td></tr>
+        <tr><td><strong>Uncertainty</strong></td><td>No uncertainty — just describes what IS</td><td>Always involves uncertainty (confidence levels)</td></tr>
+        <tr><td><strong>Tools</strong></td><td>Mean, Median, Mode, Variance, Graphs</td><td>Hypothesis Tests, Confidence Intervals, p-values</td></tr>
+        <tr><td><strong>Output</strong></td><td>Tables, charts, summary numbers</td><td>Decisions, predictions, probability statements</td></tr>
+        <tr><td><strong>Example</strong></td><td>"The average marks in this class is 72"</td><td>"We are 95% confident the population mean is between 70-74"</td></tr>
+    </tbody>
+</table>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 6 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>6 · Types of Analysis</h1>
+
+<h2>6.1 Univariate Analysis</h2>
+<p>Analysis of <strong>a single variable</strong> at a time. The goal is to describe the distribution, central tendency, and spread of one variable.</p>
+
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Data Type</th><th>Statistical Measures</th><th>Visualizations</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Categorical</strong></td><td>Frequency, Mode, Proportion</td><td>Bar Chart, Pie Chart, Count Plot</td></tr>
+        <tr><td><strong>Numerical</strong></td><td>Mean, Median, Mode, Variance, Std Dev, Skewness, Kurtosis</td><td>Histogram, Box Plot, KDE Plot, Violin Plot</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>6.2 Bivariate Analysis</h2>
+<p>Analysis of <strong>two variables</strong> together to explore the relationship between them.</p>
+
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Combination</th><th>Techniques</th><th>Visualizations</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Numerical–Numerical</strong></td><td>Correlation (Pearson, Spearman)</td><td>Scatter Plot, Line Plot, Heatmap</td></tr>
+        <tr><td><strong>Numerical–Categorical</strong></td><td>Group means comparison, ANOVA</td><td>Box Plot, Violin Plot, Bar Plot (with error bars)</td></tr>
+        <tr><td><strong>Categorical–Categorical</strong></td><td>Chi-Square Test, Contingency Table</td><td>Stacked Bar Chart, Heatmap (crosstab)</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>6.3 Multivariate Analysis</h2>
+<p>Analysis of <strong>three or more variables</strong> simultaneously. Techniques include Pair Plots, PCA, Multiple Regression, and Parallel Coordinates.</p>
+</div>
+
+<!-- ════════════════════════ SECTION 7 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>7 · Measures of Central Tendency</h1>
+<p>Measures of central tendency identify a <strong>single value</strong> that best represents the "center" or typical value of a dataset.</p>
+
+<h2>7.1 Mean (Arithmetic Average)</h2>
+<p>The <strong>sum of all values</strong> divided by the <strong>number of values</strong>. The most commonly used measure of center.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Mean</div>
+    <div class="formula-content">
+        Population Mean: μ = (Σ xᵢ) / N<br>
+        Sample Mean:     x̄ = (Σ xᵢ) / n
+    </div>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example</div>
+    <p>Dataset: {4, 8, 6, 5, 3, 2, 8, 9, 2, 5}<br>
+    Sum = 4+8+6+5+3+2+8+9+2+5 = 52<br>
+    n = 10<br>
+    <strong>Mean = 52 / 10 = 5.2</strong></p>
+</div>
+
+<h3>Properties of Mean</h3>
+<ul>
+    <li>Uses <strong>every data point</strong> in the calculation</li>
+    <li>Highly <strong>sensitive to outliers</strong> (a single extreme value can shift it dramatically)</li>
+    <li>Works best for <strong>symmetric distributions</strong></li>
+    <li>Suitable only for <strong>numerical data</strong> (interval and ratio scales)</li>
+</ul>
+
+<h2>7.2 Weighted Mean</h2>
+<p>When different values have different levels of <strong>importance or frequency</strong>, we assign weights to each value.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Weighted Mean</div>
+    <div class="formula-content">
+        x̄ᵤ = Σ(wᵢ · xᵢ) / Σ(wᵢ)
+    </div>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — CGPA Calculation</div>
+    <p>Subject grades: Math = 9 (4 credits), English = 7 (2 credits), Science = 8 (3 credits)<br>
+    Weighted Mean = (9×4 + 7×2 + 8×3) / (4+2+3) = (36+14+24) / 9 = 74/9 ≈ <strong>8.22</strong></p>
+</div>
+
+<h2>7.3 Trimmed Mean</h2>
+<p>To <strong>reduce the effect of outliers</strong>, a certain percentage of the smallest and largest values are removed before calculating the mean.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Trimmed Mean</div>
+    <div class="formula-content">
+        1. Sort the data in ascending order
+        2. Remove the bottom p% and top p% of values
+        3. Calculate the mean of the remaining values
+    </div>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — 10% Trimmed Mean</div>
+    <p>Dataset (sorted): {1, 2, 3, 4, 5, 6, 7, 8, 9, 100}<br>
+    Regular Mean = 145/10 = 14.5 (pulled up by outlier 100)<br>
+    10% trim → Remove 1 value from each end: {2, 3, 4, 5, 6, 7, 8, 9}<br>
+    <strong>Trimmed Mean = 44/8 = 5.5</strong> (much more representative!)</p>
+</div>
+
+<h2>7.4 Median</h2>
+<p>The <strong>middle value</strong> when data is arranged in ascending or descending order.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Median</div>
+    <div class="formula-content">
+        If n is odd:  Median = value at position (n+1)/2
+        If n is even: Median = average of values at positions n/2 and (n/2)+1
+    </div>
+</div>
+
+<h3>Properties of Median</h3>
+<ul>
+    <li><strong>Not affected by outliers</strong> — robust measure</li>
+    <li>Only depends on the <strong>middle value(s)</strong></li>
+    <li>Preferred over mean for <strong>skewed distributions</strong></li>
+    <li>Can be used for <strong>ordinal data</strong> as well</li>
+</ul>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example</div>
+    <p><strong>Odd count:</strong> {3, 5, 7, 9, 11} → n=5 → Median = 7 (3rd position)<br>
+    <strong>Even count:</strong> {3, 5, 7, 9} → n=4 → Median = (5+7)/2 = <strong>6</strong><br>
+    <strong>With outlier:</strong> {3, 5, 7, 9, 1000} → Mean = 204.8, but Median = <strong>7</strong> (unaffected!)</p>
+</div>
+
+<h2>7.5 Mode</h2>
+<p>The value that <strong>appears most frequently</strong> in the dataset.</p>
+
+<h3>Properties of Mode</h3>
+<ul>
+    <li>The <strong>only</strong> measure of central tendency applicable to <strong>nominal (categorical) data</strong></li>
+    <li>A dataset can be <strong>unimodal</strong> (1 mode), <strong>bimodal</strong> (2 modes), <strong>multimodal</strong> (3+ modes), or have <strong>no mode</strong></li>
+    <li>Not affected by outliers</li>
+    <li>Useful for finding the most popular or common category</li>
+</ul>
+
+<h2>7.6 When to Use What?</h2>
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Measure</th><th>Best For</th><th>Avoid When</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Mean</strong></td><td>Symmetric distributions, no outliers</td><td>Skewed data, extreme outliers present</td></tr>
+        <tr><td><strong>Median</strong></td><td>Skewed distributions, outliers present, ordinal data</td><td>Small datasets where every value matters</td></tr>
+        <tr><td><strong>Mode</strong></td><td>Categorical data, finding most common value</td><td>Continuous data (usually no repeats)</td></tr>
+        <tr><td><strong>Trimmed Mean</strong></td><td>Data with suspected outliers, wanting robustness</td><td>Small datasets (too much data lost)</td></tr>
+        <tr><td><strong>Weighted Mean</strong></td><td>Values have different importance/frequency</td><td>All values equally important</td></tr>
+    </tbody>
+</table>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 8 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>8 · Measures of Dispersion (Spread)</h1>
+<p>Central tendency alone is not enough. Two datasets can have the <strong>same mean</strong> but very <strong>different distributions</strong>. Dispersion measures tell us <strong>how spread out</strong> the data is.</p>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Why Dispersion Matters</div>
+    <p>Dataset A: {49, 50, 51} → Mean = 50<br>
+    Dataset B: {0, 50, 100} → Mean = 50<br>
+    Same mean, but A's values are tightly clustered while B's are wildly spread. Dispersion captures this difference!</p>
+</div>
+
+<h2>8.1 Range</h2>
+<p>The simplest measure of spread — the <strong>difference between the maximum and minimum</strong> values.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Range</div>
+    <div class="formula-content">Range = Maximum Value − Minimum Value</div>
+</div>
+
+<ul>
+    <li><strong>Pros:</strong> Simple and intuitive</li>
+    <li><strong>Cons:</strong> Uses only 2 data points; highly sensitive to outliers; tells nothing about how data is distributed between min and max</li>
+</ul>
+
+<h2>8.2 Variance</h2>
+<p>Measures the <strong>average of squared deviations</strong> from the mean. Tells us how far each data point is from the center, on average.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Variance</div>
+    <div class="formula-content">
+        Population Variance: σ² = Σ(xᵢ − μ)² / N<br>
+        Sample Variance:     s² = Σ(xᵢ − x̄)² / (n − 1)
+    </div>
+</div>
+
+<div class="callout callout-note">
+    <div class="callout-title">🔑 Why divide by (n−1) for sample variance?</div>
+    <p>This is called <strong>Bessel's Correction</strong>. When we calculate variance from a sample, we tend to <strong>underestimate</strong> the true population variance because the sample mean is closer to the sample data than the true population mean. Dividing by (n−1) instead of n corrects this bias, giving us an <strong>unbiased estimator</strong> of population variance. This concept is called <strong>degrees of freedom</strong> — once we know the sample mean and n−1 values, the last value is determined.</p>
+</div>
+
+<h3>Step-by-step Variance Calculation</h3>
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example</div>
+    <p>Dataset: {2, 4, 4, 4, 5, 5, 7, 9}</p>
+    <p><strong>Step 1:</strong> Calculate the mean: x̄ = (2+4+4+4+5+5+7+9)/8 = 40/8 = 5</p>
+    <p><strong>Step 2:</strong> Subtract the mean from each value (deviations):<br>
+    (2−5)=−3, (4−5)=−1, (4−5)=−1, (4−5)=−1, (5−5)=0, (5−5)=0, (7−5)=2, (9−5)=4</p>
+    <p><strong>Step 3:</strong> Square each deviation:<br>
+    9, 1, 1, 1, 0, 0, 4, 16</p>
+    <p><strong>Step 4:</strong> Sum of squared deviations = 32</p>
+    <p><strong>Step 5:</strong> Population variance σ² = 32/8 = <strong>4</strong><br>
+    Sample variance s² = 32/7 ≈ <strong>4.57</strong></p>
+</div>
+
+<h2>8.3 Standard Deviation</h2>
+<p>The <strong>square root of variance</strong>. It brings the measure back to the <strong>same units</strong> as the original data, making it more interpretable.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Standard Deviation</div>
+    <div class="formula-content">
+        Population: σ = √(σ²) = √[Σ(xᵢ − μ)² / N]<br>
+        Sample:     s = √(s²) = √[Σ(xᵢ − x̄)² / (n − 1)]
+    </div>
+</div>
+
+<h3>Interpreting Standard Deviation</h3>
+<ul>
+    <li><strong>Small σ</strong> → data points are <strong>clustered close</strong> to the mean</li>
+    <li><strong>Large σ</strong> → data points are <strong>spread far</strong> from the mean</li>
+    <li>For a <strong>normal distribution</strong> (Empirical Rule / 68-95-99.7 Rule):
+        <ul>
+            <li>~68% of data falls within <strong>μ ± 1σ</strong></li>
+            <li>~95% of data falls within <strong>μ ± 2σ</strong></li>
+            <li>~99.7% of data falls within <strong>μ ± 3σ</strong></li>
+        </ul>
+    </li>
+</ul>
+
+<h2>8.4 Coefficient of Variation (CV)</h2>
+<p>A <strong>relative measure</strong> of variability that normalizes standard deviation by the mean. Used to <strong>compare variability</strong> across datasets with different units or scales.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Coefficient of Variation</div>
+    <div class="formula-content">
+        CV = (Standard Deviation / Mean) × 100%<br>
+        CV = (σ / μ) × 100%
+    </div>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — Comparing Variability</div>
+    <p><strong>Heights:</strong> Mean = 170 cm, SD = 10 cm → CV = (10/170)×100 = 5.88%<br>
+    <strong>Weights:</strong> Mean = 70 kg, SD = 8 kg → CV = (8/70)×100 = 11.43%<br>
+    Even though SD of heights (10) > SD of weights (8), weights have <strong>higher relative variability</strong> (11.43% > 5.88%).</p>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 9 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>9 · Percentiles, Quartiles & IQR</h1>
+
+<h2>9.1 Percentiles</h2>
+<p>A <strong>percentile</strong> is a value below which a given percentage of data falls. The kth percentile (Pₖ) means that k% of the data values are less than or equal to that value.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Percentile Position</div>
+    <div class="formula-content">
+        Position = (k / 100) × (n + 1)
+        where k = desired percentile, n = number of data points
+    </div>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example</div>
+    <p>If your exam score is at the <strong>90th percentile</strong>, it means <strong>90% of students scored lower</strong> than you. Only 10% scored higher.</p>
+</div>
+
+<h2>9.2 Quartiles</h2>
+<p>Quartiles divide the ordered dataset into <strong>four equal parts</strong>.</p>
+
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Quartile</th><th>Percentile</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Q1</strong> (First Quartile)</td><td>25th Percentile</td><td>25% of data falls below this value</td></tr>
+        <tr><td><strong>Q2</strong> (Second Quartile)</td><td>50th Percentile</td><td>The Median — 50% of data below</td></tr>
+        <tr><td><strong>Q3</strong> (Third Quartile)</td><td>75th Percentile</td><td>75% of data falls below this value</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>9.3 Interquartile Range (IQR)</h2>
+<p>The range of the <strong>middle 50%</strong> of the data — the distance between Q3 and Q1.</p>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — IQR</div>
+    <div class="formula-content">IQR = Q3 − Q1</div>
+</div>
+
+<h3>Why IQR is Important</h3>
+<ul>
+    <li><strong>Robust:</strong> Not affected by outliers (unlike range)</li>
+    <li><strong>Used for outlier detection:</strong> Any value below Q1 − 1.5×IQR or above Q3 + 1.5×IQR is a potential outlier</li>
+    <li>Forms the basis of <strong>box plots</strong></li>
+</ul>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Example — Complete Calculation</div>
+    <p>Dataset (sorted): {3, 5, 7, 8, 12, 13, 14, 18, 21}<br>
+    n = 9<br>
+    <strong>Q1</strong> = Median of lower half {3, 5, 7, 8} = (5+7)/2 = <strong>6</strong><br>
+    <strong>Q2</strong> (Median) = <strong>12</strong> (5th value)<br>
+    <strong>Q3</strong> = Median of upper half {13, 14, 18, 21} = (14+18)/2 = <strong>16</strong><br>
+    <strong>IQR</strong> = 16 − 6 = <strong>10</strong><br><br>
+    <strong>Outlier Fences:</strong><br>
+    Lower Fence = Q1 − 1.5×IQR = 6 − 15 = −9<br>
+    Upper Fence = Q3 + 1.5×IQR = 16 + 15 = 31<br>
+    Any value < −9 or > 31 would be an outlier. All values are within bounds ✓</p>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 10 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>10 · Five-Number Summary</h1>
+
+<p>A concise summary that captures the key features of a data distribution using just <strong>five values</strong>.</p>
+
+<div class="diagram-box">
+    <div class="diagram-title">📊 The Five-Number Summary</div>
+    <pre style="background: transparent; color: #334155; border: none; text-align: center; padding: 0; font-size: 10pt;">
+    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
+    │   Min   │   Q1    │ Median  │   Q3    │   Max   │
+    │         │  (25%)  │  (50%)  │  (75%)  │         │
+    └─────────┴─────────┴─────────┴─────────┴─────────┘
+    </pre>
+</div>
+
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Component</th><th>What It Tells You</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Minimum</strong></td><td>The smallest value in the dataset</td></tr>
+        <tr><td><strong>Q1 (25th Percentile)</strong></td><td>Below this: 25% of data; boundary of the lower quarter</td></tr>
+        <tr><td><strong>Median (Q2)</strong></td><td>The center point — 50% above, 50% below</td></tr>
+        <tr><td><strong>Q3 (75th Percentile)</strong></td><td>Below this: 75% of data; boundary of the upper quarter</td></tr>
+        <tr><td><strong>Maximum</strong></td><td>The largest value in the dataset</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 What You Can Derive</div>
+    <p>From the five-number summary, you can immediately calculate: <strong>Range</strong> (Max − Min), <strong>IQR</strong> (Q3 − Q1), <strong>detect skewness</strong> (if Median is closer to Q1 → right-skewed; closer to Q3 → left-skewed), and <strong>identify outliers</strong> using the 1.5×IQR rule.</p>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 11 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>11 · Box Plot (Box-and-Whisker Plot)</h1>
+
+<p>A <strong>visual representation</strong> of the five-number summary that also highlights outliers. One of the most powerful tools for univariate analysis.</p>
+
+<div class="diagram-box">
+    <div class="diagram-title">📦 Anatomy of a Box Plot</div>
+    <pre style="background: transparent; color: #334155; border: none; text-align: center; padding: 0; font-size: 9pt; line-height: 1.6;">
+
+   Outliers    Lower      Q1    Median     Q3      Upper    Outliers
+     ○ ○      Whisker     │       │         │      Whisker    ○
+              ├──────────┤├───────┤─────────┤├──────────┤
+     ●  ●─────┤          ││       │         ││          ├─────●
+              ├──────────┤├───────┤─────────┤├──────────┤
+              │          └────────┘─────────┘│
+              │              BOX (IQR)       │
+              │                              │
+         Q1 - 1.5·IQR                  Q3 + 1.5·IQR
+    </pre>
+</div>
+
+<h2>Components Explained</h2>
+<ul>
+    <li><strong>Box:</strong> Spans from Q1 to Q3 (contains the middle 50% of data = IQR)</li>
+    <li><strong>Median line:</strong> A line inside the box showing Q2</li>
+    <li><strong>Whiskers:</strong> Extend from the box to the farthest data point <strong>within</strong> 1.5×IQR from Q1 and Q3</li>
+    <li><strong>Outliers:</strong> Individual points plotted beyond the whiskers (beyond ±1.5×IQR from Q1/Q3)</li>
+</ul>
+
+<h2>Reading a Box Plot</h2>
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Observation</th><th>Interpretation</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Median line near center of box</td><td>Data is approximately <strong>symmetric</strong></td></tr>
+        <tr><td>Median line closer to Q1</td><td>Data is <strong>right-skewed</strong> (positive skew)</td></tr>
+        <tr><td>Median line closer to Q3</td><td>Data is <strong>left-skewed</strong> (negative skew)</td></tr>
+        <tr><td>Long whiskers</td><td>Data has a <strong>wide spread</strong></td></tr>
+        <tr><td>Many outlier dots</td><td>Distribution has <strong>heavy tails</strong></td></tr>
+        <tr><td>Short box (small IQR)</td><td>Data is <strong>tightly clustered</strong> around the median</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 ML Use Case — Outlier Detection</div>
+    <p>Box plots are the go-to visualization for <strong>spotting outliers</strong> during EDA (Exploratory Data Analysis). In ML pipelines, outliers can drastically affect model training. Use box plots on each feature to decide whether to remove, cap, or transform outliers.</p>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 12 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>12 · Frequency Distribution & Histograms</h1>
+
+<h2>12.1 Frequency Distribution Table</h2>
+<p>Organizes data by showing <strong>how many times</strong> each value (or range of values) appears.</p>
+
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Class Interval (Bins)</th><th>Frequency (f)</th><th>Relative Frequency</th><th>Cumulative Frequency</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>0 – 20</td><td>5</td><td>5/30 = 0.167</td><td>5</td></tr>
+        <tr><td>20 – 40</td><td>8</td><td>8/30 = 0.267</td><td>13</td></tr>
+        <tr><td>40 – 60</td><td>10</td><td>10/30 = 0.333</td><td>23</td></tr>
+        <tr><td>60 – 80</td><td>5</td><td>5/30 = 0.167</td><td>28</td></tr>
+        <tr><td>80 – 100</td><td>2</td><td>2/30 = 0.067</td><td>30</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Key Terms</h3>
+<ul>
+    <li><strong>Frequency (f):</strong> Count of values in each bin</li>
+    <li><strong>Relative Frequency:</strong> Proportion = f / total n (sums to 1)</li>
+    <li><strong>Cumulative Frequency:</strong> Running total of frequencies</li>
+    <li><strong>Bin Width:</strong> The range of values in each interval</li>
+</ul>
+
+<h2>12.2 Histogram</h2>
+<p>A <strong>graphical representation</strong> of a frequency distribution for numerical data. Unlike bar charts, histogram bars <strong>touch each other</strong> (continuous data, no gaps).</p>
+
+<h3>Histogram vs Bar Chart</h3>
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Feature</th><th>Histogram</th><th>Bar Chart</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Data Type</strong></td><td>Numerical (continuous)</td><td>Categorical</td></tr>
+        <tr><td><strong>Bars</strong></td><td>Touch each other (no gaps)</td><td>Have gaps between them</td></tr>
+        <tr><td><strong>X-axis</strong></td><td>Continuous intervals (bins)</td><td>Discrete categories</td></tr>
+        <tr><td><strong>Y-axis</strong></td><td>Frequency / Density</td><td>Frequency / Count</td></tr>
+        <tr><td><strong>Bar order</strong></td><td>Cannot be rearranged</td><td>Can be rearranged</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout callout-note">
+    <div class="callout-title">💡 Choosing the Number of Bins</div>
+    <p><strong>Sturges' Rule:</strong> k = 1 + 3.322 × log₁₀(n)<br>
+    <strong>Square Root Rule:</strong> k = √n<br>
+    Too few bins → oversimplified, hides patterns. Too many bins → too noisy, hard to interpret. Python's <code>matplotlib</code> and <code>seaborn</code> handle this automatically with <code>bins='auto'</code>.</p>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 13 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>13 · Skewness — Measuring Asymmetry</h1>
+
+<p>Skewness measures the <strong>degree and direction of asymmetry</strong> in a distribution. A perfectly symmetric distribution (like a perfect bell curve) has skewness = 0.</p>
+
+<div class="diagram-box">
+    <div class="diagram-title">📊 Types of Skewness</div>
+    <pre style="background: transparent; color: #334155; border: none; text-align: left; padding: 0; font-size: 9pt;">
+
+  LEFT-SKEWED              SYMMETRIC              RIGHT-SKEWED
+  (Negative Skew)          (No Skew)              (Positive Skew)
+
+       ╭──╮              ╭────────╮                   ╭──╮
+      ╱    ╲            ╱          ╲                  ╱    ╲
+    ╱        ╲        ╱              ╲              ╱        ╲
+  ╱            ╲    ╱                  ╲          ╱            ╲
+─────────────────  ──────────────────────  ─────────────────────
+  Tail ← LEFT       Mean=Median=Mode        Tail → RIGHT
+
+  Mode > Median > Mean   All Equal      Mean > Median > Mode
+    </pre>
+</div>
+
+<h2>Understanding Skewness Values</h2>
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Skewness Value</th><th>Interpretation</th><th>Tail Direction</th><th>Relationship</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>= 0</strong></td><td>Perfectly Symmetric</td><td>Equal tails</td><td>Mean = Median = Mode</td></tr>
+        <tr><td><strong>> 0 (Positive)</strong></td><td>Right-skewed</td><td>Longer right tail</td><td>Mean > Median > Mode</td></tr>
+        <tr><td><strong>< 0 (Negative)</strong></td><td>Left-skewed</td><td>Longer left tail</td><td>Mode > Median > Mean</td></tr>
+        <tr><td><strong>|skew| < 0.5</strong></td><td>Approximately Symmetric</td><td>—</td><td>—</td></tr>
+        <tr><td><strong>0.5 < |skew| < 1</strong></td><td>Moderately Skewed</td><td>—</td><td>—</td></tr>
+        <tr><td><strong>|skew| > 1</strong></td><td>Highly Skewed</td><td>—</td><td>—</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Pearson's Skewness Coefficient</div>
+    <div class="formula-content">
+        Skewness = 3 × (Mean − Median) / Standard Deviation
+    </div>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Real-World Examples</div>
+    <p><strong>Right-skewed (Positive):</strong> Income distribution (most people earn moderate amounts, a few earn extremely high), house prices, insurance claims.<br>
+    <strong>Left-skewed (Negative):</strong> Age at retirement (most retire around 60-65, few retire very young), exam scores in an easy test (most score high).<br>
+    <strong>Symmetric:</strong> Heights and weights of a population, measurement errors.</p>
+</div>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 ML Implications</div>
+    <p>Many ML algorithms assume <strong>normally distributed</strong> (symmetric) features. Highly skewed features can lead to poor model performance. Common fixes: <strong>Log transformation</strong> (for right-skewed), <strong>Square root transformation</strong>, <strong>Box-Cox transformation</strong>, or <strong>binning</strong>.</p>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 14 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>14 · Kurtosis — Measuring Tail Heaviness</h1>
+
+<p>Kurtosis measures the <strong>"tailedness"</strong> of a distribution — how much data is in the tails vs the center. It tells you about the <strong>frequency of extreme values (outliers)</strong>.</p>
+
+<div class="callout callout-warning">
+    <div class="callout-title">⚠️ Common Misconception</div>
+    <p>Kurtosis is <strong>NOT about the "peakedness"</strong> of a distribution. It's about the <strong>tails</strong>. A high kurtosis means more data in the tails (more extreme outliers), not necessarily a taller peak.</p>
+</div>
+
+<h2>Types of Kurtosis</h2>
+
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr><th>Type</th><th>Kurtosis Value</th><th>Excess Kurtosis</th><th>Characteristics</th><th>Outliers</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Mesokurtic</strong></td><td>= 3</td><td>= 0</td><td>Normal distribution (baseline)</td><td>Normal frequency</td></tr>
+        <tr><td><strong>Leptokurtic</strong></td><td>> 3</td><td>> 0</td><td>Heavier tails, sharper peak</td><td>More extreme outliers</td></tr>
+        <tr><td><strong>Platykurtic</strong></td><td>< 3</td><td>< 0</td><td>Lighter tails, flatter peak</td><td>Fewer extreme outliers</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="formula-box">
+    <div class="formula-title">Formula — Excess Kurtosis</div>
+    <div class="formula-content">
+        Excess Kurtosis = Kurtosis − 3
+        (Normal distribution has Excess Kurtosis = 0)
+    </div>
+</div>
+
+<div class="callout callout-example">
+    <div class="callout-title">📝 Real-World Examples</div>
+    <p><strong>Leptokurtic (heavy tails):</strong> Stock market returns (frequent extreme gains/losses), income distribution.<br>
+    <strong>Platykurtic (light tails):</strong> Uniform distribution, well-controlled manufacturing processes.<br>
+    <strong>Mesokurtic (normal tails):</strong> Height distribution, measurement errors.</p>
+</div>
+
+<div class="callout callout-tip">
+    <div class="callout-title">💡 Why It Matters in ML</div>
+    <p>High kurtosis → your data has <strong>more outliers</strong> → models like Linear Regression will be heavily affected. Consider <strong>robust models</strong> (Random Forest, Gradient Boosting) or <strong>outlier treatment</strong> before training. Also relevant in <strong>financial modeling</strong> where fat tails (leptokurtic) mean higher risk.</p>
+</div>
+</div>
+
+<!-- ════════════════════════ SECTION 15 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>15 · Python Implementation</h1>
+
+<p>Here's how to compute all the descriptive statistics covered in this session using Python:</p>
+
+<h2>15.1 Basic Measures with NumPy & Pandas</h2>
+<pre><code><span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np
+<span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd
+<span class="code-keyword">from</span> scipy <span class="code-keyword">import</span> stats
+
+<span class="code-comment"># Sample data</span>
+data = [23, 45, 12, 67, 34, 89, 23, 56, 78, 12, 45, 67, 34, 91, 15]
+df = pd.Series(data)
+
+<span class="code-comment"># ── Measures of Central Tendency ──</span>
+<span class="code-function">print</span>(<span class="code-string">"Mean:          "</span>, np.mean(data))          <span class="code-comment"># or df.mean()</span>
+<span class="code-function">print</span>(<span class="code-string">"Median:        "</span>, np.median(data))        <span class="code-comment"># or df.median()</span>
+<span class="code-function">print</span>(<span class="code-string">"Mode:          "</span>, stats.mode(data).mode)  <span class="code-comment"># scipy mode</span>
+<span class="code-function">print</span>(<span class="code-string">"Trimmed Mean:  "</span>, stats.trim_mean(data, 0.1))  <span class="code-comment"># 10% trim</span>
+
+<span class="code-comment"># ── Measures of Dispersion ──</span>
+<span class="code-function">print</span>(<span class="code-string">"Range:         "</span>, np.ptp(data))            <span class="code-comment"># peak-to-peak</span>
+<span class="code-function">print</span>(<span class="code-string">"Variance:      "</span>, np.var(data, ddof=1))    <span class="code-comment"># sample var</span>
+<span class="code-function">print</span>(<span class="code-string">"Std Dev:       "</span>, np.std(data, ddof=1))    <span class="code-comment"># sample SD</span>
+<span class="code-function">print</span>(<span class="code-string">"CV:            "</span>, (np.std(data, ddof=1) / np.mean(data)) * 100)
+
+<span class="code-comment"># ── Percentiles & Quartiles ──</span>
+<span class="code-function">print</span>(<span class="code-string">"Q1:            "</span>, np.percentile(data, 25))
+<span class="code-function">print</span>(<span class="code-string">"Q2 (Median):   "</span>, np.percentile(data, 50))
+<span class="code-function">print</span>(<span class="code-string">"Q3:            "</span>, np.percentile(data, 75))
+<span class="code-function">print</span>(<span class="code-string">"IQR:           "</span>, np.percentile(data, 75) - np.percentile(data, 25))
+
+<span class="code-comment"># ── Five-Number Summary (at once!) ──</span>
+<span class="code-function">print</span>(df.describe())  <span class="code-comment"># gives count, mean, std, min, 25%, 50%, 75%, max</span>
+
+<span class="code-comment"># ── Shape Measures ──</span>
+<span class="code-function">print</span>(<span class="code-string">"Skewness:      "</span>, df.skew())               <span class="code-comment"># or stats.skew(data)</span>
+<span class="code-function">print</span>(<span class="code-string">"Kurtosis:      "</span>, df.kurtosis())           <span class="code-comment"># excess kurtosis</span>
+</code></pre>
+
+<h2>15.2 Visualization</h2>
+<pre><code><span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt
+<span class="code-keyword">import</span> seaborn <span class="code-keyword">as</span> sns
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+<span class="code-comment"># Histogram</span>
+axes[0].hist(data, bins=<span class="code-string">'auto'</span>, color=<span class="code-string">'#3b82f6'</span>, edgecolor=<span class="code-string">'white'</span>, alpha=0.8)
+axes[0].set_title(<span class="code-string">'Histogram'</span>)
+axes[0].axvline(np.mean(data), color=<span class="code-string">'red'</span>, linestyle=<span class="code-string">'--'</span>, label=<span class="code-string">'Mean'</span>)
+axes[0].axvline(np.median(data), color=<span class="code-string">'green'</span>, linestyle=<span class="code-string">'--'</span>, label=<span class="code-string">'Median'</span>)
+axes[0].legend()
+
+<span class="code-comment"># Box Plot</span>
+axes[1].boxplot(data, vert=<span class="code-keyword">True</span>)
+axes[1].set_title(<span class="code-string">'Box Plot'</span>)
+
+<span class="code-comment"># KDE Plot (smooth histogram)</span>
+sns.kdeplot(data, ax=axes[2], fill=<span class="code-keyword">True</span>, color=<span class="code-string">'#8b5cf6'</span>)
+axes[2].set_title(<span class="code-string">'KDE Plot (Density)'</span>)
+
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h2>15.3 Outlier Detection with IQR</h2>
+<pre><code>Q1 = np.percentile(data, 25)
+Q3 = np.percentile(data, 75)
+IQR = Q3 - Q1
+
+lower_fence = Q1 - 1.5 * IQR
+upper_fence = Q3 + 1.5 * IQR
+
+outliers = [x <span class="code-keyword">for</span> x <span class="code-keyword">in</span> data <span class="code-keyword">if</span> x < lower_fence <span class="code-keyword">or</span> x > upper_fence]
+<span class="code-function">print</span>(f<span class="code-string">"Lower Fence: {lower_fence}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"Upper Fence: {upper_fence}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"Outliers:    {outliers}"</span>)
+</code></pre>
+</div>
+
+<!-- ════════════════════════ SECTION 16 ════════════════════════ -->
+<div class="section-wrapper">
+<h1>16 · Quick Reference Card</h1>
+
+<div class="quick-ref">
+    <h3>🚀 Descriptive Statistics — Complete Cheat Sheet</h3>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Measures of Central Tendency</h4>
+    <ul>
+        <li><strong>Mean</strong> = Σxᵢ / n — sensitive to outliers</li>
+        <li><strong>Weighted Mean</strong> = Σ(wᵢ·xᵢ) / Σwᵢ — accounts for importance</li>
+        <li><strong>Trimmed Mean</strong> — remove p% from both ends, then calculate mean</li>
+        <li><strong>Median</strong> = middle value — robust to outliers</li>
+        <li><strong>Mode</strong> = most frequent value — works on categorical data</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Measures of Dispersion</h4>
+    <ul>
+        <li><strong>Range</strong> = Max − Min</li>
+        <li><strong>Variance</strong> = Σ(xᵢ − x̄)² / (n−1) — squared units</li>
+        <li><strong>Standard Deviation</strong> = √Variance — same units as data</li>
+        <li><strong>CV</strong> = (SD / Mean) × 100% — relative variability</li>
+        <li><strong>IQR</strong> = Q3 − Q1 — spread of middle 50%</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Shape Measures</h4>
+    <ul>
+        <li><strong>Skewness</strong> = 0 (symmetric), >0 (right-skewed), <0 (left-skewed)</li>
+        <li><strong>Kurtosis</strong> = 3 (normal), >3 (heavy tails), <3 (light tails)</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Outlier Detection (IQR Method)</h4>
+    <ul>
+        <li>Lower Fence = Q1 − 1.5 × IQR</li>
+        <li>Upper Fence = Q3 + 1.5 × IQR</li>
+        <li>Any point outside fences → potential outlier</li>
+    </ul>
+
+    <h4 style="color: #a5b4fc; margin-top: 14px;">Python Quick Reference</h4>
+    <ul>
+        <li><code>df.describe()</code> — Five-number summary + mean, std, count</li>
+        <li><code>df.skew()</code> — Skewness</li>
+        <li><code>df.kurtosis()</code> — Excess Kurtosis</li>
+        <li><code>scipy.stats.trim_mean(data, 0.1)</code> — 10% trimmed mean</li>
+        <li><code>sns.boxplot(data=df)</code> — Box plot</li>
+        <li><code>plt.hist(data, bins='auto')</code> — Histogram</li>
+    </ul>
+</div>
+
+<div class="callout callout-note" style="margin-top: 20px;">
+    <div class="callout-title">📚 What's Next? → Descriptive Statistics Part 2 (Session 39)</div>
+    <p>Part 2 continues with advanced descriptive statistics topics including more on data visualization techniques, bivariate analysis in depth, correlation analysis, and practical applications with real-world datasets using Python.</p>
+</div>
+</div>
+
+</body>
+</html>

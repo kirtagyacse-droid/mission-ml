@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Session 44 — Confidence Intervals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;--secondary:#7c3aed;--secondary-light:#f5f3ff;--accent:#059669;--accent-light:#ecfdf5;--warning:#d97706;--warning-light:#fffbeb;--dark:#0f172a;--dark-card:#1e293b;--light:#f8fafc;--border:#e2e8f0;--text-main:#334155;--text-light:#64748b; }
+        @page { size:A4; margin:18mm 15mm 20mm 15mm; }
+        @page cover-page { size:A4; margin:0; }
+        * { box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:var(--text-main); background:white; margin:0; padding:0; line-height:1.7; font-size:10pt; }
+        .cover-page { page-break-after:always; page:cover-page; height:297mm; background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 45%,#312e81 100%); color:white; padding:50mm 30mm 40mm 30mm; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; }
+        .cover-page::before { content:""; position:absolute; top:-20%; right:-15%; width:80%; height:80%; background:radial-gradient(circle,rgba(59,130,246,0.15) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-page::after { content:""; position:absolute; bottom:-10%; left:-8%; width:45%; height:45%; background:radial-gradient(circle,rgba(139,92,246,0.08) 0%,rgba(0,0,0,0) 70%); z-index:1; }
+        .cover-header { z-index:2; }
+        .cover-badge { display:inline-block; background:linear-gradient(90deg,#3b82f6,#8b5cf6); color:white; font-family:'Outfit',sans-serif; font-size:9pt; font-weight:700; padding:6px 16px; border-radius:9999px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:15px; }
+        .cover-series { font-family:'Outfit',sans-serif; font-size:11pt; color:#94a3b8; font-weight:400; letter-spacing:0.5px; margin-bottom:10px; }
+        .cover-title h1 { font-family:'Outfit',sans-serif; font-size:32pt; line-height:1.15; font-weight:800; border:none; margin:0 0 20px 0; padding:0; background:linear-gradient(to right,#ffffff,#c7d2fe); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .cover-subtitle { font-size:14pt; color:#94a3b8; font-weight:400; margin-bottom:25px; font-family:'Outfit',sans-serif; line-height:1.5; }
+        .cover-topics { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; z-index:2; }
+        .cover-topic-tag { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; font-size:8pt; padding:4px 12px; border-radius:20px; font-family:'Outfit',sans-serif; }
+        .cover-footer { border-top:1px solid rgba(255,255,255,0.1); padding-top:25px; z-index:2; }
+        .cover-author { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:600; color:white; margin-bottom:5px; }
+        .cover-meta { font-size:9pt; color:#64748b; }
+        .toc-page { page-break-after:always; padding-top:10px; }
+        .toc-title { font-family:'Outfit',sans-serif; font-size:20pt; font-weight:800; color:var(--dark); margin-bottom:25px; border-bottom:3px solid var(--primary); padding-bottom:10px; }
+        .toc-section { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; border-bottom:1px dotted #cbd5e1; font-size:10.5pt; }
+        .toc-section-num { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary); min-width:30px; }
+        .toc-section-title { flex:1; font-weight:500; color:var(--dark); }
+        .section-wrapper { page-break-before:always; padding-top:5px; }
+        h1 { font-family:'Outfit',sans-serif; font-size:18pt; font-weight:800; color:var(--dark); margin-top:30px; margin-bottom:12px; border-bottom:2px solid var(--primary); padding-bottom:8px; page-break-after:avoid; }
+        h2 { font-family:'Outfit',sans-serif; font-size:13pt; font-weight:700; color:var(--primary); margin-top:22px; margin-bottom:8px; page-break-after:avoid; }
+        h3 { font-family:'Outfit',sans-serif; font-size:11pt; font-weight:600; color:var(--secondary); margin-top:16px; margin-bottom:6px; page-break-after:avoid; }
+        h4 { font-family:'Outfit',sans-serif; font-size:10pt; font-weight:600; color:#475569; margin-top:12px; margin-bottom:5px; }
+        p { margin-top:0; margin-bottom:10px; text-align:justify; }
+        li { margin-bottom:5px; }
+        ul,ol { margin-top:4px; margin-bottom:12px; padding-left:22px; }
+        strong { color:#1e293b; }
+        .formula-box { background:linear-gradient(135deg,#eff6ff 0%,#f5f3ff 100%); border:1px solid #c7d2fe; border-left:4px solid var(--primary); border-radius:0 8px 8px 0; padding:14px 18px; margin:14px 0; page-break-inside:avoid; }
+        .formula-box .formula-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--primary-dark); font-size:9pt; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+        .formula-box .formula-content { font-family:'Fira Code',monospace; font-size:10pt; color:#1e293b; line-height:1.8; }
+        .callout { border-radius:0 8px 8px 0; padding:14px 16px; margin:14px 0; page-break-inside:avoid; }
+        .callout-title { font-family:'Outfit',sans-serif; font-weight:700; font-size:9.5pt; margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+        .callout-note { background-color:var(--primary-light); border-left:4px solid var(--primary); }
+        .callout-note .callout-title { color:var(--primary-dark); }
+        .callout-tip { background-color:var(--accent-light); border-left:4px solid var(--accent); }
+        .callout-tip .callout-title { color:#065f46; }
+        .callout-warning { background-color:var(--warning-light); border-left:4px solid var(--warning); }
+        .callout-warning .callout-title { color:#92400e; }
+        .callout-example { background-color:#fdf4ff; border-left:4px solid #a855f7; }
+        .callout-example .callout-title { color:#7e22ce; }
+        .table-wrapper { margin:14px 0; border:1px solid var(--border); border-radius:8px; overflow:hidden; page-break-inside:avoid; }
+        table { width:100%; border-collapse:collapse; font-size:8.5pt; }
+        th { background-color:var(--dark); color:white; font-family:'Outfit',sans-serif; font-weight:600; text-transform:uppercase; font-size:7.5pt; letter-spacing:0.5px; padding:10px 12px; border:none; }
+        td { padding:8px 12px; border:none; border-bottom:1px solid var(--border); vertical-align:top; }
+        tr:last-child td { border-bottom:none; }
+        tr:nth-child(even) { background-color:var(--light); }
+        .comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0; page-break-inside:avoid; }
+        .comparison-card { border:1px solid var(--border); border-radius:8px; padding:14px; background-color:var(--light); }
+        .comparison-card h4 { margin-top:0; color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:5px; }
+        .diagram-box { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:16px; margin:14px 0; text-align:center; font-family:'Fira Code',monospace; font-size:9pt; line-height:1.8; page-break-inside:avoid; }
+        .diagram-box .diagram-title { font-family:'Outfit',sans-serif; font-weight:700; color:var(--dark); font-size:10pt; margin-bottom:10px; text-align:left; }
+        pre { background-color:var(--dark-card); color:#f8fafc; padding:14px 16px; border-radius:8px; border:1px solid #334155; font-family:'Fira Code',monospace; font-size:8pt; line-height:1.5; margin:12px 0; overflow:hidden; white-space:pre-wrap; word-break:break-all; page-break-inside:avoid; }
+        code { font-family:'Fira Code',monospace; font-size:8.5pt; background-color:#f1f5f9; color:#0f172a; padding:2px 5px; border-radius:4px; }
+        pre code { background:transparent; color:inherit; padding:0; border-radius:0; font-size:8pt; }
+        .code-comment { color:#6b7280; } .code-keyword { color:#c084fc; } .code-string { color:#34d399; } .code-function { color:#60a5fa; }
+        .quick-ref { background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); color:white; border-radius:10px; padding:20px; margin:16px 0; page-break-inside:avoid; }
+        .quick-ref h3 { color:#c7d2fe; margin-top:0; font-size:12pt; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; }
+        .quick-ref p,.quick-ref li { color:#e2e8f0; }
+        .quick-ref code { background:rgba(255,255,255,0.1); color:#a5b4fc; }
+    </style>
+</head>
+<body>
+
+<div class="cover-page">
+    <div class="cover-header">
+        <div class="cover-badge">📐 Mathematics for Machine Learning</div>
+        <div class="cover-series">CampusX · Data Science Mentorship Program 2023 · Video 8 of 23</div>
+    </div>
+    <div class="cover-title">
+        <h1>SESSION 44<br>Confidence Intervals</h1>
+        <div class="cover-subtitle">Point vs Interval Estimation · Z-Intervals · T-Intervals · Margin of Error</div>
+        <div class="cover-topics">
+            <span class="cover-topic-tag">Point vs Interval Estimation</span>
+<span class="cover-topic-tag">Confidence Interval Definition</span>
+<span class="cover-topic-tag">Confidence Interval for Mean (Sigma Known)</span>
+<span class="cover-topic-tag">Confidence Interval for Mean (Sigma Unknown)</span>
+<span class="cover-topic-tag">The Student's t-Distribution</span>
+<span class="cover-topic-tag">Confidence Intervals for Proportions</span>
+<span class="cover-topic-tag">Factors Influencing Margin of Error</span>
+<span class="cover-topic-tag">Python Implementation of Confidence Intervals</span>
+
+        </div>
+    </div>
+    <div class="cover-footer">
+        <div class="cover-author">Session Notes — Complete Reference</div>
+        <div class="cover-meta">Playlist: Maths for Machine Learning · Instructor: Nitish Singh (CampusX)</div>
+    </div>
+</div>
+
+<div class="toc-page">
+    <div class="toc-title">📑 Table of Contents</div>
+    
+        <div class="toc-section">
+            <span class="toc-section-num">01</span>
+            <span class="toc-section-title">Point vs Interval Estimation</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">02</span>
+            <span class="toc-section-title">Confidence Interval Definition</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">03</span>
+            <span class="toc-section-title">Confidence Interval for Mean (Sigma Known)</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">04</span>
+            <span class="toc-section-title">Confidence Interval for Mean (Sigma Unknown)</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">05</span>
+            <span class="toc-section-title">The Student's t-Distribution</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">06</span>
+            <span class="toc-section-title">Confidence Intervals for Proportions</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">07</span>
+            <span class="toc-section-title">Factors Influencing Margin of Error</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">08</span>
+            <span class="toc-section-title">Python Implementation of Confidence Intervals</span>
+        </div>
+        
+        <div class="toc-section">
+            <span class="toc-section-num">09</span>
+            <span class="toc-section-title">Quick Reference Card</span>
+        </div>
+        
+</div>
+
+
+        <div class="section-wrapper">
+            <h1>01 · Point vs Interval Estimation</h1>
+            <p><strong>Point Estimation:</strong> A single numerical value used to estimate a population parameter (e.g., sample mean $\bar{X}$ estimating $\mu$). Point estimators are rarely exactly correct.</p>
+                <p><strong>Interval Estimation:</strong> A range of values within which the population parameter is expected to fall, with a specified degree of confidence.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>02 · Confidence Interval Definition</h1>
+            <p>A <strong>Confidence Interval (CI)</strong> is an interval computed from sample data that contains the true population parameter with a probability equal to the <strong>Confidence Level ($1 - \alpha$)</strong>.</p>
+                <p>A 95% confidence level means that if we repeat the sampling process 100 times, 95 of the computed intervals will contain the true population parameter.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>03 · Confidence Interval for Mean (Sigma Known)</h1>
+            <p>When the population standard deviation $\sigma$ is known, we use the Standard Normal (Z) distribution:</p>
+                <div class="formula-box">
+                    <div class="formula-title">Z-Interval Formula</div>
+                    <div class="formula-content">
+                        CI = X̄ ± Z_(α/2) · (σ / √n)
+                    </div>
+                </div>
+                <p>For a 95% confidence interval, $\alpha = 0.05$ and $Z_{\alpha/2} = 1.96$.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>04 · Confidence Interval for Mean (Sigma Unknown)</h1>
+            <p>In practice, $\sigma$ is almost never known. We use the sample standard deviation $s$ and the <strong>t-distribution</strong>:</p>
+                <div class="formula-box">
+                    <div class="formula-title">T-Interval Formula</div>
+                    <div class="formula-content">
+                        CI = X̄ ± t_(α/2, df) · (s / √n)
+                    </div>
+                </div>
+                <p>where $df = n - 1$ represents the degrees of freedom.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>05 · The Student's t-Distribution</h1>
+            <p>The <strong>t-distribution</strong> is symmetric and bell-shaped but has heavier tails than the standard normal distribution. This accounts for the extra uncertainty of estimating $\sigma$ with the sample statistic $s$.</p>
+                <p>As the degrees of freedom ($df = n - 1$) increase, the t-distribution approaches the standard normal distribution.</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>06 · Confidence Intervals for Proportions</h1>
+            <p>For categorical variables (e.g., proportion of users clicking a link):</p>
+                <div class="formula-box">
+                    <div class="formula-title">Proportion CI Formula</div>
+                    <div class="formula-content">
+                        CI = p̂ ± Z_(α/2) · √[p̂(1 − p̂) / n]
+                    </div>
+                </div>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>07 · Factors Influencing Margin of Error</h1>
+            <p>The **Margin of Error (MOE)** is the width of half of the confidence interval:</p>
+                <ul>
+                    <li><strong>Sample size ($n$):</strong> Increasing $n$ decreases the standard error, narrowing the interval (decreases MOE).</li>
+                    <li><strong>Confidence level:</strong> Higher confidence levels (e.g., 99% vs 95%) increase the critical value ($Z$ or $t$), widening the interval (increases MOE).</li>
+                    <li><strong>Data variance:</strong> Higher standard deviation increases MOE.</li>
+                </ul>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>08 · Python Implementation of Confidence Intervals</h1>
+            <pre><code>import numpy as np
+from scipy import stats
+
+data = [45, 47, 50, 52, 54, 58, 60, 62, 65, 68]
+n = len(data)
+mean = np.mean(data)
+sem = stats.sem(data)  # Standard error of mean: s / sqrt(n)
+
+# 95% Confidence Interval using t-distribution
+ci_t = stats.t.interval(confidence=0.95, df=n-1, loc=mean, scale=sem)
+print(f"95% CI (t-distribution): {ci_t[0]:.2f} to {ci_t[1]:.2f}")</code></pre>
+        </div>
+        
+        <div class="section-wrapper">
+            <h1>09 · Quick Reference Card</h1>
+            <div class="quick-ref">
+                    <h3>🚀 Confidence Intervals Cheat Sheet</h3>
+                    <ul>
+                        <li><strong>Sigma Known:</strong> Use $Z$-interval with critical values ($1.96$ for 95%).</li>
+                        <li><strong>Sigma Unknown:</strong> Use $t$-interval with $df = n - 1$.</li>
+                        <li><strong>Margin of Error:</strong> $\text{MOE} = \text{Critical Value} \times \text{Standard Error}$.</li>
+                        <li><strong>Width of CI:</strong> $2 \times \text{MOE}$.</li>
+                    </ul>
+                </div>
+        </div>
+        
+
+</body>
+</html>
