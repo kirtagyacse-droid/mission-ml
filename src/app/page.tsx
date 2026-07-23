@@ -385,9 +385,9 @@ export default function Dashboard() {
                     Horizontal roadmap for course book reading milestones
                   </p>
                 </div>
-                <div className="flex flex-row gap-6 overflow-x-auto pb-6 pt-2 custom-scrollbar snap-x">
+                <div className="flex flex-row gap-6 overflow-x-auto pb-6 pt-2 custom-scrollbar scrollbar-hide overscroll-x-contain touch-pan-x">
                   {bookTopics.map((topic) => (
-                    <div key={topic.id} className="snap-start">
+                    <div key={topic.id} className="flex-shrink-0">
                       <TopicCard
                         topic={topic}
                         onProgressChange={fetchTopics}
@@ -409,9 +409,9 @@ export default function Dashboard() {
                     Horizontal roadmap for video lectures and milestone trackers
                   </p>
                 </div>
-                <div className="flex flex-row gap-6 overflow-x-auto pb-6 pt-2 custom-scrollbar snap-x">
+                <div className="flex flex-row gap-6 overflow-x-auto pb-6 pt-2 custom-scrollbar overscroll-x-contain touch-pan-x">
                   {courseTopics.map((topic) => (
-                    <div key={topic.id} className="snap-start">
+                    <div key={topic.id} className="flex-shrink-0">
                       <TopicCard
                         topic={topic}
                         onProgressChange={fetchTopics}
