@@ -283,15 +283,49 @@ async function main() {
   const topic5 = await prisma.topic.create({
     data: { title: "Deep Learning", order: 7, kind: "COURSE_MANUAL" },
   });
-  await prisma.item.create({
-    data: {
-      topicId: topic5.id,
-      title: "Deep Learning — Coming Soon",
-      order: 0,
-      type: "MANUAL_MILESTONE",
-    },
-  });
-  console.log(`✅ Topic: "${topic5.title}" — placeholder`);
+  const dlLessons = [
+    "Part 1: 1 — Getting started",
+    "Part 1: 2 — Deployment",
+    "Part 1: 3 — Neural net foundations",
+    "Part 1: 4 — Natural Language (NLP)",
+    "Part 1: 5 — From-scratch model",
+    "Part 1: 6 — Random forests",
+    "Part 1: 7 — Collaborative filtering",
+    "Part 1: 8 — Convolutions (CNNs)",
+    "Part 1: Bonus — Data ethics",
+    "Part 1: Summaries",
+    "Part 2: Overview — Deep Learning Foundations to Stable Diffusion",
+    "Part 2: 9 — Stable Diffusion",
+    "Part 2: 10 — Diving Deeper",
+    "Part 2: 11 — Matrix multiplication",
+    "Part 2: 12 — Mean shift clustering",
+    "Part 2: 13 — Backpropagation & MLP",
+    "Part 2: 14 — Backpropagation",
+    "Part 2: 15 — Autoencoders",
+    "Part 2: 16 — The Learner framework",
+    "Part 2: 17 — Initialization/normalization",
+    "Part 2: 18 — Accelerated SGD & ResNets",
+    "Part 2: 19 — DDPM and Dropout",
+    "Part 2: 20 — Mixed Precision",
+    "Part 2: 21 — DDIM",
+    "Part 2: 22 — Karras et al (2022)",
+    "Part 2: 23 — Super resolution",
+    "Part 2: 24 — Attention & transformers",
+    "Part 2: 25 — Latent diffusion",
+    "Part 2: Bonus — Lesson 9a",
+    "Part 2: Bonus — Lesson 9b"
+  ];
+  for (let i = 0; i < dlLessons.length; i++) {
+    await prisma.item.create({
+      data: {
+        topicId: topic5.id,
+        title: dlLessons[i],
+        order: i,
+        type: "MANUAL_MILESTONE",
+      },
+    });
+  }
+  console.log(`✅ Topic: "${topic5.title}" — added ${dlLessons.length} course items`);
 
   // Summary
   const totalTopics = await prisma.topic.count();
