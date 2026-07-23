@@ -76,6 +76,12 @@ export default function TrackedYouTubePlayer({
   const lastPositionRef = useRef<number>(initialPosition);
   const lastDurationRef = useRef<number>(0);
 
+  // Keep callback and initial position ref stable across re-renders to prevent player destroys
+  const onProgressUpdateRef = useRef(onProgressUpdate);
+  useEffect(() => {
+    onProgressUpdateRef.current = onProgressUpdate;
+  }, [onProgressUpdate]);
+
   const [isReady, setIsReady] = useState(false);
   const [percent, setPercent] = useState(0);
   const [currentTime, setCurrentTime] = useState(initialPosition);
@@ -99,6 +105,10 @@ export default function TrackedYouTubePlayer({
   }, [initialPosition, itemId]);
 
   const targetStartPos = getEffectiveInitialPos();
+  const targetStartPosRef = useRef(targetStartPos);
+  useEffect(() => {
+    targetStartPosRef.current = targetStartPos;
+  }, [targetStartPos]);
 
   const postProgress = useCallback(
     async (watchedSeconds: number, dur: number, force = false) => {
@@ -130,10 +140,10 @@ export default function TrackedYouTubePlayer({
         } catch (e) {}
       }
 
-      // 2. Notify Parent Component Immediately
+      // 2. Notify Parent Component via Ref
       const threshold = 90;
       const shouldComplete = computedPercent >= threshold;
-      onProgressUpdate?.(computedPercent, watchedSeconds, dur, shouldComplete);
+      onProgressUpdateRef.current?.(computedPercent, watchedSeconds, dur, shouldComplete);
 
       // 3. Post to DB API
       try {
@@ -146,13 +156,13 @@ export default function TrackedYouTubePlayer({
           const data = await res.json();
           const pct = data.percent ?? computedPercent;
           setPercent(pct);
-          onProgressUpdate?.(pct, watchedSeconds, dur, data.completed);
+          onProgressUpdateRef.current?.(pct, watchedSeconds, dur, data.completed);
         }
       } catch (err) {
         console.warn("Progress post error (saved locally):", err);
       }
     },
-    [itemId, onProgressUpdate]
+    [itemId]
   );
 
   const startTracking = useCallback(() => {
@@ -182,20 +192,22 @@ export default function TrackedYouTubePlayer({
     }
   }, [duration, postProgress]);
 
-  const performInitialSeek = useCallback(() => {
-    if (hasSoughtRef.current) return;
-    const player = playerRef.current;
-    if (player && targetStartPos > 2) {
-      try {
-        player.seekTo(targetStartPos, true);
-        hasSoughtRef.current = true;
-      } catch (e) {}
-    }
-  }, [targetStartPos]);
-
+  // Main YouTube Player Lifetime effect — MUST ONLY RUN ONCE PER videoId/itemId
   useEffect(() => {
     let mounted = true;
     const playerId = `yt-player-${itemId}`;
+
+    const performInitialSeek = () => {
+      if (hasSoughtRef.current) return;
+      const player = playerRef.current;
+      const pos = targetStartPosRef.current;
+      if (player && pos > 2) {
+        try {
+          player.seekTo(pos, true);
+          hasSoughtRef.current = true;
+        } catch (e) {}
+      }
+    };
 
     loadYouTubeAPI().then(() => {
       if (!mounted || !containerRef.current) return;
@@ -214,7 +226,7 @@ export default function TrackedYouTubePlayer({
           autoplay: 0,
           modestbranding: 1,
           rel: 0,
-          start: Math.floor(targetStartPos),
+          start: Math.floor(targetStartPosRef.current),
         },
         events: {
           onReady: () => {
@@ -274,7 +286,8 @@ export default function TrackedYouTubePlayer({
       }
       playerRef.current?.destroy?.();
     };
-  }, [videoId, itemId, targetStartPos, performInitialSeek, startTracking, stopTracking, postProgress]);
+    // CRITICAL FIX: Only depend on videoId and itemId so YouTube player is NOT destroyed on progress updates!
+  }, [videoId, itemId, startTracking, stopTracking, postProgress]);
 
   return (
     <div className="w-full flex flex-col gap-2">
