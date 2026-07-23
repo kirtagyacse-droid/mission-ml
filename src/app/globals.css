@@ -19,6 +19,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -32,6 +33,7 @@
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
@@ -42,6 +44,12 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(206, 255, 50, 0.4);
+  }
+
+  button, 
+  a, 
+  [role="button"] {
+    touch-action: manipulation;
   }
 }
 
@@ -150,7 +158,7 @@
   -webkit-backdrop-filter: blur(25px);
   border: 1px solid var(--color-border-glass);
   border-radius: 1.25rem;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
 }
@@ -257,6 +265,7 @@
   pointer-events: none;
   animation: floatOrb 25s ease-in-out infinite alternate;
   z-index: -5;
+  will-change: transform;
 }
 
 .orb-pink {
@@ -336,4 +345,40 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Mobile Performance & Touch Optimizations */
+@media (max-width: 768px) {
+  /* Disable GPU-draining 3D rotating cubes and background rings on mobile */
+  .bg-3d-container .cube-3d,
+  .bg-3d-container .ring-3d,
+  .cyber-grid {
+    display: none !important;
+  }
+
+  /* Simplify glow blur filters to prevent mobile GPU compositing lag */
+  .glow-orb {
+    filter: blur(40px) !important;
+    opacity: 0.08 !important;
+    animation: none !important;
+  }
+
+  /* Lightweight glassmorphism for mobile screens */
+  .glass-card {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    background: rgba(13, 4, 23, 0.88) !important;
+  }
+
+  /* Smooth momentum scrolling for mobile touch containers */
+  .overflow-x-auto,
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  /* Disable hover transforms on touch screens to eliminate touch stickiness */
+  .glass-card:hover {
+    transform: none !important;
+  }
 }
