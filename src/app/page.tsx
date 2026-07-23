@@ -9,6 +9,7 @@ const signIn = (provider?: string) => {};
 const signOut = () => {};
 import { useEffect, useState, useCallback } from "react";
 import TopicCard from "@/components/TopicCard";
+import AITimePredictor from "@/components/AITimePredictor";
 
 interface Progress {
   id: string;
@@ -370,6 +371,9 @@ export default function Dashboard() {
           </div>
         ) : (
           <>
+            {/* AI Completion Forecast Predictor */}
+            <AITimePredictor />
+
             {/* 1. Books section (Horizontal Stack) */}
             {bookTopics.length > 0 && (
               <section className="space-y-4" id="books-section">
