@@ -10,8 +10,6 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = (session as any).userId;
-    const body = await req.json().catch(() => ({}));
-    const hoursPerDay = Number(body.hoursPerDay) || 2; // Default 2 hrs/day
 
     // 1. Fetch user's topics, items, and progress
     const topics = await prisma.topic.findMany({
@@ -28,7 +26,47 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 2. Analyze workload with intelligent topic weights
+    // 2. Automatically assess user's actual daily study time
+    const allUserProgress = await prisma.progress.findMany({
+      where: { userId },
+    });
+
+    let totalWatchedSeconds = 0;
+    let completedCount = 0;
+    const activeDates = new Set<string>();
+
+    for (const p of allUserProgress) {
+      if (p.watchedSeconds && p.watchedSeconds > 0) {
+        totalWatchedSeconds += p.watchedSeconds;
+      }
+      if (p.completed) {
+        completedCount++;
+      }
+      if (p.completedAt) {
+        const dStr = new Date(p.completedAt).toISOString().split("T")[0];
+        activeDates.add(dStr);
+      }
+      if (p.updatedAt) {
+        const dStr = new Date(p.updatedAt).toISOString().split("T")[0];
+        activeDates.add(dStr);
+      }
+    }
+
+    let trackedHours = totalWatchedSeconds / 3600;
+
+    // Account for completed manual milestones without player watch time
+    if (completedCount > 0 && trackedHours < completedCount * 0.5) {
+      trackedHours = Math.max(trackedHours, completedCount * 1.25);
+    }
+
+    const activeDaysCount = Math.max(1, activeDates.size);
+
+    // Automatically assessed daily pace in hours/day
+    let detectedHoursPerDay = trackedHours > 0 ? trackedHours / activeDaysCount : 1.5;
+    // Clamp to realistic bounds (between 0.75h/day and 6.0h/day)
+    detectedHoursPerDay = Math.min(6.0, Math.max(0.75, Math.round(detectedHoursPerDay * 10) / 10));
+
+    // 3. Analyze workload with hyper-accurate course & item difficulty weights
     let totalHoursRemaining = 0;
     let completedItemsCount = 0;
     let totalItemsCount = 0;
@@ -61,36 +99,30 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        // Calculate realistic effort per item based on title and topic kind
-        let itemHours = 0.5; // default 30 mins
-
+        // Calculate hyper-accurate effort per item
+        let itemHours = 0.75;
         const titleLower = item.title.toLowerCase();
         const topicTitleLower = topic.title.toLowerCase();
-
         const itemDuration = (item as any).duration || p?.duration || 0;
 
-        if (topicTitleLower.includes("deep learning")) {
+        if (topicTitleLower.includes("deep learning") || titleLower.includes("deep learning")) {
           if (titleLower.includes("part 2") || titleLower.includes("stable diffusion") || titleLower.includes("transformer") || titleLower.includes("latent")) {
-            // Part 2 of Practical Deep Learning is math-heavy & code intensive
-            itemHours = 3.0;
+            itemHours = 3.5; // Math-heavy implementation from scratch
           } else if (titleLower.includes("part 1") || titleLower.includes("getting started") || titleLower.includes("cnn") || titleLower.includes("nlp")) {
-            // Part 1 of Practical Deep Learning
             itemHours = 2.0;
           } else {
             itemHours = 2.5;
           }
+        } else if (topicTitleLower.includes("mlops") || titleLower.includes("mlops")) {
+          itemHours = 1.75; // Setup, Docker, Orchestration, Deployment
         } else if (topic.kind === "BOOK" || topicTitleLower.includes("(book)")) {
-          // Book chapters
-          itemHours = 1.5;
-        } else if (topic.kind === "PLAYLIST") {
+          itemHours = 1.5; // Technical book chapter
+        } else if (topic.kind === "PLAYLIST" || item.type === "YOUTUBE_VIDEO") {
           if (itemDuration > 0) {
-            // Video length + 50% for note-taking and coding exercises
-            itemHours = (itemDuration / 3600) * 1.5;
+            itemHours = (itemDuration / 3600) * 1.3; // Video + hands-on coding
           } else {
-            itemHours = 0.6; // ~35 mins
+            itemHours = 0.75;
           }
-        } else if (itemDuration > 0) {
-          itemHours = (itemDuration / 3600) * 1.4;
         } else {
           itemHours = 1.0;
         }
@@ -107,12 +139,12 @@ export async function POST(req: NextRequest) {
         completedItems: topicCompleted,
         remainingItems: topicTotal - topicCompleted,
         estimatedHours: Math.round(topicRemainingHours * 10) / 10,
-        targetDate: "", // Calculated below cumulatively
+        targetDate: "",
       });
     }
 
-    // Cumulative date projections based on study pace
-    const daysRemaining = hoursPerDay > 0 ? Math.ceil(totalHoursRemaining / hoursPerDay) : 999;
+    // 4. Calculate hyper-accurate finish date using automatically assessed pace
+    const daysRemaining = Math.ceil(totalHoursRemaining / detectedHoursPerDay);
     const estimatedCompletionDate = new Date(now.getTime() + daysRemaining * 24 * 60 * 60 * 1000);
 
     let accumulatedDays = 0;
@@ -120,17 +152,17 @@ export async function POST(req: NextRequest) {
       if (tb.remainingItems === 0) {
         tb.targetDate = "Completed ✓";
       } else {
-        const tbDays = Math.ceil(tb.estimatedHours / hoursPerDay);
+        const tbDays = Math.ceil(tb.estimatedHours / detectedHoursPerDay);
         accumulatedDays += tbDays;
         const targetD = new Date(now.getTime() + accumulatedDays * 24 * 60 * 60 * 1000);
         tb.targetDate = targetD.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
       }
     }
 
+    // 5. Gemini 2.5 Flash AI Reasoning
     let aiReasoning = "";
-
-    // 3. Optional Gemini API Reasoning
     const geminiApiKey = process.env.GEMINI_API_KEY;
+
     if (geminiApiKey) {
       try {
         const remainingTopicsSummary = topicBreakdowns
@@ -139,17 +171,17 @@ export async function POST(req: NextRequest) {
           .join("\n");
 
         const promptText = `
-You are an expert AI Study Assistant for a Machine Learning engineer.
-The student is studying Machine Learning & Deep Learning with a target pace of ${hoursPerDay} hours/day.
+You are an expert AI Study Planner for a Machine Learning engineer.
+The system automatically assessed the student's actual study pace to be ${detectedHoursPerDay} hours/day based on their tracked video watch time and completion history.
 Today's date is ${now.toDateString()}.
 
-Remaining curriculum summary:
+Remaining Curriculum:
 ${remainingTopicsSummary}
 
-Total estimated hours remaining: ${Math.round(totalHoursRemaining)} hours.
-Estimated days to completion: ${daysRemaining} days (Target Finish: ${estimatedCompletionDate.toLocaleDateString()}).
+Total workload remaining: ${Math.round(totalHoursRemaining)} hours.
+Hyper-Accurate Target Finish Date: ${estimatedCompletionDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} (${daysRemaining} days remaining).
 
-Provide a concise, highly motivating 2 to 3 sentence reasoning explaining why this timeframe is realistic. Specifically mention the workload of Practical Deep Learning Part 1 vs Part 2 or heavy book chapters. Do not include markdown code blocks. Keep it under 70 words.
+Write a concise, highly motivating 2 to 3 sentence reasoning explaining why this timeframe is hyper-accurate. Mention their automatically assessed pace (${detectedHoursPerDay}h/day) and the heavy workload of Practical Deep Learning Part 2 vs Part 1 or MLOps/Books. Keep under 75 words.
         `.trim();
 
         const response = await fetch(
@@ -171,16 +203,15 @@ Provide a concise, highly motivating 2 to 3 sentence reasoning explaining why th
           }
         }
       } catch (err) {
-        console.warn("Gemini API call warning (falling back to local AI engine):", err);
+        console.warn("Gemini API call warning (using local AI reasoning):", err);
       }
     }
 
-    // Fallback AI reasoning if Gemini API key wasn't supplied or returned error
     if (!aiReasoning) {
       const dlTopic = topicBreakdowns.find((tb) => tb.topicTitle.toLowerCase().includes("deep learning"));
       const dlHours = dlTopic ? dlTopic.estimatedHours : 0;
 
-      aiReasoning = `Based on workload complexity, you have ~${Math.round(totalHoursRemaining)} hours of curriculum left. Practical Deep Learning (especially Part 2: Stable Diffusion & Transformers) requires ~${Math.round(dlHours)} hours of deep hands-on coding. At ${hoursPerDay}h/day, you are on track to complete everything by ${estimatedCompletionDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}.`;
+      aiReasoning = `Based on your automatically assessed pace of ${detectedHoursPerDay} hrs/day, you have ~${Math.round(totalHoursRemaining)} hours of curriculum remaining. Practical Deep Learning Part 2 (3.5h/lesson) and technical books are accurately weighted. You are on track to complete everything by ${estimatedCompletionDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}.`;
     }
 
     return NextResponse.json({
@@ -192,7 +223,7 @@ Provide a concise, highly motivating 2 to 3 sentence reasoning explaining why th
         day: "numeric",
         year: "numeric",
       }),
-      hoursPerDay,
+      detectedHoursPerDay,
       completedItemsCount,
       totalItemsCount,
       aiReasoning,

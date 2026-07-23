@@ -78,38 +78,6 @@ export default function Dashboard() {
   const bookTopics = topics.filter((t) => t.kind === "BOOK");
   const courseTopics = topics.filter((t) => t.kind !== "BOOK");
 
-  // Calculate speed and ETA
-  const completedProgress = topics.flatMap((t) =>
-    t.items.flatMap((item) =>
-      item.progress.filter((p) => p.completed && p.completedAt)
-    )
-  );
-
-  const completionDates = completedProgress
-    .map((p) => new Date(p.completedAt!))
-    .sort((a, b) => a.getTime() - b.getTime());
-
-  let velocity = 0; // items per day
-  let estimatedCompletionDate: Date | null = null;
-  let daysRemaining = 0;
-
-  if (completionDates.length > 0) {
-    const now = new Date();
-    const earliestDate = completionDates[0];
-    const timeDiffMs = now.getTime() - earliestDate.getTime();
-    const daysDiff = timeDiffMs / (1000 * 60 * 60 * 24);
-
-    // Use a minimum baseline of 15 days to account for the initial batch completions (and seeded completions),
-    // which scales up dynamically once your tracking history exceeds 15 days.
-    const clampedDays = Math.max(15, daysDiff);
-    velocity = completionDates.length / clampedDays;
-
-    const remainingItems = totalItems - completedItems;
-    if (velocity > 0 && remainingItems > 0) {
-      daysRemaining = remainingItems / velocity;
-      estimatedCompletionDate = new Date(now.getTime() + daysRemaining * 24 * 60 * 60 * 1000);
-    }
-  }
 
   if (status === "loading") {
     return (
@@ -245,10 +213,9 @@ export default function Dashboard() {
             <span className="text-[--color-accent-chartreuse] font-bold tracking-wide drop-shadow-[0_0_10px_rgba(206,255,50,0.3)]">2027</span>
           </p>
 
-          {/* Dynamic Reactor Core and Speed HUD Panel */}
-          <div className="flex flex-col md:flex-row items-stretch justify-center gap-6 max-w-3xl mx-auto">
-            {/* Sci-Fi Reactor Core Progress Circle */}
-            <div className="flex-1 flex flex-col items-center justify-center gap-4 glass-card p-6 border border-[--color-border-glass] shadow-2xl relative min-h-[220px]">
+          {/* Sci-Fi Reactor Core Overall Progress Gauge */}
+          <div className="flex flex-col items-center justify-center max-w-md mx-auto">
+            <div className="w-full flex flex-col items-center justify-center gap-4 glass-card p-6 border border-[--color-border-glass] shadow-2xl relative min-h-[200px]">
               {/* Holographic scanner laser */}
               <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[--color-accent-chartreuse] to-transparent opacity-30 animate-pulse" />
               
@@ -298,61 +265,6 @@ export default function Dashboard() {
                 <span className="text-[--color-text-muted] mx-1">/</span>
                 <span className="font-semibold text-[--color-text-primary]">{totalItems}</span> items completed
               </p>
-            </div>
-
-            {/* Velocity Dynamics HUD */}
-            <div className="flex-1 glass-card p-6 border border-[--color-border-glass] shadow-2xl relative flex flex-col justify-between text-left font-mono min-h-[220px]">
-              {/* Holographic scanner laser */}
-              <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[--color-accent-pink] to-transparent opacity-30 animate-pulse" />
-
-              <div>
-                <div className="flex items-center justify-between text-[10px] text-[--color-text-muted] font-bold uppercase tracking-wider mb-4 border-b border-white/5 pb-2">
-                  <span>⚡ System Dynamics</span>
-                  <span className="flex items-center gap-1.5">
-                    <span className={`w-2 h-2 rounded-full ${velocity > 0 ? "bg-[--color-accent-chartreuse] animate-pulse" : "bg-[--color-accent-pink]"}`} />
-                    {velocity > 0 ? "Analyzing" : "Awaiting Data"}
-                  </span>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-[10px] text-[--color-text-muted] uppercase tracking-wider">Current Velocity</div>
-                    <div className="text-xl sm:text-2xl font-black text-[--color-accent-chartreuse] mt-0.5 tracking-tight">
-                      {velocity.toFixed(2)} <span className="text-xs font-normal text-[--color-text-secondary]">items / day</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-[10px] text-[--color-text-muted] uppercase tracking-wider">Estimated Time Left</div>
-                    <div className="text-lg font-bold text-[--color-text-primary] mt-0.5">
-                      {completedItems === totalItems && totalItems > 0 ? (
-                        <span className="text-[--color-accent-chartreuse]">0 Days (Completed! 🎯)</span>
-                      ) : velocity > 0 ? (
-                        `${Math.ceil(daysRemaining)} Days`
-                      ) : (
-                        <span className="text-[--color-text-muted] text-xs">Need completions to calculate speed...</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-                <div className="text-[10px] text-[--color-text-muted] uppercase tracking-wider">ETA Target Lock</div>
-                <div className="text-xs font-bold text-[--color-accent-pink] bg-[--color-accent-pink]/5 border border-[--color-accent-pink]/25 px-2.5 py-1 rounded-md">
-                  {completedItems === totalItems && totalItems > 0 ? (
-                    "COMPLETED"
-                  ) : estimatedCompletionDate ? (
-                    estimatedCompletionDate.toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })
-                  ) : (
-                    "N/A"
-                  )}
-                </div>
-              </div>
             </div>
           </div>
         </div>
