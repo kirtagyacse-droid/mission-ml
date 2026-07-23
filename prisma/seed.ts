@@ -263,21 +263,89 @@ async function main() {
     });
   }
 
-  // Moved book chapters to separate Hands-on Machine Learning (Book) topic
+  // Removed old MLOps, FastAPI, MLflow, Docker placeholders from Machine Learning topic as they are now standalone topics below!
+  console.log(`✅ Topic: "${topic4.title}" — ${mlStandalone.length} items`);
 
-  // Placeholder items at the end
-  const placeholders = ["MLOps", "FastAPI", "MLflow", "Docker"];
-  for (const p of placeholders) {
+  // ─── Topic 4.1: MLOps ──────────────────────────────────────
+  const topicMLOps = await prisma.topic.create({
+    data: { title: "MLOps", order: 8, kind: "COURSE_MANUAL" },
+  });
+  const mlopsChapters = [
+    "01-intro",
+    "02-experiment-tracking",
+    "03-orchestration",
+    "04-deployment",
+    "05-monitoring",
+    "06-best-practices",
+    "07-project",
+  ];
+  for (let i = 0; i < mlopsChapters.length; i++) {
     await prisma.item.create({
       data: {
-        topicId: topic4.id,
-        title: p,
-        order: mlOrder++,
+        topicId: topicMLOps.id,
+        title: mlopsChapters[i],
+        order: i,
         type: "MANUAL_MILESTONE",
       },
     });
   }
-  console.log(`  ➕ Added ${placeholders.length} placeholder items (MLOps, FastAPI, MLflow, Docker)`);
+
+  // ─── Topic 4.2: Docker ─────────────────────────────────────
+  const topicDocker = await prisma.topic.create({
+    data: { title: "Docker", order: 9, kind: "SINGLE_VIDEO" },
+  });
+  await prisma.item.create({
+    data: {
+      topicId: topicDocker.id,
+      title: "Docker Tutorial for Beginners – Full Course (7 Hours)",
+      order: 0,
+      type: "YOUTUBE_VIDEO",
+      youtubeVideoId: "rjjES5IsPdg",
+    },
+  });
+
+  // ─── Topic 4.3: FastAPI ────────────────────────────────────
+  const topicFastAPI = await prisma.topic.create({
+    data: { title: "FastAPI", order: 10, kind: "PLAYLIST" },
+  });
+  await prisma.item.create({
+    data: {
+      topicId: topicFastAPI.id,
+      title: "FastAPI Complete Course for Beginners",
+      order: 0,
+      type: "YOUTUBE_VIDEO",
+      youtubeVideoId: "gQtr9-iVj4w",
+      playlistId: "PLKnIA16_RmvZ41tjbKB2ZnwchfniNsMuQ",
+    },
+  });
+
+  // ─── Topic 4.4: SQL ────────────────────────────────────────
+  const topicSQL = await prisma.topic.create({
+    data: { title: "SQL", order: 11, kind: "SINGLE_VIDEO" },
+  });
+  await prisma.item.create({
+    data: {
+      topicId: topicSQL.id,
+      title: "SQL Tutorial - Full Database Course for Beginners",
+      order: 0,
+      type: "YOUTUBE_VIDEO",
+      youtubeVideoId: "HXV3zeQKqGY",
+    },
+  });
+
+  // ─── Topic 4.5: Git & GitHub ───────────────────────────────
+  const topicGit = await prisma.topic.create({
+    data: { title: "Git & GitHub", order: 12, kind: "SINGLE_VIDEO" },
+  });
+  await prisma.item.create({
+    data: {
+      topicId: topicGit.id,
+      title: "Git and GitHub Crash Course",
+      order: 0,
+      type: "YOUTUBE_VIDEO",
+      youtubeVideoId: "mAFoROnOfHs",
+    },
+  });
 
   // ─── Topic 5: Deep Learning ────────────────────────────────
   const topic5 = await prisma.topic.create({
