@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import TrackedYouTubePlayer from "./TrackedYouTubePlayer";
 
 interface Progress {
@@ -28,62 +28,108 @@ interface Props {
   onProgressChange: () => void;
 }
 
+function formatTime(seconds: number): string {
+  if (!seconds || isNaN(seconds)) return "0:00";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  if (h > 0) {
+    return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  }
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
 export default function ItemRow({ item, onProgressChange }: Props) {
   const [showPlayer, setShowPlayer] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
 
-  const progress = item.progress[0];
-  const isCompleted = progress?.completed ?? false;
-  const watchPercent = progress?.percent ?? 0;
-  const lastPosition = progress?.lastPosition ?? 0;
+  const initialProgress = item.progress[0];
+  
+  // Real-time local state synchronized with player and database
+  const [isCompleted, setIsCompleted] = useState<boolean>(initialProgress?.completed ?? false);
+  const [watchPercent, setWatchPercent] = useState<number>(initialProgress?.percent ?? 0);
+  const [lastPosition, setLastPosition] = useState<number>(initialProgress?.lastPosition ?? 0);
+
+  // Read LocalStorage on mount as an instant cache fallback
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem(`mission_ml_pos_${item.id}`);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed?.percent && parsed.percent > watchPercent) {
+            setWatchPercent(parsed.percent);
+          }
+          if (parsed?.watchedSeconds && parsed.watchedSeconds > lastPosition) {
+            setLastPosition(parsed.watchedSeconds);
+          }
+        }
+      } catch (e) {}
+    }
+  }, [item.id, watchPercent, lastPosition]);
+
+  // Sync state if props change from outside
+  useEffect(() => {
+    const p = item.progress[0];
+    if (p) {
+      if (p.completed !== undefined) setIsCompleted(p.completed);
+      if (p.percent !== null && p.percent > watchPercent) setWatchPercent(p.percent);
+      if (p.lastPosition !== null && p.lastPosition > lastPosition) setLastPosition(p.lastPosition);
+    }
+  }, [item.progress, watchPercent, lastPosition]);
+
   const isVideo = item.type === "YOUTUBE_VIDEO" && item.youtubeVideoId;
 
   const toggleCompleted = useCallback(async () => {
     if (isToggling) return;
     setIsToggling(true);
+    const targetState = !isCompleted;
+    setIsCompleted(targetState); // Optimistic UI update
+
     try {
       await fetch("/api/progress", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           itemId: item.id,
-          completed: !isCompleted,
+          completed: targetState,
         }),
       });
       onProgressChange();
     } catch (err) {
-      console.error("Failed to toggle:", err);
+      console.error("Failed to toggle completed state:", err);
+      setIsCompleted(!targetState); // Revert on failure
     } finally {
       setIsToggling(false);
     }
   }, [item.id, isCompleted, isToggling, onProgressChange]);
 
   const handleProgressUpdate = useCallback(
-    (percent: number, completed: boolean) => {
-      if (completed) {
+    (percent: number, watchedSeconds: number, duration: number, completed: boolean) => {
+      setWatchPercent(percent);
+      setLastPosition(watchedSeconds);
+      if (completed && !isCompleted) {
+        setIsCompleted(true);
         onProgressChange();
       }
     },
-    [onProgressChange]
+    [isCompleted, onProgressChange]
   );
 
   return (
-    <div className="group">
+    <div className="group w-full">
+      {/* Item Row Header Bar */}
       <div
-        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 border-l-2 ${
-          showPlayer 
-            ? "bg-[#0d0417]/50 border-[--color-accent-chartreuse]" 
-            : "border-transparent hover:border-[--color-accent-pink]/30"
-        } ${
-          isVideo
-            ? "hover:bg-[--color-accent-pink]/5 cursor-pointer"
-            : "hover:bg-[--color-accent-pink]/3"
-        }`}
+        className={`flex items-center gap-2.5 sm:gap-3.5 px-3 sm:px-4 py-3 rounded-xl transition-all duration-200 border ${
+          showPlayer
+            ? "bg-[#0f061e] border-[--color-accent-chartreuse]/50 shadow-[0_0_20px_rgba(206,255,50,0.1)]"
+            : "border-white/5 hover:border-[--color-accent-pink]/30 bg-[#07030e]/60 hover:bg-[#0e051c]"
+        } ${isVideo ? "cursor-pointer" : ""}`}
         onClick={() => {
           if (isVideo) setShowPlayer(!showPlayer);
         }}
       >
-        {/* Checkbox / Checkmark */}
+        {/* Checkbox Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -91,8 +137,8 @@ export default function ItemRow({ item, onProgressChange }: Props) {
           }}
           className={`flex-shrink-0 w-5 h-5 rounded-md border transition-all flex items-center justify-center cursor-pointer ${
             isCompleted
-              ? "bg-[--color-accent-chartreuse] border-[--color-accent-chartreuse] check-pop"
-              : "border-white/10 hover:border-[--color-accent-pink]/40"
+              ? "bg-[--color-accent-chartreuse] border-[--color-accent-chartreuse] check-pop shadow-[0_0_10px_rgba(206,255,50,0.3)]"
+              : "border-white/20 hover:border-[--color-accent-pink]/60 bg-white/5"
           } ${isToggling ? "opacity-50" : ""}`}
           title={isCompleted ? "Mark as incomplete" : "Mark as complete"}
         >
@@ -104,56 +150,61 @@ export default function ItemRow({ item, onProgressChange }: Props) {
               stroke="currentColor"
               strokeWidth={3.5}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           )}
         </button>
 
-        {/* Order number */}
-        <span className="flex-shrink-0 text-xs text-[--color-text-muted] font-mono w-6 text-right">
+        {/* Order Index */}
+        <span className="flex-shrink-0 text-xs text-[--color-text-muted] font-mono w-5 text-right">
           {item.order + 1}.
         </span>
 
         {/* Title */}
         <span
-          className={`flex-1 text-sm truncate transition-colors ${
+          className={`flex-1 text-xs sm:text-sm font-medium transition-colors line-clamp-2 ${
             isCompleted
-              ? "text-[--color-text-muted] line-through decoration-[--color-accent-pink]/25"
+              ? "text-[--color-text-muted] line-through decoration-[--color-accent-pink]/30"
               : "text-[--color-text-primary]"
           }`}
         >
           {item.title}
         </span>
 
-        {/* Video indicator / percent badge */}
+        {/* Video progress indicator & play expand arrow */}
         {isVideo && (
           <div className="flex items-center gap-2 flex-shrink-0">
-            {watchPercent > 0 && watchPercent < 90 && (
-              <span className="text-[10px] font-mono text-[--color-accent-chartreuse] bg-[--color-accent-chartreuse]/10 px-1.5 py-0.5 rounded-full border border-[--color-accent-chartreuse]/10">
+            {watchPercent > 0 && (
+              <span
+                className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                  isCompleted
+                    ? "bg-[--color-accent-chartreuse]/15 text-[--color-accent-chartreuse] border-[--color-accent-chartreuse]/25"
+                    : "bg-[--color-accent-pink]/15 text-[--color-accent-pink] border-[--color-accent-pink]/25"
+                }`}
+              >
                 {Math.round(watchPercent)}%
               </span>
             )}
-            <svg
-              className={`w-4.5 h-4.5 transition-transform ${
-                showPlayer ? "rotate-90" : ""
-              } ${
-                isCompleted
-                  ? "text-[--color-accent-chartreuse] drop-shadow-[0_0_5px_rgba(206,255,50,0.3)]"
-                  : "text-[--color-accent-pink]"
+            <div
+              className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-all ${
+                showPlayer
+                  ? "bg-[--color-accent-chartreuse] border-[--color-accent-chartreuse] text-[#05020a]"
+                  : "bg-white/5 border-white/10 text-[--color-accent-pink] group-hover:border-[--color-accent-pink]/40"
               }`}
-              fill="currentColor"
-              viewBox="0 0 24 24"
             >
-              <path d="M8 5v14l11-7z" />
-            </svg>
+              <svg
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  showPlayer ? "rotate-90" : ""
+                }`}
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
           </div>
         )}
 
-        {/* Manual milestone icon */}
         {!isVideo && (
           <span className="flex-shrink-0 text-xs text-[--color-text-muted]">
             {item.type === "MANUAL_MILESTONE" ? "📌" : ""}
@@ -161,41 +212,43 @@ export default function ItemRow({ item, onProgressChange }: Props) {
         )}
       </div>
 
-      {/* Inline YouTube Player */}
+      {/* Expanded Large Video Player Surface */}
       {showPlayer && isVideo && item.youtubeVideoId && (
-        <div className="expand-enter mx-3 mb-3 mt-2 p-3 rounded-xl bg-[#07030d] border border-[--color-border-glass] shadow-inner">
+        <div className="expand-enter my-3 p-3 sm:p-5 rounded-2xl bg-[#06020c] border border-[--color-accent-pink]/25 shadow-2xl space-y-3">
           <TrackedYouTubePlayer
             videoId={item.youtubeVideoId}
             itemId={item.id}
             initialPosition={lastPosition}
             onProgressUpdate={handleProgressUpdate}
           />
-          <div className="mt-2.5 flex items-center justify-between px-1">
-            <p className="text-[10px] text-[--color-text-muted]">
-              {lastPosition > 0
-                ? `Resuming from ${formatTime(lastPosition)}`
-                : "Start watching to track progress"}
-            </p>
-            {!isCompleted && (
+
+          {/* Bottom Action & Stats Bar */}
+          <div className="pt-2 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
+            <div className="flex items-center gap-2 text-xs font-mono text-[--color-text-secondary]">
+              <span>⏱ Position:</span>
+              <span className="font-bold text-[--color-accent-chartreuse]">
+                {formatTime(lastPosition)}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleCompleted();
                 }}
-                className="text-[10px] font-bold text-[--color-accent-carnation] hover:text-[--color-accent-chartreuse] transition-colors cursor-pointer"
+                className={`w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  isCompleted
+                    ? "bg-white/10 text-[--color-text-secondary] border border-white/15 hover:bg-white/20"
+                    : "btn-gradient text-[#05020a] shadow-lg shadow-pink-500/20 hover:scale-102"
+                }`}
               >
-                ✓ Mark as watched
+                {isCompleted ? "✓ Completed (Click to unmark)" : "✓ Mark as Watched"}
               </button>
-            )}
+            </div>
           </div>
         </div>
       )}
     </div>
   );
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
 }

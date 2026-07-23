@@ -118,7 +118,7 @@ export default function TopicCard({ topic, onProgressChange }: Props) {
           />
 
           {/* Modal Container */}
-          <div className="relative w-full max-w-2xl max-h-[80vh] bg-[#0c0418]/95 border border-[--color-accent-pink]/25 rounded-3xl p-6 sm:p-8 flex flex-col gap-6 shadow-[0_0_60px_rgba(236,43,122,0.2)] overflow-hidden scale-in">
+          <div className="relative w-full max-w-5xl max-h-[92vh] sm:max-h-[90vh] bg-[#0c0418]/95 border border-[--color-accent-pink]/25 rounded-3xl p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6 shadow-[0_0_60px_rgba(236,43,122,0.2)] overflow-hidden scale-in">
             {/* Holographic scanner effect line */}
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[--color-accent-pink] to-transparent animate-pulse" />
 
