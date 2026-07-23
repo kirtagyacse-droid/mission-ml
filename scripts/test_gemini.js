@@ -1,21 +1,24 @@
-require('dotenv').config();
-const apiKey = process.env.GEMINI_API_KEY || process.env.YOUTUBE_API_KEY;
-
-async function testGemini() {
-  console.log("Testing Gemini API key ending in:", apiKey ? apiKey.slice(-5) : "none");
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: "Hello! Say hi and give a short 5 word ML tip." }] }],
-      }),
+async function testKey() {
+  const key = "AIzaSyDCNCTEg7jx3YsaawzsKuDVzUZKQjB8FgE";
+  const models = ["gemini-1.5-flash-latest", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-pro"];
+  for (const m of models) {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: "Hello! Say hi." }] }],
+        }),
+      }
+    );
+    const data = await response.json();
+    console.log(`Model ${m} status:`, response.status);
+    if (response.ok) {
+      console.log(`Model ${m} WORKS! Answer:`, data.candidates?.[0]?.content?.parts?.[0]?.text);
+      break;
     }
-  );
-  const data = await response.json();
-  console.log("Status:", response.status);
-  console.log("Response:", JSON.stringify(data, null, 2));
+  }
 }
 
-testGemini().catch(console.error);
+testKey().catch(console.error);
