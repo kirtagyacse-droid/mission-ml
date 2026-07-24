@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   title: "Mission ML: Kirtagya will be a Machine Learning Engineer in 2027",
   description:
     "Personal ML roadmap tracker — track courses, videos, and playlists on the journey to becoming a Machine Learning Engineer by 2027.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
