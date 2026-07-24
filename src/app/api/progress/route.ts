@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(progress);
 }
 
-// PATCH /api/progress — manual toggle completed
+// PATCH /api/progress — manual toggle completed OR log daily revision session
 export async function PATCH(req: NextRequest) {
   const session = await getSession();
   if (!session?.user?.email) {
@@ -73,11 +73,44 @@ export async function PATCH(req: NextRequest) {
 
   const userId = (session as any).userId;
   const body = await req.json();
-  const { itemId, completed } = body;
+  const { itemId, completed, isRevision } = body;
 
-  if (!itemId || typeof completed !== "boolean") {
+  if (!itemId) {
     return NextResponse.json(
-      { error: "itemId and completed (boolean) required" },
+      { error: "itemId required" },
+      { status: 400 }
+    );
+  }
+
+  // Handle daily revision log for completed books/courses
+  if (isRevision) {
+    const existing = await prisma.progress.findUnique({
+      where: { userId_itemId: { userId, itemId } }
+    });
+    const currentWatched = existing?.watchedSeconds || 0;
+    const progress = await prisma.progress.upsert({
+      where: { userId_itemId: { userId, itemId } },
+      create: {
+        userId,
+        itemId,
+        completed: true,
+        manuallyMarked: true,
+        watchedSeconds: 1800, // 30 mins study session
+        completedAt: new Date(),
+      },
+      update: {
+        completed: true,
+        watchedSeconds: currentWatched + 1800,
+        completedAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+    return NextResponse.json(progress);
+  }
+
+  if (typeof completed !== "boolean") {
+    return NextResponse.json(
+      { error: "completed (boolean) required" },
       { status: 400 }
     );
   }

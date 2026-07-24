@@ -76,9 +76,16 @@ export default function TopicCard({ topic, onProgressChange }: Props) {
             <div className="w-12 h-12 rounded-2xl bg-[--color-accent-pink]/10 border border-[--color-accent-pink]/20 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(236,43,122,0.15)] group-hover:scale-110 transition-transform duration-300">
               {kindIcons[topic.kind] ?? "📌"}
             </div>
-            <span className="text-[9px] uppercase tracking-widest font-black text-[--color-accent-carnation] bg-[--color-accent-pink]/10 border border-[--color-accent-pink]/25 px-3 py-1 rounded-full">
-              {kindLabels[topic.kind] ?? topic.kind}
-            </span>
+            <div className="flex items-center gap-1.5">
+              {completedItems === totalItems && totalItems > 0 && (
+                <span className="text-[9px] uppercase tracking-widest font-black text-[#05020a] bg-[--color-accent-chartreuse] px-2.5 py-0.5 rounded-full shadow-[0_0_12px_rgba(206,255,50,0.4)]">
+                  🏆 Mastered
+                </span>
+              )}
+              <span className="text-[9px] uppercase tracking-widest font-black text-[--color-accent-carnation] bg-[--color-accent-pink]/10 border border-[--color-accent-pink]/25 px-3 py-1 rounded-full">
+                {kindLabels[topic.kind] ?? topic.kind}
+              </span>
+            </div>
           </div>
 
           <h3 className="font-bold text-[--color-text-primary] text-lg leading-snug group-hover:text-[--color-accent-chartreuse] transition-colors duration-300 line-clamp-3">
@@ -223,6 +230,21 @@ export default function TopicCard({ topic, onProgressChange }: Props) {
                 </div>
               </div>
             </div>
+
+            {/* Mastered Revision Banner */}
+            {completedItems === totalItems && totalItems > 0 && (
+              <div className="p-3.5 rounded-2xl bg-[rgba(206,255,50,0.06)] border border-[rgba(206,255,50,0.25)] flex items-center justify-between gap-4 text-xs">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl">🏆</span>
+                  <div>
+                    <div className="font-bold text-[--color-accent-chartreuse]">100% Course Mastered & Preserved!</div>
+                    <div className="text-[11px] text-[--color-text-muted]">
+                      Your completion achievement is permanently saved. Click <strong className="text-white">⚡ Revision</strong> on any item to log today's study session into your streak!
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Scrollable Checklist Items */}
             <div className="flex-1 overflow-y-auto pr-1 space-y-2 custom-scrollbar">

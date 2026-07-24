@@ -104,6 +104,32 @@ export default function ItemRow({ item, onProgressChange }: Props) {
     }
   }, [item.id, isCompleted, isToggling, onProgressChange]);
 
+  const [isLoggingRevision, setIsLoggingRevision] = useState(false);
+  const [revisionLogged, setRevisionLogged] = useState(false);
+
+  const logRevisionSession = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isLoggingRevision) return;
+    setIsLoggingRevision(true);
+    try {
+      await fetch("/api/progress", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          itemId: item.id,
+          isRevision: true,
+        }),
+      });
+      setRevisionLogged(true);
+      setTimeout(() => setRevisionLogged(false), 3500);
+      onProgressChange();
+    } catch (err) {
+      console.error("Failed to log revision session:", err);
+    } finally {
+      setIsLoggingRevision(false);
+    }
+  }, [item.id, isLoggingRevision, onProgressChange]);
+
   const handleProgressUpdate = useCallback(
     (percent: number, watchedSeconds: number, duration: number, completed: boolean) => {
       setWatchPercent(percent);
@@ -171,45 +197,62 @@ export default function ItemRow({ item, onProgressChange }: Props) {
           {item.title}
         </span>
 
-        {/* Video progress indicator & play expand arrow */}
-        {isVideo && (
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {watchPercent > 0 && (
-              <span
-                className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
-                  isCompleted
-                    ? "bg-[--color-accent-chartreuse]/15 text-[--color-accent-chartreuse] border-[--color-accent-chartreuse]/25"
-                    : "bg-[--color-accent-pink]/15 text-[--color-accent-pink] border-[--color-accent-pink]/25"
-                }`}
-              >
-                {Math.round(watchPercent)}%
-              </span>
-            )}
-            <div
-              className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-all ${
-                showPlayer
-                  ? "bg-[--color-accent-chartreuse] border-[--color-accent-chartreuse] text-[#05020a]"
-                  : "bg-white/5 border-white/10 text-[--color-accent-pink] group-hover:border-[--color-accent-pink]/40"
+        {/* Action Controls */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {isCompleted && (
+            <button
+              onClick={logRevisionSession}
+              disabled={isLoggingRevision}
+              className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                revisionLogged
+                  ? "bg-[--color-accent-chartreuse] text-[#05020a] border border-[--color-accent-chartreuse]"
+                  : "bg-[rgba(206,255,50,0.1)] text-[--color-accent-chartreuse] border border-[rgba(206,255,50,0.3)] hover:bg-[rgba(206,255,50,0.2)] hover:border-[--color-accent-chartreuse]"
               }`}
+              title="Log a 30-minute revision / problem-solving session for today without erasing your 100% completed status"
             >
-              <svg
-                className={`w-4 h-4 transition-transform duration-200 ${
-                  showPlayer ? "rotate-90" : ""
-                }`}
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div>
-          </div>
-        )}
+              <span>{revisionLogged ? "✓ Logged +30m!" : isLoggingRevision ? "Logging..." : "⚡ Revision"}</span>
+            </button>
+          )}
 
-        {!isVideo && (
-          <span className="flex-shrink-0 text-xs text-[--color-text-muted]">
-            {item.type === "MANUAL_MILESTONE" ? "📌" : ""}
-          </span>
-        )}
+          {isVideo && (
+            <>
+              {watchPercent > 0 && (
+                <span
+                  className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                    isCompleted
+                      ? "bg-[--color-accent-chartreuse]/15 text-[--color-accent-chartreuse] border-[--color-accent-chartreuse]/25"
+                      : "bg-[--color-accent-pink]/15 text-[--color-accent-pink] border-[--color-accent-pink]/25"
+                  }`}
+                >
+                  {Math.round(watchPercent)}%
+                </span>
+              )}
+              <div
+                className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-all ${
+                  showPlayer
+                    ? "bg-[--color-accent-chartreuse] border-[--color-accent-chartreuse] text-[#05020a]"
+                    : "bg-white/5 border-white/10 text-[--color-accent-pink] group-hover:border-[--color-accent-pink]/40"
+                }`}
+              >
+                <svg
+                  className={`w-4 h-4 transition-transform duration-200 ${
+                    showPlayer ? "rotate-90" : ""
+                  }`}
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </>
+          )}
+
+          {!isVideo && !isCompleted && (
+            <span className="text-xs text-[--color-text-muted]">
+              {item.type === "MANUAL_MILESTONE" ? "📌" : ""}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Expanded Large Video Player Surface */}
