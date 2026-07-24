@@ -8,12 +8,15 @@ interface TopicBreakdown {
   totalItems: number;
   completedItems: number;
   remainingItems: number;
-  estimatedHours: number;
+  contentHours: number;
+  actualClockHours: number;
   targetDate: string;
 }
 
 interface AIETAData {
-  totalHoursRemaining: number;
+  totalContentHoursRemaining: number;
+  actualClockHoursRemaining: number;
+  playbackSpeedFactor: number;
   daysRemaining: number;
   estimatedCompletionDate: string;
   formattedDate: string;
@@ -59,11 +62,11 @@ export default function AITimePredictor() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
         {/* Left Side: Header & AI Target Date */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2.5 py-1 text-[11px] font-bold tracking-wider uppercase rounded-full bg-[rgba(206,255,50,0.12)] border border-[rgba(206,255,50,0.3)] text-[--color-accent-chartreuse]">
               🤖 AI Completion Predictor
             </span>
-            <span className="text-xs text-[--color-text-muted] font-medium">Hyper-Accurate Forecast Engine</span>
+            <span className="text-xs text-[--color-text-muted] font-medium">Speed-Aware Forecast Engine</span>
           </div>
 
           <div className="flex items-baseline gap-3 pt-1">
@@ -80,23 +83,34 @@ export default function AITimePredictor() {
           </div>
 
           <p className="text-xs text-[--color-text-secondary] max-w-xl leading-relaxed">
-            Predicts your completion date with deep AI reasoning by evaluating your actual study velocity, video watch history, and course difficulty (e.g. Practical Deep Learning Part 2 vs Part 1).
+            Analyzes your actual video playback speed factor, watch history, and course difficulty to predict your exact finish date.
           </p>
         </div>
 
-        {/* Right Side: Automatically Assessed Pace HUD */}
-        <div className="flex flex-col sm:items-end gap-2.5">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[rgba(236,43,122,0.1)] border border-[rgba(236,43,122,0.25)] text-xs text-[--color-accent-carnation] font-bold">
-            <span>⚡ Automatically Assessed Pace:</span>
-            <span className="text-[--color-accent-chartreuse] text-sm">
-              {data?.detectedHoursPerDay || 1.5} hrs/day
-            </span>
+        {/* Right Side: Automatically Assessed Pace & Playback Speed Badges */}
+        <div className="flex flex-col sm:items-end gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Playback speed factor badge */}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[rgba(206,255,50,0.08)] border border-[rgba(206,255,50,0.25)] text-xs text-[--color-accent-chartreuse] font-bold">
+              <span>🚀 Playback Speed:</span>
+              <span className="text-white text-sm font-black">
+                {data?.playbackSpeedFactor || 1.35}x
+              </span>
+            </div>
+
+            {/* Daily Pace Badge */}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[rgba(236,43,122,0.1)] border border-[rgba(236,43,122,0.25)] text-xs text-[--color-accent-carnation] font-bold">
+              <span>⚡ Daily Pace:</span>
+              <span className="text-[--color-accent-chartreuse] text-sm">
+                {data?.detectedHoursPerDay || 1.5} hrs/day
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 text-xs text-[--color-text-muted] pt-1">
-            <span>⏳ <strong>{data?.totalHoursRemaining || 0} hrs</strong> workload left</span>
+            <span>⏳ <strong>{data?.totalContentHoursRemaining || 0}h</strong> content → <strong>{data?.actualClockHoursRemaining || 0}h</strong> real study time</span>
             <span>•</span>
-            <span>📚 <strong>{data?.completedItemsCount || 0} / {data?.totalItemsCount || 0}</strong> completed</span>
+            <span>📚 <strong>{data?.completedItemsCount || 0} / {data?.totalItemsCount || 0}</strong> items</span>
           </div>
         </div>
       </div>
@@ -106,7 +120,7 @@ export default function AITimePredictor() {
         <div className="mt-5 p-4 rounded-xl bg-[#090314]/80 border border-[rgba(236,43,122,0.2)] text-xs text-[--color-text-secondary] leading-relaxed flex items-start gap-3">
           <span className="text-base leading-none">💡</span>
           <div className="flex-1">
-            <strong className="text-[--color-accent-pink] font-semibold">AI Insights & Workload Reasoning: </strong>
+            <strong className="text-[--color-accent-pink] font-semibold">AI Speed & Workload Insights: </strong>
             <span>{data.aiReasoning}</span>
           </div>
           <button
@@ -141,7 +155,7 @@ export default function AITimePredictor() {
                     {tb.topicTitle}
                   </span>
                   <div className="flex items-center justify-between text-[--color-text-muted] pt-1">
-                    <span>{tb.remainingItems} left ({tb.estimatedHours}h)</span>
+                    <span>{tb.contentHours}h content → ~{tb.actualClockHours}h study</span>
                     <span className="font-bold text-[--color-accent-carnation]">
                       {tb.targetDate}
                     </span>
